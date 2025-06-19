@@ -55,6 +55,19 @@ const OrderList: React.FC = () => {
     }
   };
 
+  // Refresh function to force reload of current page
+  const refreshOrders = async () => {
+    console.log('Refreshing order list...');
+    try {
+      setError(''); // Clear any existing errors
+      await fetchOrders();
+      console.log('Order list refreshed successfully');
+    } catch (err: any) {
+      console.error('Error refreshing orders:', err);
+      setError('Failed to refresh order list');
+    }
+  };
+
   const handleNextPage = () => {
     if (pagination.next) {
       fetchOrders(pagination.next);
@@ -82,17 +95,18 @@ const OrderList: React.FC = () => {
     setViewMode('detail');
   };
 
-  const handleSaveOrder = (order: Order) => {
-    setOrders(prev => {
-      const index = prev.findIndex(o => o.id === order.id);
-      if (index >= 0) {
-        const updated = [...prev];
-        updated[index] = order;
-        return updated;
-      } else {
-        return [order, ...prev];
-      }
-    });
+  const handleSaveOrder = async (order: Order) => {
+    console.log('Order saved, refreshing list with updated data:', order);
+    
+    // Always refresh the entire order list to ensure all related data is properly loaded
+    try {
+      await refreshOrders();
+      console.log('Successfully refreshed order list with complete data');
+    } catch (error) {
+      console.error('Error refreshing order list:', error);
+      setError('Order saved but failed to refresh list. Please refresh the page to see updated data.');
+    }
+    
     setViewMode('list');
     setSelectedOrder(null);
   };

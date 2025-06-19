@@ -45,6 +45,19 @@ const CustomerList: React.FC = () => {
     }
   };
 
+  // Refresh function to force reload of current page
+  const refreshCustomers = async () => {
+    console.log('Refreshing customer list...');
+    try {
+      setError(''); // Clear any existing errors
+      await fetchCustomers();
+      console.log('Customer list refreshed successfully');
+    } catch (err: any) {
+      console.error('Error refreshing customers:', err);
+      setError('Failed to refresh customer list');
+    }
+  };
+
   const handleNextPage = () => {
     if (pagination.next) {
       fetchCustomers(pagination.next);
@@ -72,20 +85,59 @@ const CustomerList: React.FC = () => {
     setViewMode('detail');
   };
 
-  const handleSaveCustomer = (customer: Customer) => {
-    // Update the customer in the list or add if new
-    setCustomers(prev => {
-      const index = prev.findIndex(c => c.id === customer.id);
-      if (index >= 0) {
-        // Update existing
-        const updated = [...prev];
-        updated[index] = customer;
-        return updated;
+  const handleSaveCustomer = async (customer: Customer) => {
+    console.log('Customer saved, refreshing list with updated data:', customer);
+    
+    try {
+      // For existing customers, fetch the updated record to get all computed fields
+      if (customer.id) {
+        console.log('Fetching updated customer data from backend...');
+        const response = await api.get<Customer>(`/customers/${customer.id}/`);
+        const updatedCustomer = response.data;
+        console.log('Received updated customer data:', updatedCustomer);
+        
+        // Update the customer in the list with complete data from backend
+        setCustomers(prev => {
+          const index = prev.findIndex(c => c.id === customer.id);
+          if (index >= 0) {
+            // Update existing with fresh data from backend
+            const updated = [...prev];
+            updated[index] = updatedCustomer;
+            console.log('Updated customer in list at index:', index);
+            return updated;
+          } else {
+            // If not found, add to list (shouldn't happen for edits)
+            console.log('Customer not found in list, adding as new');
+            return [updatedCustomer, ...prev];
+          }
+        });
       } else {
-        // Add new
-        return [customer, ...prev];
+        // For new customers, add to the beginning of the list
+        console.log('Adding new customer to list');
+        setCustomers(prev => [customer, ...prev]);
       }
-    });
+    } catch (error) {
+      console.error('Error fetching updated customer data, trying full list refresh:', error);
+      // Try refreshing the entire list as a fallback
+      try {
+        await refreshCustomers();
+        console.log('Successfully refreshed customer list after individual fetch failed');
+      } catch (refreshError) {
+        console.error('Full list refresh also failed, using form data as final fallback:', refreshError);
+        // Final fallback to using the form data if everything fails
+        setCustomers(prev => {
+          const index = prev.findIndex(c => c.id === customer.id);
+          if (index >= 0) {
+            const updated = [...prev];
+            updated[index] = customer;
+            return updated;
+          } else {
+            return [customer, ...prev];
+          }
+        });
+      }
+    }
+    
     setViewMode('list');
     setSelectedCustomer(null);
   };

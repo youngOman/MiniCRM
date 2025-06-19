@@ -57,6 +57,19 @@ const TransactionList: React.FC = () => {
     }
   };
 
+  // Refresh function to force reload of current page
+  const refreshTransactions = async () => {
+    console.log('Refreshing transaction list...');
+    try {
+      setError(''); // Clear any existing errors
+      await fetchTransactions();
+      console.log('Transaction list refreshed successfully');
+    } catch (err: any) {
+      console.error('Error refreshing transactions:', err);
+      setError('Failed to refresh transaction list');
+    }
+  };
+
   const handleNextPage = () => {
     if (pagination.next) {
       fetchTransactions(pagination.next);
@@ -101,17 +114,18 @@ const TransactionList: React.FC = () => {
     setViewMode('detail');
   };
 
-  const handleSaveTransaction = (transaction: Transaction) => {
-    setTransactions(prev => {
-      const index = prev.findIndex(t => t.id === transaction.id);
-      if (index >= 0) {
-        const updated = [...prev];
-        updated[index] = transaction;
-        return updated;
-      } else {
-        return [transaction, ...prev];
-      }
-    });
+  const handleSaveTransaction = async (transaction: Transaction) => {
+    console.log('Transaction saved, refreshing list with updated data:', transaction);
+    
+    // Always refresh the entire transaction list to ensure all related data is properly loaded
+    try {
+      await refreshTransactions();
+      console.log('Successfully refreshed transaction list with complete data');
+    } catch (error) {
+      console.error('Error refreshing transaction list:', error);
+      setError('Transaction saved but failed to refresh list. Please refresh the page to see updated data.');
+    }
+    
     setViewMode('list');
     setSelectedTransaction(null);
   };

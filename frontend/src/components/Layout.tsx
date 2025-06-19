@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import authService from '../services/auth';
+import { Link } from 'react-router-dom';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
@@ -24,9 +25,9 @@ const Layout: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex">
               {/* Logo */}
-              <div className="flex-shrink-0 flex items-center">
+              <Link to="/" className="flex-shrink-0 flex items-center">
                 <h1 className="text-xl font-bold text-gray-900">BestCRM</h1>
-              </div>
+              </Link>
               
               {/* Navigation Links */}
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">

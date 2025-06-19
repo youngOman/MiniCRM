@@ -61,7 +61,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     product_name = models.CharField(max_length=200)
-    product_sku = models.CharField(max_length=100, blank=True, null=True)
+    product_sku = models.CharField(max_length=100, blank=True, null=True) # 存貨單位
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
