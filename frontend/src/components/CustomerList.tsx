@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Customer } from '../types/customer';
 import { PaginatedResponse } from '../types/common';
 import api from '../services/api';
+import CustomerForm from './CustomerForm';
+import CustomerDetail from './CustomerDetail';
+
+type ViewMode = 'list' | 'form' | 'detail';
 
 const CustomerList: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -10,9 +14,12 @@ const CustomerList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [pagination, setPagination] = useState({
     count: 0,
-    next: null,
-    previous: null,
+    next: null as string | null,
+    previous: null as string | null,
   });
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -50,6 +57,67 @@ const CustomerList: React.FC = () => {
     }
   };
 
+  const handleAddCustomer = () => {
+    setSelectedCustomer(null);
+    setViewMode('form');
+  };
+
+  const handleEditCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setViewMode('form');
+  };
+
+  const handleViewCustomer = (customer: Customer) => {
+    setSelectedCustomerId(customer.id);
+    setViewMode('detail');
+  };
+
+  const handleSaveCustomer = (customer: Customer) => {
+    // Update the customer in the list or add if new
+    setCustomers(prev => {
+      const index = prev.findIndex(c => c.id === customer.id);
+      if (index >= 0) {
+        // Update existing
+        const updated = [...prev];
+        updated[index] = customer;
+        return updated;
+      } else {
+        // Add new
+        return [customer, ...prev];
+      }
+    });
+    setViewMode('list');
+    setSelectedCustomer(null);
+  };
+
+  const handleCancel = () => {
+    setViewMode('list');
+    setSelectedCustomer(null);
+    setSelectedCustomerId(null);
+  };
+
+  // Show form view
+  if (viewMode === 'form') {
+    return (
+      <CustomerForm
+        customer={selectedCustomer || undefined}
+        onSave={handleSaveCustomer}
+        onCancel={handleCancel}
+      />
+    );
+  }
+
+  // Show detail view
+  if (viewMode === 'detail' && selectedCustomerId) {
+    return (
+      <CustomerDetail
+        customerId={selectedCustomerId}
+        onEdit={handleEditCustomer}
+        onBack={handleCancel}
+      />
+    );
+  }
+
   if (loading && customers.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -71,6 +139,7 @@ const CustomerList: React.FC = () => {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             type="button"
+            onClick={handleAddCustomer}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
             Add Customer
@@ -121,17 +190,29 @@ const CustomerList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
+              <th className="relative px-6 py-3">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {customers.map((customer) => (
               <tr key={customer.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">
-                    {customer.full_name}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    ID: {customer.id}
+                  <div className="flex items-center">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        <button
+                          onClick={() => handleViewCustomer(customer)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          {customer.full_name}
+                        </button>
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        ID: {customer.id}
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -162,6 +243,20 @@ const CustomerList: React.FC = () => {
                   >
                     {customer.is_active ? 'Active' : 'Inactive'}
                   </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => handleEditCustomer(customer)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleViewCustomer(customer)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}

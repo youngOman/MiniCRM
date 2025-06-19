@@ -1,0 +1,370 @@
+import React, { useState, useEffect } from 'react';
+import { Customer } from '../types/customer';
+import { Order } from '../types/order';
+import { Transaction } from '../types/transaction';
+import api from '../services/api';
+
+interface CustomerDetailProps {
+  customerId: number;
+  onEdit: (customer: Customer) => void;
+  onBack: () => void;
+}
+
+const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onBack }) => {
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('details');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchCustomerData();
+  }, [customerId]);
+
+  const fetchCustomerData = async () => {
+    try {
+      setLoading(true);
+      const [customerResponse, ordersResponse, transactionsResponse] = await Promise.all([
+        api.get<Customer>(`/customers/${customerId}/`),
+        api.get<Order[]>(`/customers/${customerId}/orders/`),
+        api.get<Transaction[]>(`/customers/${customerId}/transactions/`)
+      ]);
+
+      setCustomer(customerResponse.data);
+      setOrders(ordersResponse.data);
+      setTransactions(transactionsResponse.data);
+    } catch (err: any) {
+      setError('Failed to fetch customer data');
+      console.error('Error fetching customer:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!customer) return;
+    
+    const confirmed = window.confirm(`Are you sure you want to delete ${customer.full_name}? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/customers/${customer.id}/`);
+      onBack();
+    } catch (err: any) {
+      setError('Failed to delete customer');
+      console.error('Error deleting customer:', err);
+    }
+  };
+
+  const formatCurrency = (amount: number | string) => {
+    const num = typeof amount === 'number' ? amount : parseFloat(amount || '0');
+    return `$${num.toFixed(2)}`;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (!customer) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-red-600">Customer not found</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <div className="rounded-md bg-red-50 p-4">
+          <div className="text-sm text-red-700">{error}</div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <div>
+              <button
+                onClick={onBack}
+                className="text-blue-600 hover:text-blue-800 mb-2"
+              >
+                ← Back to Customers
+              </button>
+              <h1 className="text-2xl font-bold text-gray-900">{customer.full_name}</h1>
+              <p className="text-gray-600">{customer.email}</p>
+            </div>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => onEdit(customer)}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="px-6 py-4 grid grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{customer.total_orders}</div>
+            <div className="text-sm text-gray-500">Total Orders</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {formatCurrency(customer.total_spent)}
+            </div>
+            <div className="text-sm text-gray-500">Total Spent</div>
+          </div>
+          <div className="text-center">
+            <div className={`text-2xl font-bold ${customer.is_active ? 'text-green-600' : 'text-red-600'}`}>
+              {customer.is_active ? 'Active' : 'Inactive'}
+            </div>
+            <div className="text-sm text-gray-500">Status</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="bg-white shadow rounded-lg">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex">
+            {[
+              { id: 'details', name: 'Details' },
+              { id: 'orders', name: `Orders (${orders.length})` },
+              { id: 'transactions', name: `Transactions (${transactions.length})` }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`py-4 px-6 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                {tab.name}
+              </button>
+            ))}
+          </nav>
+        </div>
+
+        <div className="p-6">
+          {activeTab === 'details' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Email</dt>
+                    <dd className="text-sm text-gray-900">{customer.email}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Phone</dt>
+                    <dd className="text-sm text-gray-900">{customer.phone || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Company</dt>
+                    <dd className="text-sm text-gray-900">{customer.company || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Source</dt>
+                    <dd className="text-sm text-gray-900">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                        {customer.source}
+                      </span>
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Address</dt>
+                    <dd className="text-sm text-gray-900">{customer.address || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">City</dt>
+                    <dd className="text-sm text-gray-900">{customer.city || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">State</dt>
+                    <dd className="text-sm text-gray-900">{customer.state || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">ZIP Code</dt>
+                    <dd className="text-sm text-gray-900">{customer.zip_code || 'Not provided'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Country</dt>
+                    <dd className="text-sm text-gray-900">{customer.country}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              {(customer.tags || customer.notes) && (
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
+                  <dl className="space-y-3">
+                    {customer.tags && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Tags</dt>
+                        <dd className="text-sm text-gray-900">{customer.tags}</dd>
+                      </div>
+                    )}
+                    {customer.notes && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">Notes</dt>
+                        <dd className="text-sm text-gray-900 whitespace-pre-wrap">{customer.notes}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'orders' && (
+            <div>
+              {orders.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No orders found for this customer.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-300">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Order Number
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Total
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {orders.map((order) => (
+                        <tr key={order.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {order.order_number}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatDate(order.order_date)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              {order.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatCurrency(order.total)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'transactions' && (
+            <div>
+              {transactions.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  No transactions found for this customer.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-300">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Transaction ID
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Payment Method
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Amount
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Date
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {transactions.map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {transaction.transaction_id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {transaction.transaction_type}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {transaction.payment_method}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatCurrency(transaction.amount)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              transaction.status === 'failed' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {transaction.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatDate(transaction.created_at)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerDetail;

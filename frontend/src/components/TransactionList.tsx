@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Transaction } from '../types/transaction';
 import { PaginatedResponse } from '../types/common';
 import api from '../services/api';
+import TransactionForm from './TransactionForm';
+import TransactionDetail from './TransactionDetail';
+
+type ViewMode = 'list' | 'form' | 'detail';
 
 const TransactionList: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -12,9 +16,12 @@ const TransactionList: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState('');
   const [pagination, setPagination] = useState({
     count: 0,
-    next: null,
-    previous: null,
+    next: null as string | null,
+    previous: null as string | null,
   });
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchTransactions();
@@ -79,6 +86,42 @@ const TransactionList: React.FC = () => {
     }
   };
 
+  const handleAddTransaction = () => {
+    setSelectedTransaction(null);
+    setViewMode('form');
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setViewMode('form');
+  };
+
+  const handleViewTransaction = (transaction: Transaction) => {
+    setSelectedTransactionId(transaction.id);
+    setViewMode('detail');
+  };
+
+  const handleSaveTransaction = (transaction: Transaction) => {
+    setTransactions(prev => {
+      const index = prev.findIndex(t => t.id === transaction.id);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = transaction;
+        return updated;
+      } else {
+        return [transaction, ...prev];
+      }
+    });
+    setViewMode('list');
+    setSelectedTransaction(null);
+  };
+
+  const handleCancel = () => {
+    setViewMode('list');
+    setSelectedTransaction(null);
+    setSelectedTransactionId(null);
+  };
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'sale':
@@ -93,6 +136,28 @@ const TransactionList: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Show form view
+  if (viewMode === 'form') {
+    return (
+      <TransactionForm
+        transaction={selectedTransaction || undefined}
+        onSave={handleSaveTransaction}
+        onCancel={handleCancel}
+      />
+    );
+  }
+
+  // Show detail view
+  if (viewMode === 'detail' && selectedTransactionId) {
+    return (
+      <TransactionDetail
+        transactionId={selectedTransactionId}
+        onEdit={handleEditTransaction}
+        onBack={handleCancel}
+      />
+    );
+  }
 
   if (loading && transactions.length === 0) {
     return (
@@ -115,6 +180,7 @@ const TransactionList: React.FC = () => {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             type="button"
+            onClick={handleAddTransaction}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
             New Transaction
@@ -194,6 +260,9 @@ const TransactionList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Date
               </th>
+              <th className="relative px-6 py-3">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -201,7 +270,12 @@ const TransactionList: React.FC = () => {
               <tr key={transaction.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {transaction.transaction_id}
+                    <button
+                      onClick={() => handleViewTransaction(transaction)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {transaction.transaction_id}
+                    </button>
                   </div>
                   <div className="text-sm text-gray-500">
                     ID: {transaction.id}
@@ -255,6 +329,20 @@ const TransactionList: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {new Date(transaction.created_at).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => handleEditTransaction(transaction)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleViewTransaction(transaction)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}

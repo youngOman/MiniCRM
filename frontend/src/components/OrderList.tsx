@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Order } from '../types/order';
 import { PaginatedResponse } from '../types/common';
 import api from '../services/api';
+import OrderForm from './OrderForm';
+import OrderDetail from './OrderDetail';
+
+type ViewMode = 'list' | 'form' | 'detail';
 
 const OrderList: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -11,9 +15,12 @@ const OrderList: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [pagination, setPagination] = useState({
     count: 0,
-    next: null,
-    previous: null,
+    next: null as string | null,
+    previous: null as string | null,
   });
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchOrders();
@@ -60,6 +67,42 @@ const OrderList: React.FC = () => {
     }
   };
 
+  const handleAddOrder = () => {
+    setSelectedOrder(null);
+    setViewMode('form');
+  };
+
+  const handleEditOrder = (order: Order) => {
+    setSelectedOrder(order);
+    setViewMode('form');
+  };
+
+  const handleViewOrder = (order: Order) => {
+    setSelectedOrderId(order.id);
+    setViewMode('detail');
+  };
+
+  const handleSaveOrder = (order: Order) => {
+    setOrders(prev => {
+      const index = prev.findIndex(o => o.id === order.id);
+      if (index >= 0) {
+        const updated = [...prev];
+        updated[index] = order;
+        return updated;
+      } else {
+        return [order, ...prev];
+      }
+    });
+    setViewMode('list');
+    setSelectedOrder(null);
+  };
+
+  const handleCancel = () => {
+    setViewMode('list');
+    setSelectedOrder(null);
+    setSelectedOrderId(null);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending':
@@ -78,6 +121,28 @@ const OrderList: React.FC = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Show form view
+  if (viewMode === 'form') {
+    return (
+      <OrderForm
+        order={selectedOrder || undefined}
+        onSave={handleSaveOrder}
+        onCancel={handleCancel}
+      />
+    );
+  }
+
+  // Show detail view
+  if (viewMode === 'detail' && selectedOrderId) {
+    return (
+      <OrderDetail
+        orderId={selectedOrderId}
+        onEdit={handleEditOrder}
+        onBack={handleCancel}
+      />
+    );
+  }
 
   if (loading && orders.length === 0) {
     return (
@@ -100,6 +165,7 @@ const OrderList: React.FC = () => {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             type="button"
+            onClick={handleAddOrder}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
             New Order
@@ -164,6 +230,9 @@ const OrderList: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Items
               </th>
+              <th className="relative px-6 py-3">
+                <span className="sr-only">Actions</span>
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -171,7 +240,12 @@ const OrderList: React.FC = () => {
               <tr key={order.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {order.order_number}
+                    <button
+                      onClick={() => handleViewOrder(order)}
+                      className="text-blue-600 hover:text-blue-800"
+                    >
+                      {order.order_number}
+                    </button>
                   </div>
                   <div className="text-sm text-gray-500">
                     ID: {order.id}
@@ -210,6 +284,20 @@ const OrderList: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {order.items ? order.items.length : 0} items
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <button
+                    onClick={() => handleEditOrder(order)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleViewOrder(order)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
