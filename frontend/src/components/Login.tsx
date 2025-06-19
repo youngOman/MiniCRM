@@ -96,7 +96,7 @@ const Login: React.FC = () => {
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Demo credentials: admin / admin123
+              Demo credentials: young / young0921
             </p>
           </div>
         </form>

@@ -11,9 +11,9 @@ const Layout: React.FC = () => {
   };
 
   const navItems = [
-    { to: '/customers', label: 'Customers', icon: '👥' },
-    { to: '/orders', label: 'Orders', icon: '📦' },
-    { to: '/transactions', label: 'Transactions', icon: '💳' },
+    { to: '/customers', label: '會員資料', icon: '👥' },
+    { to: '/orders', label: '訂單管理', icon: '📦' },
+    { to: '/transactions', label: '交易記錄', icon: '💳' }, 
   ];
 
   return (
@@ -25,7 +25,7 @@ const Layout: React.FC = () => {
             <div className="flex">
               {/* Logo */}
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-900">客戶關係管理系統</h1>
+                <h1 className="text-xl font-bold text-gray-900">BestCRM</h1>
               </div>
               
               {/* Navigation Links */}
