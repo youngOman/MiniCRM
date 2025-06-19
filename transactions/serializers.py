@@ -1,12 +1,14 @@
 from rest_framework import serializers
 from .models import Transaction
 from customers.serializers import CustomerSerializer
-from orders.serializers import OrderSerializer
 
 
 class TransactionSerializer(serializers.ModelSerializer):
     customer_info = CustomerSerializer(source='customer', read_only=True)
-    order_info = OrderSerializer(source='order', read_only=True)
+    order_info = serializers.SerializerMethodField()
+    amount = serializers.FloatField()
+    fee_amount = serializers.FloatField()
+    net_amount = serializers.FloatField(read_only=True)
     
     class Meta:
         model = Transaction
@@ -17,6 +19,16 @@ class TransactionSerializer(serializers.ModelSerializer):
             'description', 'notes', 'processed_at', 'created_at', 'updated_at'
         ]
         read_only_fields = ['transaction_id', 'net_amount', 'created_at', 'updated_at']
+    
+    def get_order_info(self, obj):
+        if obj.order:
+            return {
+                'id': obj.order.id,
+                'order_number': obj.order.order_number,
+                'status': obj.order.status,
+                'total': float(obj.order.total)
+            }
+        return None
 
 
 class TransactionCreateUpdateSerializer(serializers.ModelSerializer):

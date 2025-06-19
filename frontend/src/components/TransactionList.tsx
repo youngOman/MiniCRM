@@ -235,10 +235,10 @@ const TransactionList: React.FC = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    ${transaction.amount.toFixed(2)}
+                    ${typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount || '0').toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Net: ${transaction.net_amount.toFixed(2)}
+                    Net: ${typeof transaction.net_amount === 'number' ? transaction.net_amount.toFixed(2) : parseFloat(transaction.net_amount || '0').toFixed(2)}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

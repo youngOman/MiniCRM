@@ -16,7 +16,7 @@ export interface Customer {
   notes?: string;
   is_active: boolean;
   total_orders: number;
-  total_spent: number;
+  total_spent: number | string;
   created_at: string;
   updated_at: string;
 }

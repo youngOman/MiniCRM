@@ -5,8 +5,8 @@ export interface OrderItem {
   product_name: string;
   product_sku?: string;
   quantity: number;
-  unit_price: number;
-  total_price: number;
+  unit_price: number | string;
+  total_price: number | string;
   created_at: string;
   updated_at: string;
 }
@@ -18,11 +18,11 @@ export interface Order {
   customer_info?: Customer;
   status: string;
   order_date: string;
-  subtotal: number;
-  tax_amount: number;
-  shipping_amount: number;
-  discount_amount: number;
-  total: number;
+  subtotal: number | string;
+  tax_amount: number | string;
+  shipping_amount: number | string;
+  discount_amount: number | string;
+  total: number | string;
   shipping_address?: string;
   billing_address?: string;
   notes?: string;

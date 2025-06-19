@@ -4,8 +4,8 @@ from .models import Customer
 
 class CustomerSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
-    total_orders = serializers.ReadOnlyField()
-    total_spent = serializers.ReadOnlyField()
+    total_orders = serializers.IntegerField(read_only=True)
+    total_spent = serializers.FloatField(read_only=True)
     
     class Meta:
         model = Customer

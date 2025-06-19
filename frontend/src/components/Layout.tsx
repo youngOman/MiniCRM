@@ -25,7 +25,7 @@ const Layout: React.FC = () => {
             <div className="flex">
               {/* Logo */}
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-900">CRM Dashboard</h1>
+                <h1 className="text-xl font-bold text-gray-900">客戶關係管理系統</h1>
               </div>
               
               {/* Navigation Links */}

@@ -150,7 +150,7 @@ const CustomerList: React.FC = () => {
                   {customer.total_orders}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${customer.total_spent.toFixed(2)}
+                  ${typeof customer.total_spent === 'number' ? customer.total_spent.toFixed(2) : parseFloat(customer.total_spent || '0').toFixed(2)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span

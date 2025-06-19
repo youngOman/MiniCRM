@@ -11,9 +11,9 @@ export interface Transaction {
   transaction_type: string;
   payment_method: string;
   status: string;
-  amount: number;
-  fee_amount: number;
-  net_amount: number;
+  amount: number | string;
+  fee_amount: number | string;
+  net_amount: number | string;
   currency: string;
   gateway_transaction_id?: string;
   gateway_response?: string;

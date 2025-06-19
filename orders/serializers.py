@@ -4,6 +4,9 @@ from customers.serializers import CustomerSerializer
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
+    unit_price = serializers.FloatField()
+    total_price = serializers.FloatField(read_only=True)
+    
     class Meta:
         model = OrderItem
         fields = [
@@ -16,6 +19,11 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     customer_info = CustomerSerializer(source='customer', read_only=True)
     items = OrderItemSerializer(many=True, read_only=True)
+    subtotal = serializers.FloatField()
+    tax_amount = serializers.FloatField()
+    shipping_amount = serializers.FloatField()
+    discount_amount = serializers.FloatField()
+    total = serializers.FloatField(read_only=True)
     
     class Meta:
         model = Order

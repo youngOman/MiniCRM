@@ -10,34 +10,59 @@ This guide will help you set up the CRM Dashboard system with Django backend and
 
 ## Backend Setup (Django)
 
-### 1. Activate Virtual Environment
+### 1. Environment Configuration
+Create or update your `.env` file with database credentials:
 ```bash
-source crm_venv/bin/activate
+# .env file
+DEBUG=True
+SECRET_KEY=your-secret-key-here
+
+# Database Configuration (MySQL)
+DB_ENGINE=django.db.backends.mysql
+DB_NAME=crm_dashboard
+DB_USER=your_db_user
+DB_PASSWORD=your_db_password
+DB_HOST=your_db_host
+DB_PORT=3306
 ```
 
-### 2. Install Python Dependencies
+### 2. Activate Virtual Environment
+```bash
+source crm_venv/bin/activate
+# OR
+source venv/bin/activate
+```
+
+### 3. Install Python Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run Database Migrations
+### 4. Run Database Migrations
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
-### 4. Create Superuser
+### 5. Create Superuser
 ```bash
 python manage.py createsuperuser
-# Use: admin / admin@example.com / admin123
+# Use: young / young@example.com / young0921
 ```
 
-### 5. Create Sample Data (Optional)
+### 6. Create Sample Data (Optional)
 ```bash
+# Option 1: Using Django management command
 python manage.py create_sample_data
+
+# Option 2: Using the simple script
+python simple_dummy_data.py
+
+# Option 3: Using MySQL direct script (if using MySQL)
+python create_mysql_dummy_data.py
 ```
 
-### 6. Start Django Development Server
+### 7. Start Django Development Server
 ```bash
 python manage.py runserver
 ```
@@ -158,3 +183,11 @@ react-ts-crm/
 - JWT tokens expire after 1 hour
 - Refresh tokens expire after 7 days
 - All API endpoints require authentication except login
+
+## Security Notes
+
+- **Never commit the `.env` file** to version control
+- Database credentials are loaded from environment variables
+- Change default SECRET_KEY in production
+- Use strong passwords for database and admin accounts
+- The `.env` file should be added to `.gitignore`
