@@ -34,29 +34,29 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const transactionTypeOptions = [
-    { value: 'sale', label: 'Sale' },
-    { value: 'refund', label: 'Refund' },
-    { value: 'payment', label: 'Payment' },
-    { value: 'chargeback', label: 'Chargeback' },
+    { value: 'sale', label: '銷售' },
+    { value: 'refund', label: '退款' },
+    { value: 'payment', label: '付款' },
+    { value: 'chargeback', label: '退單' },
   ];
 
   const paymentMethodOptions = [
-    { value: 'credit_card', label: 'Credit Card' },
-    { value: 'debit_card', label: 'Debit Card' },
+    { value: 'credit_card', label: '信用卡' },
+    { value: 'debit_card', label: '金融卡' },
     { value: 'paypal', label: 'PayPal' },
     { value: 'stripe', label: 'Stripe' },
-    { value: 'cash', label: 'Cash' },
-    { value: 'check', label: 'Check' },
-    { value: 'bank_transfer', label: 'Bank Transfer' },
-    { value: 'other', label: 'Other' },
+    { value: 'cash', label: '現金' },
+    { value: 'check', label: '支票' },
+    { value: 'bank_transfer', label: '銀行轉帳' },
+    { value: 'other', label: '其他' },
   ];
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'completed', label: 'Completed' },
-    { value: 'failed', label: 'Failed' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' },
+    { value: 'pending', label: '等待處理' },
+    { value: 'completed', label: '已完成' },
+    { value: 'failed', label: '失敗' },
+    { value: 'cancelled', label: '已取消' },
+    { value: 'refunded', label: '已退款' },
   ];
 
   useEffect(() => {
@@ -110,13 +110,13 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
     const newErrors: Record<string, string> = {};
 
     if (!formData.customer) {
-      newErrors.customer = 'Customer is required';
+      newErrors.customer = '客戶為必選項目';
     }
     if (formData.amount <= 0) {
-      newErrors.amount = 'Amount must be greater than 0';
+      newErrors.amount = '金額必須大於0';
     }
     if (formData.fee_amount < 0) {
-      newErrors.fee_amount = 'Fee amount cannot be negative';
+      newErrors.fee_amount = '手續費不能為負數';
     }
 
     setErrors(newErrors);
@@ -152,7 +152,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
       if (error.response?.data) {
         setErrors(error.response.data);
       } else {
-        setErrors({ general: 'An error occurred while saving the transaction' });
+        setErrors({ general: '儲存交易時發生錯誤' });
       }
     } finally {
       setLoading(false);
@@ -208,10 +208,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
         <div className="px-8 py-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            {transaction ? 'Edit Transaction' : 'Create New Transaction'}
+            {transaction ? '編輯交易' : '建立新交易'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {transaction ? 'Update transaction information below.' : 'Fill in the details to create a new transaction.'}
+            {transaction ? '在下方更新交易資訊。' : '填寫詳細資料以建立新交易。'}
           </p>
         </div>
       </div>
@@ -237,11 +237,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
           {/* Basic Information Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">基本資訊</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="customer" className="block text-sm font-semibold text-gray-700">
-                    Customer *
+                    客戶 *
                   </label>
                   <select
                     id="customer"
@@ -251,7 +251,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     disabled={loadingCustomers}
                     className={selectClass('customer')}
                   >
-                    <option value={0}>Select a customer</option>
+                    <option value={0}>選擇客戶</option>
                     {customers.map(customer => (
                       <option key={customer.id} value={customer.id}>
                         {customer.full_name} ({customer.email})
@@ -270,7 +270,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label htmlFor="order" className="block text-sm font-semibold text-gray-700">
-                    Related Order (Optional)
+                    相關訂單 (可選)
                   </label>
                   <select
                     id="order"
@@ -280,7 +280,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     disabled={loadingOrders}
                     className={selectClass('order')}
                   >
-                    <option value={0}>No related order</option>
+                    <option value={0}>沒有相關訂單</option>
                     {getFilteredOrders().map(order => (
                       <option key={order.id} value={order.id}>
                         {order.order_number} - ${typeof order.total === 'number' ? order.total.toFixed(2) : parseFloat(order.total || '0').toFixed(2)}
@@ -295,11 +295,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
           {/* Transaction Details Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Transaction Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">交易詳情</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="transaction_type" className="block text-sm font-semibold text-gray-700">
-                    Transaction Type
+                    交易類型
                   </label>
                   <select
                     id="transaction_type"
@@ -318,7 +318,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label htmlFor="payment_method" className="block text-sm font-semibold text-gray-700">
-                    Payment Method
+                    付款方式
                   </label>
                   <select
                     id="payment_method"
@@ -337,7 +337,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label htmlFor="status" className="block text-sm font-semibold text-gray-700">
-                    Status
+                    狀態
                   </label>
                   <select
                     id="status"
@@ -360,11 +360,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
           {/* Financial Details Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Details</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">金額詳情</h3>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                   <label htmlFor="amount" className="block text-sm font-semibold text-gray-700">
-                    Amount *
+                    金額 *
                   </label>
                   <input
                     type="number"
@@ -389,7 +389,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label htmlFor="fee_amount" className="block text-sm font-semibold text-gray-700">
-                    Fee Amount
+                    手續費
                   </label>
                   <input
                     type="number"
@@ -414,7 +414,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label htmlFor="currency" className="block text-sm font-semibold text-gray-700">
-                    Currency
+                    貨幣
                   </label>
                   <input
                     type="text"
@@ -430,7 +430,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700">
-                    Net Amount
+                    淨額
                   </label>
                   <input
                     type="number"
@@ -439,7 +439,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     readOnly
                     className="mt-2 block w-full px-4 py-3 text-base border border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Amount minus fees</p>
+                  <p className="mt-1 text-xs text-gray-500">金額減去手續費</p>
                 </div>
               </div>
             </div>
@@ -448,11 +448,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
           {/* Gateway Information Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Gateway Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">金流串接資訊</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="gateway_transaction_id" className="block text-sm font-semibold text-gray-700">
-                    Gateway Transaction ID
+                    金流交易編號
                   </label>
                   <input
                     type="text"
@@ -461,13 +461,13 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     value={formData.gateway_transaction_id}
                     onChange={handleChange}
                     className={inputClass('gateway_transaction_id')}
-                    placeholder="Enter gateway transaction ID"
+                    placeholder="請輸入金流交易編號"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="processed_at" className="block text-sm font-semibold text-gray-700">
-                    Processed At
+                    處理時間
                   </label>
                   <input
                     type="datetime-local"
@@ -482,7 +482,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
 
               <div>
                 <label htmlFor="gateway_response" className="block text-sm font-semibold text-gray-700">
-                  Gateway Response
+                  金流回應
                 </label>
                 <textarea
                   id="gateway_response"
@@ -490,7 +490,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                   rows={3}
                   value={formData.gateway_response}
                   onChange={handleChange}
-                  placeholder="Raw response from payment gateway"
+                  placeholder="來自付款金流的原始回應"
                   className={textareaClass('gateway_response')}
                 />
               </div>
@@ -500,11 +500,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
           {/* Additional Information Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">其他資訊</h3>
               <div className="space-y-6">
                 <div>
                   <label htmlFor="description" className="block text-sm font-semibold text-gray-700">
-                    Description
+                    描述
                   </label>
                   <input
                     type="text"
@@ -512,14 +512,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    placeholder="Brief description of the transaction"
+                    placeholder="交易的簡單描述"
                     className={inputClass('description')}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="notes" className="block text-sm font-semibold text-gray-700">
-                    Internal Notes
+                    內部備註
                   </label>
                   <textarea
                     id="notes"
@@ -527,7 +527,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                     rows={4}
                     value={formData.notes}
                     onChange={handleChange}
-                    placeholder="Internal notes and comments"
+                    placeholder="內部備註和評論"
                     className={textareaClass('notes')}
                   />
                 </div>
@@ -542,7 +542,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
               onClick={onCancel}
               className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
-              Cancel
+              取消
             </button>
             <button
               type="submit"
@@ -555,7 +555,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               )}
-              {loading ? 'Saving...' : transaction ? 'Update Transaction' : 'Create Transaction'}
+              {loading ? '儲存中...' : transaction ? '更新交易' : '建立交易'}
             </button>
           </div>
         </form>

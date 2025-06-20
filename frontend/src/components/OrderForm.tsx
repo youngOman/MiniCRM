@@ -28,12 +28,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const statusOptions = [
-    { value: 'pending', label: 'Pending' },
-    { value: 'processing', label: 'Processing' },
-    { value: 'shipped', label: 'Shipped' },
-    { value: 'delivered', label: 'Delivered' },
-    { value: 'cancelled', label: 'Cancelled' },
-    { value: 'refunded', label: 'Refunded' },
+    { value: 'pending', label: '等待處理' },
+    { value: 'processing', label: '處理中' },
+    { value: 'shipped', label: '已出貨' },
+    { value: 'delivered', label: '已送達' },
+    { value: 'cancelled', label: '已取消' },
+    { value: 'refunded', label: '已退款' },
   ];
 
   useEffect(() => {
@@ -77,24 +77,24 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.customer) {
-      newErrors.customer = 'Customer is required';
+      newErrors.customer = '客戶為必選項目';
     }
     if (formData.subtotal < 0) {
-      newErrors.subtotal = 'Subtotal cannot be negative';
+      newErrors.subtotal = '小計不能為負數';
     }
     if (formData.items.length === 0) {
-      newErrors.items = 'At least one item is required';
+      newErrors.items = '至少需要一個商品';
     }
 
     formData.items.forEach((item, index) => {
       if (!item.product_name.trim()) {
-        newErrors[`item_${index}_product_name`] = 'Product name is required';
+        newErrors[`item_${index}_product_name`] = '商品名稱為必填項目';
       }
       if (Number(item.quantity) <= 0) {
-        newErrors[`item_${index}_quantity`] = 'Quantity must be greater than 0';
+        newErrors[`item_${index}_quantity`] = '數量必須大於0';
       }
       if (Number(item.unit_price) <= 0) {
-        newErrors[`item_${index}_unit_price`] = 'Unit price must be greater than 0';
+        newErrors[`item_${index}_unit_price`] = '單價必須大於0';
       }
     });
 
@@ -124,7 +124,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
       if (error.response?.data) {
         setErrors(error.response.data);
       } else {
-        setErrors({ general: 'An error occurred while saving the order' });
+        setErrors({ general: '儲存訂單時發生錯誤' });
       }
     } finally {
       setLoading(false);
@@ -225,10 +225,10 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
         <div className="px-8 py-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            {order ? 'Edit Order' : 'Create New Order'}
+            {order ? '編輯訂單' : '建立新訂單'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {order ? 'Update order information below.' : 'Fill in the details to create a new order.'}
+            {order ? '在下方更新訂單資訊。' : '填寫詳細資料以建立新訂單。'}
           </p>
         </div>
       </div>
@@ -254,11 +254,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         {/* Order Information Section */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">訂單資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="customer" className="block text-sm font-semibold text-gray-700">
-                  Customer *
+                  客戶 *
                 </label>
                 <select
                   id="customer"
@@ -268,7 +268,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                   disabled={loadingCustomers}
                   className={selectClass('customer')}
                 >
-                  <option value={0}>Select a customer</option>
+                  <option value={0}>選擇客戶</option>
                   {customers.map(customer => (
                     <option key={customer.id} value={customer.id}>
                       {customer.full_name} ({customer.email})
@@ -287,7 +287,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
               <div>
                 <label htmlFor="status" className="block text-sm font-semibold text-gray-700">
-                  Order Status
+                  訂單狀態
                 </label>
                 <select
                   id="status"
@@ -311,7 +311,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         <div className="space-y-6">
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-900">Order Items</h3>
+              <h3 className="text-lg font-semibold text-gray-900">訂單商品</h3>
               <button
                 type="button"
                 onClick={addItem}
@@ -320,7 +320,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                 <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Add Item
+                新增商品
               </button>
             </div>
 
@@ -343,7 +343,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
               {formData.items.map((item, index) => (
                 <div key={index} className="border border-gray-200 rounded-lg p-6 bg-gray-50">
                   <div className="flex justify-between items-start mb-6">
-                    <h4 className="text-base font-semibold text-gray-900">Item {index + 1}</h4>
+                    <h4 className="text-base font-semibold text-gray-900">商品 {index + 1}</h4>
                     <button
                       type="button"
                       onClick={() => removeItem(index)}
@@ -352,21 +352,21 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                       <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      Remove
+                      移除
                     </button>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-semibold text-gray-700">
-                        Product Name *
+                        商品名稱 *
                       </label>
                       <input
                         type="text"
                         value={item.product_name}
                         onChange={(e) => handleItemChange(index, 'product_name', e.target.value)}
                         className={inputClass(`item_${index}_product_name`)}
-                        placeholder="Enter product name"
+                        placeholder="請輸入商品名稱"
                       />
                       {errors[`item_${index}_product_name`] && (
                         <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -380,20 +380,20 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700">
-                        SKU
+                        商品編號
                       </label>
                       <input
                         type="text"
                         value={item.product_sku}
                         onChange={(e) => handleItemChange(index, 'product_sku', e.target.value)}
                         className={inputClass(`item_${index}_product_sku`)}
-                        placeholder="Enter SKU"
+                        placeholder="請輸入商品編號"
                       />
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700">
-                        Quantity *
+                        數量 *
                       </label>
                       <input
                         type="number"
@@ -415,7 +415,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700">
-                        Unit Price *
+                        單價 *
                       </label>
                       <input
                         type="number"
@@ -438,7 +438,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700">
-                        Total Price
+                        總價
                       </label>
                       <input
                         type="number"
@@ -458,11 +458,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         {/* Financial Details Section */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Financial Details</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">金額詳情</h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
                 <label htmlFor="subtotal" className="block text-sm font-semibold text-gray-700">
-                  Subtotal
+                  小計
                 </label>
                 <input
                   type="number"
@@ -473,12 +473,12 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                   readOnly
                   className="mt-2 block w-full px-4 py-3 text-base border border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
                 />
-                <p className="mt-1 text-xs text-gray-500">Calculated from items</p>
+                <p className="mt-1 text-xs text-gray-500">由商品自動計算</p>
               </div>
 
               <div>
                 <label htmlFor="tax_amount" className="block text-sm font-semibold text-gray-700">
-                  Tax Amount
+                  稅額
                 </label>
                 <input
                   type="number"
@@ -495,7 +495,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
               <div>
                 <label htmlFor="shipping_amount" className="block text-sm font-semibold text-gray-700">
-                  Shipping Cost
+                  運費
                 </label>
                 <input
                   type="number"
@@ -512,7 +512,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
               <div>
                 <label htmlFor="discount_amount" className="block text-sm font-semibold text-gray-700">
-                  Discount
+                  折扣
                 </label>
                 <input
                   type="number"
@@ -530,7 +530,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
 
             <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-700">Order Total:</span>
+                <span className="text-lg font-semibold text-gray-700">訂單總額：</span>
                 <span className="text-2xl font-bold text-blue-600">
                   ${calculateTotal().toFixed(2)}
                 </span>
@@ -542,11 +542,11 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         {/* Addresses Section */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Address Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">地址資訊</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="shipping_address" className="block text-sm font-semibold text-gray-700">
-                  Shipping Address
+                  送貨地址
                 </label>
                 <textarea
                   id="shipping_address"
@@ -555,13 +555,13 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                   value={formData.shipping_address}
                   onChange={handleChange}
                   className={textareaClass('shipping_address')}
-                  placeholder="Enter shipping address"
+                  placeholder="請輸入送貨地址"
                 />
               </div>
 
               <div>
                 <label htmlFor="billing_address" className="block text-sm font-semibold text-gray-700">
-                  Billing Address
+                  帳單地址
                 </label>
                 <textarea
                   id="billing_address"
@@ -570,7 +570,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                   value={formData.billing_address}
                   onChange={handleChange}
                   className={textareaClass('billing_address')}
-                  placeholder="Enter billing address"
+                  placeholder="請輸入帳單地址"
                 />
               </div>
             </div>
@@ -580,10 +580,10 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         {/* Additional Information Section */}
         <div className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">Additional Information</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">其他資訊</h3>
             <div>
               <label htmlFor="notes" className="block text-sm font-semibold text-gray-700">
-                Order Notes
+                訂單備註
               </label>
               <textarea
                 id="notes"
@@ -592,7 +592,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                 value={formData.notes}
                 onChange={handleChange}
                 className={textareaClass('notes')}
-                placeholder="Enter any additional notes about this order"
+                placeholder="請輸入關於此訂單的其他備註"
               />
             </div>
           </div>
@@ -605,7 +605,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
             onClick={onCancel}
             className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
           >
-            Cancel
+            取消
           </button>
           <button
             type="submit"
@@ -618,7 +618,7 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
             )}
-            {loading ? 'Saving...' : order ? 'Update Order' : 'Create Order'}
+            {loading ? '儲存中...' : order ? '更新訂單' : '建立訂單'}
           </button>
         </div>
       </form>

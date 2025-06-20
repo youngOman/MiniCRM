@@ -29,11 +29,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const sourceOptions = [
-    { value: 'website', label: 'Website' },
-    { value: 'social_media', label: 'Social Media' },
-    { value: 'referral', label: 'Referral' },
-    { value: 'advertisement', label: 'Advertisement' },
-    { value: 'other', label: 'Other' },
+    { value: 'website', label: '官方網站' },
+    { value: 'social_media', label: '社群媒體' },
+    { value: 'referral', label: '推薦介紹' },
+    { value: 'advertisement', label: '廣告宣傳' },
+    { value: 'other', label: '其他' },
   ];
 
   useEffect(() => {
@@ -62,15 +62,15 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
     const newErrors: Record<string, string> = {};
 
     if (!formData.first_name.trim()) {
-      newErrors.first_name = 'First name is required';
+      newErrors.first_name = '姓氏為必填項目';
     }
     if (!formData.last_name.trim()) {
-      newErrors.last_name = 'Last name is required';
+      newErrors.last_name = '名字為必填項目';
     }
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = '電子信箱為必填項目';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = '請輸入有效的電子信箱地址';
     }
 
     setErrors(newErrors);
@@ -100,7 +100,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
       if (error.response?.data) {
         setErrors(error.response.data);
       } else {
-        setErrors({ general: 'An error occurred while saving the customer' });
+        setErrors({ general: '儲存客戶資料時發生錯誤' });
       }
     } finally {
       setLoading(false);
@@ -148,10 +148,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 mb-6">
         <div className="px-8 py-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            {customer ? 'Edit Customer' : 'Add New Customer'}
+            {customer ? '編輯客戶' : '新增客戶'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {customer ? 'Update customer information below.' : 'Fill in the details to create a new customer.'}
+            {customer ? '在下方更新客戶資訊。' : '填寫詳細資料以建立新客戶。'}
           </p>
         </div>
       </div>
@@ -177,11 +177,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
           {/* Personal Information Section */}
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">個人資訊</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="first_name" className="block text-sm font-semibold text-gray-700">
-                    First Name *
+                    姓氏 *
                   </label>
                   <input
                     type="text"
@@ -190,7 +190,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.first_name}
                     onChange={handleChange}
                     className={inputClass('first_name')}
-                    placeholder="Enter first name"
+                    placeholder="請輸入姓氏"
                   />
                   {errors.first_name && (
                     <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -204,7 +204,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
 
                 <div>
                   <label htmlFor="last_name" className="block text-sm font-semibold text-gray-700">
-                    Last Name *
+                    名字 *
                   </label>
                   <input
                     type="text"
@@ -213,7 +213,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.last_name}
                     onChange={handleChange}
                     className={inputClass('last_name')}
-                    placeholder="Enter last name"
+                    placeholder="請輸入名字"
                   />
                   {errors.last_name && (
                     <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -229,11 +229,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
 
             {/* Contact Information Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">聯絡資訊</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                    Email Address *
+                    電子信箱 *
                   </label>
                   <input
                     type="email"
@@ -242,7 +242,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.email}
                     onChange={handleChange}
                     className={inputClass('email')}
-                    placeholder="Enter email address"
+                    placeholder="請輸入電子信箱"
                   />
                   {errors.email && (
                     <p className="mt-2 text-sm text-red-600 flex items-center">
@@ -256,7 +256,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
 
                 <div>
                   <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">
-                    Phone Number
+                    電話號碼
                   </label>
                   <input
                     type="tel"
@@ -265,14 +265,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.phone}
                     onChange={handleChange}
                     className={inputClass('phone')}
-                    placeholder="Enter phone number"
+                    placeholder="請輸入電話號碼"
                   />
                 </div>
               </div>
 
               <div className="mt-6">
                 <label htmlFor="company" className="block text-sm font-semibold text-gray-700">
-                  Company
+                  公司名稱
                 </label>
                 <input
                   type="text"
@@ -281,18 +281,18 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                   value={formData.company}
                   onChange={handleChange}
                   className={inputClass('company')}
-                  placeholder="Enter company name"
+                  placeholder="請輸入公司名稱"
                 />
               </div>
             </div>
 
             {/* Address Information Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Address Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">地址資訊</h3>
               <div className="space-y-6">
                 <div>
                   <label htmlFor="address" className="block text-sm font-semibold text-gray-700">
-                    Street Address
+                    街道地址
                   </label>
                   <textarea
                     id="address"
@@ -301,14 +301,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.address}
                     onChange={handleChange}
                     className={textareaClass('address')}
-                    placeholder="Enter street address"
+                    placeholder="請輸入街道地址"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
                     <label htmlFor="city" className="block text-sm font-semibold text-gray-700">
-                      City
+                      城市
                     </label>
                     <input
                       type="text"
@@ -317,13 +317,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                       value={formData.city}
                       onChange={handleChange}
                       className={inputClass('city')}
-                      placeholder="Enter city"
+                      placeholder="請輸入城市"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="state" className="block text-sm font-semibold text-gray-700">
-                      State/Province
+                      州/省
                     </label>
                     <input
                       type="text"
@@ -332,13 +332,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                       value={formData.state}
                       onChange={handleChange}
                       className={inputClass('state')}
-                      placeholder="Enter state"
+                      placeholder="請輸入州/省"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="zip_code" className="block text-sm font-semibold text-gray-700">
-                      ZIP/Postal Code
+                      郵遞區號
                     </label>
                     <input
                       type="text"
@@ -347,7 +347,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                       value={formData.zip_code}
                       onChange={handleChange}
                       className={inputClass('zip_code')}
-                      placeholder="Enter ZIP code"
+                      placeholder="請輸入郵遞區號"
                     />
                   </div>
                 </div>
@@ -355,7 +355,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="country" className="block text-sm font-semibold text-gray-700">
-                      Country
+                      國家
                     </label>
                     <input
                       type="text"
@@ -364,13 +364,13 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                       value={formData.country}
                       onChange={handleChange}
                       className={inputClass('country')}
-                      placeholder="Enter country"
+                      placeholder="請輸入國家"
                     />
                   </div>
 
                   <div>
                     <label htmlFor="source" className="block text-sm font-semibold text-gray-700">
-                      Customer Source
+                      客戶來源
                     </label>
                     <select
                       id="source"
@@ -392,11 +392,11 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
 
             {/* Additional Information Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">其他資訊</h3>
               <div className="space-y-6">
                 <div>
                   <label htmlFor="tags" className="block text-sm font-semibold text-gray-700">
-                    Tags
+                    標籤
                   </label>
                   <input
                     type="text"
@@ -405,14 +405,14 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.tags}
                     onChange={handleChange}
                     className={inputClass('tags')}
-                    placeholder="e.g., VIP, High-Value, Referral (comma-separated)"
+                    placeholder="例如：VIP、高價值客戶、推薦客戶 (用逗號分隔)"
                   />
-                  <p className="mt-1 text-xs text-gray-500">Separate multiple tags with commas</p>
+                  <p className="mt-1 text-xs text-gray-500">多個標籤請用逗號分隔</p>
                 </div>
 
                 <div>
                   <label htmlFor="notes" className="block text-sm font-semibold text-gray-700">
-                    Notes
+                    備註
                   </label>
                   <textarea
                     id="notes"
@@ -421,7 +421,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     value={formData.notes}
                     onChange={handleChange}
                     className={textareaClass('notes')}
-                    placeholder="Enter any additional notes about this customer"
+                    placeholder="請輸入關於此客戶的其他備註"
                   />
                 </div>
 
@@ -435,7 +435,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                     className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200"
                   />
                   <label htmlFor="is_active" className="ml-3 block text-sm font-medium text-gray-700">
-                    Active Customer
+                    啟用客戶
                   </label>
                 </div>
               </div>
@@ -449,7 +449,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
               onClick={onCancel}
               className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200"
             >
-              Cancel
+              取消
             </button>
             <button
               type="submit"
@@ -462,7 +462,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
               )}
-              {loading ? 'Saving...' : customer ? 'Update Customer' : 'Create Customer'}
+              {loading ? '儲存中...' : customer ? '更新客戶' : '建立客戶'}
             </button>
           </div>
         </form>

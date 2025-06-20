@@ -171,9 +171,9 @@ const OrderList: React.FC = () => {
       {/* Header */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Orders</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">訂單管理</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Manage and track all customer orders.
+            管理和追蹤所有客戶訂單
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -182,7 +182,7 @@ const OrderList: React.FC = () => {
             onClick={handleAddOrder}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
-            New Order
+            新增訂單
           </button>
         </div>
       </div>
@@ -192,7 +192,7 @@ const OrderList: React.FC = () => {
         <div>
           <input
             type="text"
-            placeholder="Search orders..."
+            placeholder="搜尋訂單..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -204,13 +204,13 @@ const OrderList: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="processing">Processing</option>
-            <option value="shipped">Shipped</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
+            <option value="">所有狀態</option>
+            <option value="pending">待處理</option>
+            <option value="processing">處理中</option>
+            <option value="shipped">已出貨</option>
+            <option value="delivered">已送達</option>
+            <option value="cancelled">已取消</option>
+            <option value="refunded">已退款</option>
           </select>
         </div>
       </div>
@@ -227,25 +227,25 @@ const OrderList: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Order
+                訂單
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
+                客戶
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
+                日期
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+                狀態
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total
+                總金額
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Items
+                項目數
               </th>
               <th className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">操作</span>
               </th>
             </tr>
           </thead>
@@ -277,7 +277,7 @@ const OrderList: React.FC = () => {
                     </div>
                   ) : (
                     <div className="text-sm text-gray-500">
-                      Customer ID: {order.customer}
+                      客戶編號: {order.customer}
                     </div>
                   )}
                 </td>
@@ -297,20 +297,20 @@ const OrderList: React.FC = () => {
                   ${typeof order.total === 'number' ? order.total.toFixed(2) : parseFloat(order.total || '0').toFixed(2)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {order.items ? order.items.length : 0} items
+                  {order.items ? order.items.length : 0} 個項目
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button
                     onClick={() => handleEditOrder(order)}
                     className="text-blue-600 hover:text-blue-900 mr-4"
                   >
-                    Edit
+                    編輯
                   </button>
                   <button
                     onClick={() => handleViewOrder(order)}
                     className="text-gray-600 hover:text-gray-900"
                   >
-                    View
+                    查看
                   </button>
                 </td>
               </tr>
@@ -328,21 +328,21 @@ const OrderList: React.FC = () => {
               disabled={!pagination.previous}
               className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Previous
+              上一頁
             </button>
             <button
               onClick={handleNextPage}
               disabled={!pagination.next}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Next
+              下一頁
             </button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{orders.length}</span> of{' '}
-                <span className="font-medium">{pagination.count}</span> results
+                顯示 <span className="font-medium">{orders.length}</span> 筆，共{' '}
+                <span className="font-medium">{pagination.count}</span> 筆資料
               </p>
             </div>
             <div>
@@ -352,14 +352,14 @@ const OrderList: React.FC = () => {
                   disabled={!pagination.previous}
                   className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Previous
+                  上一頁
                 </button>
                 <button
                   onClick={handleNextPage}
                   disabled={!pagination.next}
                   className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Next
+                  下一頁
                 </button>
               </nav>
             </div>

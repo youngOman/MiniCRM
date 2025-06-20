@@ -183,9 +183,9 @@ const CustomerList: React.FC = () => {
       {/* Header */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Customers</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">客戶管理</h1>
           <p className="mt-2 text-sm text-gray-700">
-            A list of all customers in your CRM system.
+            管理系統中的所有客戶資料
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -194,7 +194,7 @@ const CustomerList: React.FC = () => {
             onClick={handleAddCustomer}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
-            Add Customer
+            新增客戶
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ const CustomerList: React.FC = () => {
       <div className="max-w-md">
         <input
           type="text"
-          placeholder="Search customers..."
+          placeholder="搜尋客戶..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -222,28 +222,28 @@ const CustomerList: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
+                客戶
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contact
+                聯絡方式
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Company
+                公司
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Source
+                來源
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Orders
+                訂單數
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Total Spent
+                總消費額
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+                狀態
               </th>
               <th className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">操作</span>
               </th>
             </tr>
           </thead>
@@ -293,7 +293,7 @@ const CustomerList: React.FC = () => {
                         : 'bg-red-100 text-red-800'
                     }`}
                   >
-                    {customer.is_active ? 'Active' : 'Inactive'}
+                    {customer.is_active ? '啟用' : '停用'}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -301,13 +301,13 @@ const CustomerList: React.FC = () => {
                     onClick={() => handleEditCustomer(customer)}
                     className="text-blue-600 hover:text-blue-900 mr-4"
                   >
-                    Edit
+                    編輯
                   </button>
                   <button
                     onClick={() => handleViewCustomer(customer)}
                     className="text-gray-600 hover:text-gray-900"
                   >
-                    View
+                    查看
                   </button>
                 </td>
               </tr>
@@ -325,21 +325,21 @@ const CustomerList: React.FC = () => {
               disabled={!pagination.previous}
               className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Previous
+              上一頁
             </button>
             <button
               onClick={handleNextPage}
               disabled={!pagination.next}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Next
+              下一頁
             </button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{customers.length}</span> of{' '}
-                <span className="font-medium">{pagination.count}</span> results
+                顯示 <span className="font-medium">{customers.length}</span> 筆，共{' '}
+                <span className="font-medium">{pagination.count}</span> 筆資料
               </p>
             </div>
             <div>
@@ -349,14 +349,14 @@ const CustomerList: React.FC = () => {
                   disabled={!pagination.previous}
                   className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Previous
+                  上一頁
                 </button>
                 <button
                   onClick={handleNextPage}
                   disabled={!pagination.next}
                   className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Next
+                  下一頁
                 </button>
               </nav>
             </div>

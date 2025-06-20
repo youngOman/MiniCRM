@@ -186,9 +186,9 @@ const TransactionList: React.FC = () => {
       {/* Header */}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Transactions</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">交易記錄</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Track all financial transactions and payments.
+            追蹤所有財務交易和付款資料
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -197,7 +197,7 @@ const TransactionList: React.FC = () => {
             onClick={handleAddTransaction}
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
           >
-            New Transaction
+            新增交易
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@ const TransactionList: React.FC = () => {
         <div>
           <input
             type="text"
-            placeholder="Search transactions..."
+            placeholder="搜尋交易記錄..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
@@ -219,12 +219,12 @@ const TransactionList: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="failed">Failed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="refunded">Refunded</option>
+            <option value="">所有狀態</option>
+            <option value="pending">待處理</option>
+            <option value="completed">已完成</option>
+            <option value="failed">失敗</option>
+            <option value="cancelled">已取消</option>
+            <option value="refunded">已退款</option>
           </select>
         </div>
         <div>
@@ -233,11 +233,11 @@ const TransactionList: React.FC = () => {
             onChange={(e) => setTypeFilter(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">All Types</option>
-            <option value="sale">Sale</option>
-            <option value="refund">Refund</option>
-            <option value="payment">Payment</option>
-            <option value="chargeback">Chargeback</option>
+            <option value="">所有類型</option>
+            <option value="sale">銷售</option>
+            <option value="refund">退款</option>
+            <option value="payment">付款</option>
+            <option value="chargeback">退單</option>
           </select>
         </div>
       </div>
@@ -254,28 +254,28 @@ const TransactionList: React.FC = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Transaction
+                交易
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Customer
+                客戶
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Type
+                類型
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Amount
+                金額
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Payment Method
+                付款方式
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
+                狀態
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
+                日期
               </th>
               <th className="relative px-6 py-3">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">操作</span>
               </th>
             </tr>
           </thead>
@@ -307,7 +307,7 @@ const TransactionList: React.FC = () => {
                     </div>
                   ) : (
                     <div className="text-sm text-gray-500">
-                      Customer ID: {transaction.customer}
+                      客戶編號: {transaction.customer}
                     </div>
                   )}
                 </td>
@@ -326,7 +326,7 @@ const TransactionList: React.FC = () => {
                     ${typeof transaction.amount === 'number' ? transaction.amount.toFixed(2) : parseFloat(transaction.amount || '0').toFixed(2)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Net: ${typeof transaction.net_amount === 'number' ? transaction.net_amount.toFixed(2) : parseFloat(transaction.net_amount || '0').toFixed(2)}
+                    淨額: ${typeof transaction.net_amount === 'number' ? transaction.net_amount.toFixed(2) : parseFloat(transaction.net_amount || '0').toFixed(2)}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -349,13 +349,13 @@ const TransactionList: React.FC = () => {
                     onClick={() => handleEditTransaction(transaction)}
                     className="text-blue-600 hover:text-blue-900 mr-4"
                   >
-                    Edit
+                    編輯
                   </button>
                   <button
                     onClick={() => handleViewTransaction(transaction)}
                     className="text-gray-600 hover:text-gray-900"
                   >
-                    View
+                    查看
                   </button>
                 </td>
               </tr>
@@ -373,21 +373,21 @@ const TransactionList: React.FC = () => {
               disabled={!pagination.previous}
               className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Previous
+              上一頁
             </button>
             <button
               onClick={handleNextPage}
               disabled={!pagination.next}
               className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
-              Next
+              下一頁
             </button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{transactions.length}</span> of{' '}
-                <span className="font-medium">{pagination.count}</span> results
+                顯示 <span className="font-medium">{transactions.length}</span> 筆，共{' '}
+                <span className="font-medium">{pagination.count}</span> 筆資料
               </p>
             </div>
             <div>
@@ -397,14 +397,14 @@ const TransactionList: React.FC = () => {
                   disabled={!pagination.previous}
                   className="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Previous
+                  上一頁
                 </button>
                 <button
                   onClick={handleNextPage}
                   disabled={!pagination.next}
                   className="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50"
                 >
-                  Next
+                  下一頁
                 </button>
               </nav>
             </div>
