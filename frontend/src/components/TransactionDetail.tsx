@@ -23,7 +23,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       const response = await api.get<Transaction>(`/transactions/${transactionId}/`);
       setTransaction(response.data);
     } catch (err: any) {
-      setError('Failed to fetch transaction data');
+      setError('無法取得交易資料');
       console.error('Error fetching transaction:', err);
     } finally {
       setLoading(false);
@@ -33,14 +33,14 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
   const handleDelete = async () => {
     if (!transaction) return;
     
-    const confirmed = window.confirm(`Are you sure you want to delete transaction ${transaction.transaction_id}? This action cannot be undone.`);
+    const confirmed = window.confirm(`確定要刪除交易 ${transaction.transaction_id} 嗎？此操作無法復原。`);
     if (!confirmed) return;
 
     try {
       await api.delete(`/transactions/${transaction.id}/`);
       onBack();
     } catch (err: any) {
-      setError('Failed to delete transaction');
+      setError('無法刪除交易');
       console.error('Error deleting transaction:', err);
     }
   };
@@ -86,7 +86,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
   if (!transaction) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600">Transaction not found</div>
+        <div className="text-red-600">找不到交易</div>
       </div>
     );
   }
@@ -108,10 +108,10 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
                 onClick={onBack}
                 className="text-blue-600 hover:text-blue-800 mb-2"
               >
-                ← Back to Transactions
+                ← 返回交易列表
               </button>
               <h1 className="text-2xl font-bold text-gray-900">
-                Transaction {transaction.transaction_id}
+                交易 {transaction.transaction_id}
               </h1>
               <p className="text-gray-600">
                 {transaction.customer_info?.full_name || `Customer #${transaction.customer}`}
@@ -123,13 +123,13 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
                 onClick={() => onEdit(transaction)}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Edit
+                編輯
               </button>
               <button
                 onClick={handleDelete}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                Delete
+                刪除
               </button>
             </div>
           </div>
@@ -141,25 +141,25 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
             <div className="text-lg font-bold text-green-600">
               {formatCurrency(transaction.amount, transaction.currency)}
             </div>
-            <div className="text-sm text-gray-500">Amount</div>
+            <div className="text-sm text-gray-500">金額</div>
           </div>
           <div className="text-center">
             <div className="text-lg font-bold text-gray-600">
               {formatCurrency(transaction.net_amount, transaction.currency)}
             </div>
-            <div className="text-sm text-gray-500">Net Amount</div>
+            <div className="text-sm text-gray-500">淨金額</div>
           </div>
           <div className="text-center">
             <div className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
               {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
             </div>
-            <div className="text-sm text-gray-500 mt-1">Status</div>
+            <div className="text-sm text-gray-500 mt-1">狀態</div>
           </div>
           <div className="text-center">
             <div className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getTypeColor(transaction.transaction_type)}`}>
               {transaction.transaction_type.charAt(0).toUpperCase() + transaction.transaction_type.slice(1)}
             </div>
-            <div className="text-sm text-gray-500 mt-1">Type</div>
+            <div className="text-sm text-gray-500 mt-1">類型</div>
           </div>
         </div>
       </div>
@@ -167,20 +167,20 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       {/* Transaction Details */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Transaction Details</h2>
+          <h2 className="text-lg font-medium text-gray-900">交易詳情</h2>
         </div>
         <div className="px-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Transaction Information */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Transaction Information</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">交易資訊</h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm text-gray-500">Transaction ID</dt>
+                  <dt className="text-sm text-gray-500">交易編號</dt>
                   <dd className="text-sm text-gray-900 font-mono">{transaction.transaction_id}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Type</dt>
+                  <dt className="text-sm text-gray-500">類型</dt>
                   <dd className="text-sm text-gray-900">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeColor(transaction.transaction_type)}`}>
                       {transaction.transaction_type.charAt(0).toUpperCase() + transaction.transaction_type.slice(1)}
@@ -188,13 +188,13 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Payment Method</dt>
+                  <dt className="text-sm text-gray-500">付款方式</dt>
                   <dd className="text-sm text-gray-900">
                     {transaction.payment_method.replace('_', ' ').toUpperCase()}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Status</dt>
+                  <dt className="text-sm text-gray-500">狀態</dt>
                   <dd className="text-sm text-gray-900">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(transaction.status)}`}>
                       {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
@@ -202,12 +202,12 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Created</dt>
+                  <dt className="text-sm text-gray-500">建立日期</dt>
                   <dd className="text-sm text-gray-900">{formatDate(transaction.created_at)}</dd>
                 </div>
                 {transaction.processed_at && (
                   <div>
-                    <dt className="text-sm text-gray-500">Processed</dt>
+                    <dt className="text-sm text-gray-500">處理日期</dt>
                     <dd className="text-sm text-gray-900">{formatDate(transaction.processed_at)}</dd>
                   </div>
                 )}
@@ -216,33 +216,33 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
 
             {/* Financial Information */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Financial Information</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">財務資訊</h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm text-gray-500">Amount</dt>
+                  <dt className="text-sm text-gray-500">金額</dt>
                   <dd className="text-sm text-gray-900 font-semibold">
                     {formatCurrency(transaction.amount, transaction.currency)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Fee Amount</dt>
+                  <dt className="text-sm text-gray-500">手續費</dt>
                   <dd className="text-sm text-gray-900">
                     {formatCurrency(transaction.fee_amount, transaction.currency)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Net Amount</dt>
+                  <dt className="text-sm text-gray-500">淨金額</dt>
                   <dd className="text-sm text-gray-900 font-semibold">
                     {formatCurrency(transaction.net_amount, transaction.currency)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm text-gray-500">Currency</dt>
+                  <dt className="text-sm text-gray-500">貨幣</dt>
                   <dd className="text-sm text-gray-900">{transaction.currency}</dd>
                 </div>
                 {transaction.gateway_transaction_id && (
                   <div>
-                    <dt className="text-sm text-gray-500">Gateway Transaction ID</dt>
+                    <dt className="text-sm text-gray-500">金流交易編號</dt>
                     <dd className="text-sm text-gray-900 font-mono">{transaction.gateway_transaction_id}</dd>
                   </div>
                 )}
@@ -255,31 +255,31 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       {/* Customer Information */}
       <div className="bg-white shadow rounded-lg">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-medium text-gray-900">Customer Information</h2>
+          <h2 className="text-lg font-medium text-gray-900">客戶資訊</h2>
         </div>
         <div className="px-6 py-4">
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
             <div>
-              <dt className="text-sm text-gray-500">Name</dt>
+              <dt className="text-sm text-gray-500">姓名</dt>
               <dd className="text-sm text-gray-900">
                 {transaction.customer_info?.full_name || `Customer #${transaction.customer}`}
               </dd>
             </div>
             {transaction.customer_info?.email && (
               <div>
-                <dt className="text-sm text-gray-500">Email</dt>
+                <dt className="text-sm text-gray-500">電子郵件</dt>
                 <dd className="text-sm text-gray-900">{transaction.customer_info.email}</dd>
               </div>
             )}
             {transaction.customer_info?.phone && (
               <div>
-                <dt className="text-sm text-gray-500">Phone</dt>
+                <dt className="text-sm text-gray-500">電話</dt>
                 <dd className="text-sm text-gray-900">{transaction.customer_info.phone}</dd>
               </div>
             )}
             {transaction.customer_info?.company && (
               <div>
-                <dt className="text-sm text-gray-500">Company</dt>
+                <dt className="text-sm text-gray-500">公司</dt>
                 <dd className="text-sm text-gray-900">{transaction.customer_info.company}</dd>
               </div>
             )}
@@ -291,20 +291,20 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       {transaction.order_info && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Related Order</h2>
+            <h2 className="text-lg font-medium text-gray-900">相關訂單</h2>
           </div>
           <div className="px-6 py-4">
             <dl className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-3">
               <div>
-                <dt className="text-sm text-gray-500">Order Number</dt>
+                <dt className="text-sm text-gray-500">訂單編號</dt>
                 <dd className="text-sm text-gray-900 font-mono">{transaction.order_info.order_number}</dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-500">Order Status</dt>
+                <dt className="text-sm text-gray-500">訂單狀態</dt>
                 <dd className="text-sm text-gray-900">{transaction.order_info.status}</dd>
               </div>
               <div>
-                <dt className="text-sm text-gray-500">Order Total</dt>
+                <dt className="text-sm text-gray-500">訂單總計</dt>
                 <dd className="text-sm text-gray-900">
                   {formatCurrency(transaction.order_info.total, transaction.currency)}
                 </dd>
@@ -318,18 +318,18 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       {(transaction.description || transaction.notes) && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Additional Information</h2>
+            <h2 className="text-lg font-medium text-gray-900">其他資訊</h2>
           </div>
           <div className="px-6 py-4 space-y-4">
             {transaction.description && (
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Description</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">描述</h3>
                 <div className="text-sm text-gray-600">{transaction.description}</div>
               </div>
             )}
             {transaction.notes && (
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">Notes</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">備註</h3>
                 <div className="text-sm text-gray-600 whitespace-pre-wrap">{transaction.notes}</div>
               </div>
             )}
@@ -341,7 +341,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       {transaction.gateway_response && (
         <div className="bg-white shadow rounded-lg">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Gateway Response</h2>
+            <h2 className="text-lg font-medium text-gray-900">金流回應</h2>
           </div>
           <div className="px-6 py-4">
             <div className="bg-gray-50 rounded-md p-4">

@@ -35,7 +35,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
       setOrders(ordersResponse.data);
       setTransactions(transactionsResponse.data);
     } catch (err: any) {
-      setError('Failed to fetch customer data');
+      setError('無法取得客戶資料');
       console.error('Error fetching customer:', err);
     } finally {
       setLoading(false);
@@ -45,14 +45,14 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
   const handleDelete = async () => {
     if (!customer) return;
     
-    const confirmed = window.confirm(`Are you sure you want to delete ${customer.full_name}? This action cannot be undone.`);
+    const confirmed = window.confirm(`確定要刪除 ${customer.full_name} 嗎？此操作無法復原。`);
     if (!confirmed) return;
 
     try {
       await api.delete(`/customers/${customer.id}/`);
       onBack();
     } catch (err: any) {
-      setError('Failed to delete customer');
+      setError('無法刪除客戶');
       console.error('Error deleting customer:', err);
     }
   };
@@ -77,7 +77,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
   if (!customer) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600">Customer not found</div>
+        <div className="text-red-600">找不到客戶</div>
       </div>
     );
   }
@@ -99,7 +99,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
                 onClick={onBack}
                 className="text-blue-600 hover:text-blue-800 mb-2"
               >
-                ← Back to Customers
+                ← 返回客戶列表
               </button>
               <h1 className="text-2xl font-bold text-gray-900">{customer.full_name}</h1>
               <p className="text-gray-600">{customer.email}</p>
@@ -109,13 +109,13 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
                 onClick={() => onEdit(customer)}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Edit
+                編輯
               </button>
               <button
                 onClick={handleDelete}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                Delete
+                刪除
               </button>
             </div>
           </div>
@@ -125,19 +125,19 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
         <div className="px-6 py-4 grid grid-cols-3 gap-6">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{customer.total_orders}</div>
-            <div className="text-sm text-gray-500">Total Orders</div>
+            <div className="text-sm text-gray-500">總訂單數</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">
               {formatCurrency(customer.total_spent)}
             </div>
-            <div className="text-sm text-gray-500">Total Spent</div>
+            <div className="text-sm text-gray-500">總消費金額</div>
           </div>
           <div className="text-center">
             <div className={`text-2xl font-bold ${customer.is_active ? 'text-green-600' : 'text-red-600'}`}>
-              {customer.is_active ? 'Active' : 'Inactive'}
+              {customer.is_active ? '活躍' : '非活躍'}
             </div>
-            <div className="text-sm text-gray-500">Status</div>
+            <div className="text-sm text-gray-500">狀態</div>
           </div>
         </div>
       </div>
@@ -147,9 +147,9 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex">
             {[
-              { id: 'details', name: 'Details' },
-              { id: 'orders', name: `Orders (${orders.length})` },
-              { id: 'transactions', name: `Transactions (${transactions.length})` }
+              { id: 'details', name: '詳細資料' },
+              { id: 'orders', name: `訂單 (${orders.length})` },
+              { id: 'transactions', name: `交易記錄 (${transactions.length})` }
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -170,22 +170,22 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
           {activeTab === 'details' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">聯絡資訊</h3>
                 <dl className="space-y-3">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Email</dt>
+                    <dt className="text-sm font-medium text-gray-500">電子郵件</dt>
                     <dd className="text-sm text-gray-900">{customer.email}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                    <dd className="text-sm text-gray-900">{customer.phone || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">電話</dt>
+                    <dd className="text-sm text-gray-900">{customer.phone || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Company</dt>
-                    <dd className="text-sm text-gray-900">{customer.company || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">公司</dt>
+                    <dd className="text-sm text-gray-900">{customer.company || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Source</dt>
+                    <dt className="text-sm font-medium text-gray-500">來源</dt>
                     <dd className="text-sm text-gray-900">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                         {customer.source}
@@ -196,26 +196,26 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
               </div>
               
               <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Address Information</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">地址資訊</h3>
                 <dl className="space-y-3">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Address</dt>
-                    <dd className="text-sm text-gray-900">{customer.address || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">地址</dt>
+                    <dd className="text-sm text-gray-900">{customer.address || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">City</dt>
-                    <dd className="text-sm text-gray-900">{customer.city || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">城市</dt>
+                    <dd className="text-sm text-gray-900">{customer.city || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">State</dt>
-                    <dd className="text-sm text-gray-900">{customer.state || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">州/省</dt>
+                    <dd className="text-sm text-gray-900">{customer.state || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">ZIP Code</dt>
-                    <dd className="text-sm text-gray-900">{customer.zip_code || 'Not provided'}</dd>
+                    <dt className="text-sm font-medium text-gray-500">郵遞區號</dt>
+                    <dd className="text-sm text-gray-900">{customer.zip_code || '未提供'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Country</dt>
+                    <dt className="text-sm font-medium text-gray-500">國家</dt>
                     <dd className="text-sm text-gray-900">{customer.country}</dd>
                   </div>
                 </dl>
@@ -223,17 +223,17 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
 
               {(customer.tags || customer.notes) && (
                 <div className="md:col-span-2">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Additional Information</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">其他資訊</h3>
                   <dl className="space-y-3">
                     {customer.tags && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Tags</dt>
+                        <dt className="text-sm font-medium text-gray-500">標籤</dt>
                         <dd className="text-sm text-gray-900">{customer.tags}</dd>
                       </div>
                     )}
                     {customer.notes && (
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Notes</dt>
+                        <dt className="text-sm font-medium text-gray-500">備註</dt>
                         <dd className="text-sm text-gray-900 whitespace-pre-wrap">{customer.notes}</dd>
                       </div>
                     )}
@@ -247,7 +247,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
             <div>
               {orders.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  No orders found for this customer.
+                  此客戶沒有訂單記錄。
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -255,16 +255,16 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Order Number
+                          訂單編號
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
+                          日期
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
+                          狀態
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Total
+                          總計
                         </th>
                       </tr>
                     </thead>
@@ -298,7 +298,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
             <div>
               {transactions.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  No transactions found for this customer.
+                  此客戶沒有交易記錄。
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -306,22 +306,22 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Transaction ID
+                          交易編號
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Type
+                          類型
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Payment Method
+                          付款方式
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Amount
+                          金額
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Status
+                          狀態
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Date
+                          日期
                         </th>
                       </tr>
                     </thead>
