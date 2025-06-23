@@ -88,54 +88,13 @@ const CustomerList: React.FC = () => {
   const handleSaveCustomer = async (customer: Customer) => {
     console.log('Customer saved, refreshing list with updated data:', customer);
     
+    // Always refresh the entire customer list to ensure all related data is properly loaded
     try {
-      // For existing customers, fetch the updated record to get all computed fields
-      if (customer.id) {
-        console.log('Fetching updated customer data from backend...');
-        const response = await api.get<Customer>(`/customers/${customer.id}/`);
-        const updatedCustomer = response.data;
-        console.log('Received updated customer data:', updatedCustomer);
-        
-        // Update the customer in the list with complete data from backend
-        setCustomers(prev => {
-          const index = prev.findIndex(c => c.id === customer.id);
-          if (index >= 0) {
-            // Update existing with fresh data from backend
-            const updated = [...prev];
-            updated[index] = updatedCustomer;
-            console.log('Updated customer in list at index:', index);
-            return updated;
-          } else {
-            // If not found, add to list (shouldn't happen for edits)
-            console.log('Customer not found in list, adding as new');
-            return [updatedCustomer, ...prev];
-          }
-        });
-      } else {
-        // For new customers, add to the beginning of the list
-        console.log('Adding new customer to list');
-        setCustomers(prev => [customer, ...prev]);
-      }
+      await refreshCustomers();
+      console.log('Successfully refreshed customer list with complete data');
     } catch (error) {
-      console.error('Error fetching updated customer data, trying full list refresh:', error);
-      // Try refreshing the entire list as a fallback
-      try {
-        await refreshCustomers();
-        console.log('Successfully refreshed customer list after individual fetch failed');
-      } catch (refreshError) {
-        console.error('Full list refresh also failed, using form data as final fallback:', refreshError);
-        // Final fallback to using the form data if everything fails
-        setCustomers(prev => {
-          const index = prev.findIndex(c => c.id === customer.id);
-          if (index >= 0) {
-            const updated = [...prev];
-            updated[index] = customer;
-            return updated;
-          } else {
-            return [customer, ...prev];
-          }
-        });
-      }
+      console.error('Error refreshing customer list:', error);
+      setError('Customer saved but failed to refresh list. Please refresh the page to see updated data.');
     }
     
     setViewMode('list');
