@@ -12,10 +12,12 @@
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.10.0",
+    "date-fns": "^4.1.0",
     "papaparse": "^5.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
+    "recharts": "^3.0.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

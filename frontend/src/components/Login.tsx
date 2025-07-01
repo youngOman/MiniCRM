@@ -18,7 +18,7 @@ const Login: React.FC = () => {
 
     try {
       await authService.login(credentials);
-      navigate('/customers');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please try again.');
     } finally {

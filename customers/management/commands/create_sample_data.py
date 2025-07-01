@@ -14,7 +14,10 @@ class Command(BaseCommand):
         self.stdout.write('Creating sample data...')
 
         # Get admin user
-        admin_user = User.objects.get(username='admin')
+        admin_user = User.objects.filter(is_superuser=True).first()
+        if not admin_user:
+            self.stdout.write(self.style.ERROR('No admin user found!'))
+            return
 
         # Create sample customers
         customers_data = [
