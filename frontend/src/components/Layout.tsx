@@ -58,7 +58,7 @@ const Layout: React.FC = () => {
                     </svg>
                   </div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent group-hover:from-blue-700 group-hover:to-indigo-800 transition-all duration-300">
-                    BestCRM
+                    AutoCRM Pro
                   </h1>
                 </div>
               </Link>

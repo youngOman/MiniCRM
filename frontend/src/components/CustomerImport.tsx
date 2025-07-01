@@ -20,6 +20,7 @@ interface FieldMapping {
 }
 
 const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCancel }) => {
+  
   const [step, setStep] = useState<'upload' | 'mapping' | 'preview' | 'importing'>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [rawData, setRawData] = useState<ImportData[]>([]);
@@ -191,7 +192,7 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
           const value = row[mapping.sourceField];
           if (mapping.targetField === 'is_active') {
             customer[mapping.targetField as keyof Customer] = 
-              ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toString().toLowerCase()) as any;
+              ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toStrinfg().toLowerCase()) as any;
           } else {
             customer[mapping.targetField as keyof Customer] = value as any;
           }

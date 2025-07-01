@@ -1,22 +1,20 @@
-# BestCRM - 現代化客戶關係管理系統
+# AutoCRM Pro - 輕量型智慧全端 AI CRM 系統
 
 <div align="center">
 
-![BestCRM Logo](https://img.shields.io/badge/BestCRM-v1.0-blue?style=for-the-badge)
+![AutoCRM Pro Logo](https://img.shields.io/badge/AutoCRM Pro-v1.0-blue?style=for-the-badge)
 ![Django](https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django)
-![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
+![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-06B6D4?style=for-the-badge&logo=tailwindcss)
-
-**使用 DRF 和 React + TS 開發的全端客戶關係管理系統**
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss)
 
 </div>
 
 ---
 
-## 🌟 專案概述
+## 專案概述
 
-BestCRM 是一個為輕便型的的綜合性客戶關係管理系統。採用 Django REST API 後端與 React + TS 前端，提供管理客戶關係、追蹤銷售業績以及分析業務表現所需的一切工具。
+AutoCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計的高效率 CRM 系統。採用 Django REST API 後端與 React + TS 前端，具備靈活的資料管理、即時查詢、視覺化報表與 AI 智慧摘要，協助你用最輕量的方式打造最智慧的客戶經營流程，提供管理客戶關係、追蹤銷售業績以及分析業務表現所需的一切工具。
 
 目前有三個主要功能模組：
 
@@ -24,16 +22,43 @@ BestCRM 是一個為輕便型的的綜合性客戶關係管理系統。採用 Dj
 - orders (訂單管理)
 - transactions (交易記錄)
 
-### ✨ 核心亮點
+## 核心功能及特色
 
-- **安全驗證** - 基於 JWT 的身份驗證，具備自動令牌刷新功能
-- **響應式設計** - 使用 TailwindCSS 開發 RWD 頁面
-- **即時資料** - 即時更新與資料同步
-- **進階搜尋** - 有即時篩選跟搜尋功能
-- **RESTful API** - 採 RESTful API 設計，將 CRUD 操作整合於一個 View，大幅簡化程式結構並提升擴展性，便於後續功能整合與維護
+### 現代化技術架構
+
+- 使用 React + TypeScript + TailwindCSS 開發，界面清晰，操作流暢
+- RWD，支援桌機與行動裝置使用
+- 模組化架構設計，方便後續功能擴充與客製化
+
+### 客戶資料彈性匯入
+
+- 支援手動新增或批次匯入（CSV / Excel）
+- 多欄位對應設計，可選擇忽略不必要欄位
+- 匯入支援欄位對應與容錯，不完整資料亦可導入
+
+### 進階搜尋與即時篩選
+
+- 多條件篩選與即時模糊搜尋功能
+- 可跨欄位比對，快速定位目標客戶或交易紀錄
+- 操作直覺，適合大量資料環境
+
+### 即時報表生成 - 尚未開發
+
+- 一鍵產出關鍵指標圖表（客戶數、成交金額、轉換率等）
+- 可依區間、來源、標籤等條件切換統計維度
+- 清晰呈現營運概況與銷售表現
+
+### AI 應用擴充性 - 尚未開發
+
+- 系統預留 AI 模組接口，支援導入：
+  - 客戶價值分析與自動分群
+  - 聯絡紀錄摘要與後續建議
+  - 流失預警、銷售機會預測
+  - 自動標籤推薦與話術輔助生成
+
 ---
 
-## 🖼️ 系統截圖
+## 系統頁面截圖
 
 ### 登入頁面
 
@@ -58,6 +83,10 @@ _財務交易追蹤，包含付款方式詳細資訊_
 ### 搜尋與篩選資料
 
 ![Search Results](./images/search_result.png)
+
+### 匯入客戶資料
+
+![Import Customers](./images/import_customer_data.png)
 
 ---
 
@@ -151,7 +180,7 @@ npm run dev
 - **前端介面**: http://localhost:5173
 - **後端 API**: http://localhost:8000
 - **管理後台**: http://localhost:8000/admin
-- **示範登入**: `young` / `young0921`
+- **示範登入**: `www` / `young0921`
 
 ---
 
@@ -180,14 +209,6 @@ npm run dev
 - **手續費計算** - 自動計算付款處理手續費
 - **閘道整合** - 為付款閘道整合做好準備
 - **財務報表** - 完整的交易歷史與分析
-
-### 🔍 進階功能
-
-- **全域搜尋** - 跨客戶、訂單、交易的搜尋功能
-- **進階篩選** - 多重篩選條件與即時更新
-- **分頁處理** - 高效處理大型資料集
-- **響應式設計** - 在桌機、平板、手機上的完美體驗
-- **資料匯出** - 為報表與分析整合做好準備
 
 ---
 

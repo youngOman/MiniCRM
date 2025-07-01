@@ -150,7 +150,7 @@ const Login: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-blue-700 font-medium">
-                  測試帳號：young / young0921
+                  測試體驗帳號：www / young0921
                 </p>
               </div>
             </div>

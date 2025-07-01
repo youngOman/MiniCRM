@@ -12,11 +12,20 @@
 
 ### ✨ 新增功能
 
-- 新增匯入
+- **客戶資料匯入功能**: 新增完整的客戶資料匯入系統
+  - 支援 CSV 和 Excel 檔案格式
+  - 欄位對應功能
+  - 匯入前資料預覽
+  - 錯誤處理和進度追蹤
+  - 測試用範例檔案提供
 
 ### 📝 修改檔案
 
 - `frontend/src/components/Login.tsx` - 登入頁面現代化設計
+- `frontend/package.json` - 新增 PapaParse 和 XLSX 依賴套件
+- `frontend/src/components/CustomerList.tsx` - 新增匯入按鈕和檢視功能
+- `frontend/src/components/CustomerImport.tsx` - 客戶資料匯入組件
+- `frontend/test_customers.csv` - 匯入功能測試檔案
 
 ---
 
@@ -189,8 +198,9 @@
 - [ ] **儀表板分析** - 圖表與 KPI 指標小工具
 - [ ] **電子郵件整合** - 自動化電子郵件行銷
 - [ ] **進階報表** - 自訂報表建構器
-- [ ] **行動應用程式** - React Native 配套應用
+
 - [ ] **API 速率限制** - 增強安全性與效能
 - [ ] **批次操作** - 大量資料匯入匯出
-- [ ] **角色權限管理** - 進階權限系統
+- [ ] 
+- [ ] **行動應用程式** - React Native 配套應用
 - [ ] **Webhook 支援** - 第三方整合
