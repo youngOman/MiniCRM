@@ -4,8 +4,9 @@ import { PaginatedResponse } from '../types/common';
 import api from '../services/api';
 import CustomerForm from './CustomerForm';
 import CustomerDetail from './CustomerDetail';
+import CustomerImport from './CustomerImport';
 
-type ViewMode = 'list' | 'form' | 'detail';
+type ViewMode = 'list' | 'form' | 'detail' | 'import';
 
 const CustomerList: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -75,6 +76,10 @@ const CustomerList: React.FC = () => {
     setViewMode('form');
   };
 
+  const handleImportCustomers = () => {
+    setViewMode('import');
+  };
+
   const handleEditCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
     setViewMode('form');
@@ -99,6 +104,18 @@ const CustomerList: React.FC = () => {
     
     setViewMode('list');
     setSelectedCustomer(null);
+  };
+
+  const handleImportComplete = async () => {
+    console.log('Import completed, refreshing customer list...');
+    try {
+      await refreshCustomers();
+      console.log('Successfully refreshed customer list after import');
+    } catch (error) {
+      console.error('Error refreshing customer list after import:', error);
+      setError('Import completed but failed to refresh list. Please refresh the page to see updated data.');
+    }
+    setViewMode('list');
   };
 
   const handleCancel = () => {
@@ -129,6 +146,16 @@ const CustomerList: React.FC = () => {
     );
   }
 
+  // Show import view
+  if (viewMode === 'import') {
+    return (
+      <CustomerImport
+        onImportComplete={handleImportComplete}
+        onCancel={handleCancel}
+      />
+    );
+  }
+
   if (loading && customers.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -147,7 +174,14 @@ const CustomerList: React.FC = () => {
             管理系統中的所有客戶資料
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none space-x-3">
+          <button
+            type="button"
+            onClick={handleImportCustomers}
+            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto"
+          >
+            匯入客戶
+          </button>
           <button
             type="button"
             onClick={handleAddCustomer}
