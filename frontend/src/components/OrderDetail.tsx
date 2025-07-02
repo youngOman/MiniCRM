@@ -29,7 +29,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onEdit, onBack }) =>
 
       setOrder(orderResponse.data);
       setTransactions(transactionsResponse.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法取得訂單資料');
       console.error('Error fetching order:', err);
     } finally {
@@ -46,7 +46,7 @@ const OrderDetail: React.FC<OrderDetailProps> = ({ orderId, onEdit, onBack }) =>
     try {
       await api.delete(`/orders/${order.id}/`);
       onBack();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法刪除訂單');
       console.error('Error deleting order:', err);
     }

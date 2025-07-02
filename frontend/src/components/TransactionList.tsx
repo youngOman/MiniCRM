@@ -49,7 +49,7 @@ const TransactionList: React.FC = () => {
         next: response.data.next,
         previous: response.data.previous,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('Failed to fetch transactions');
       console.error('Error fetching transactions:', err);
     } finally {
@@ -64,7 +64,7 @@ const TransactionList: React.FC = () => {
       setError(''); // Clear any existing errors
       await fetchTransactions();
       console.log('Transaction list refreshed successfully');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error refreshing transactions:', err);
       setError('Failed to refresh transaction list');
     }
@@ -204,20 +204,25 @@ const TransactionList: React.FC = () => {
 
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
+        <div className="relative group">
           <input
             type="text"
             placeholder="搜尋交易記錄..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm"
           />
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
-        <div>
+        <div className="relative group">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="w-full px-4 py-3 pl-12 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm appearance-none cursor-pointer"
           >
             <option value="">所有狀態</option>
             <option value="pending">待處理</option>
@@ -226,12 +231,22 @@ const TransactionList: React.FC = () => {
             <option value="cancelled">已取消</option>
             <option value="refunded">已退款</option>
           </select>
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
-        <div>
+        <div className="relative group">
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="w-full px-4 py-3 pl-12 pr-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm appearance-none cursor-pointer"
           >
             <option value="">所有類型</option>
             <option value="sale">銷售</option>
@@ -239,6 +254,16 @@ const TransactionList: React.FC = () => {
             <option value="payment">付款</option>
             <option value="chargeback">退單</option>
           </select>
+          <div className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h4a1 1 0 110 2h-1v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6H3a1 1 0 110-2h4zM9 3v1h6V3H9zm-2 3v12h10V6H7zm2 3a1 1 0 112 0v6a1 1 0 11-2 0V9zm4 0a1 1 0 112 0v6a1 1 0 11-2 0V9z" />
+            </svg>
+          </div>
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
       </div>
 

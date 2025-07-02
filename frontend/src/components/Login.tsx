@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/auth';
+import { CatchError } from '../types/error';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -19,8 +20,13 @@ const Login: React.FC = () => {
     try {
       await authService.login(credentials);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed. Please try again.');
+    } catch (err: CatchError) {
+      if (err && typeof err === 'object' && 'response' in err) {
+        const apiError = err as { response?: { data?: { detail?: string } } };
+        setError(apiError.response?.data?.detail || 'Login failed. Please try again.');
+      } else {
+        setError('Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

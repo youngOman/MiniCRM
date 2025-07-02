@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Transaction } from '../types/transaction';
 import { Customer } from '../types/customer';
 import { Order } from '../types/order';
+import { CatchError, ApiError } from '../types/error';
 import api from '../services/api';
 
 interface TransactionFormProps {
@@ -148,9 +149,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
         response = await api.post('/transactions/', submitData);
       }
       onSave(response.data);
-    } catch (error: any) {
-      if (error.response?.data) {
-        setErrors(error.response.data);
+    } catch (error: CatchError) {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as ApiError;
+        if (apiError.response?.data) {
+          setErrors(apiError.response.data as Record<string, string>);
+        } else {
+          setErrors({ general: '儲存交易時發生錯誤' });
+        }
       } else {
         setErrors({ general: '儲存交易時發生錯誤' });
       }

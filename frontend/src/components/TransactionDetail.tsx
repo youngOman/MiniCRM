@@ -22,7 +22,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
       setLoading(true);
       const response = await api.get<Transaction>(`/transactions/${transactionId}/`);
       setTransaction(response.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法取得交易資料');
       console.error('Error fetching transaction:', err);
     } finally {
@@ -39,7 +39,7 @@ const TransactionDetail: React.FC<TransactionDetailProps> = ({ transactionId, on
     try {
       await api.delete(`/transactions/${transaction.id}/`);
       onBack();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法刪除交易');
       console.error('Error deleting transaction:', err);
     }

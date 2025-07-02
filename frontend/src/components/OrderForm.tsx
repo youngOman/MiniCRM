@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Order, OrderItem } from '../types/order';
 import { Customer } from '../types/customer';
+import { ApiError } from '../types/error';
 import api from '../services/api';
 
 interface OrderFormProps {
@@ -120,9 +121,14 @@ const OrderForm: React.FC<OrderFormProps> = ({ order, onSave, onCancel }) => {
         response = await api.post('/orders/', formData);
       }
       onSave(response.data);
-    } catch (error: any) {
-      if (error.response?.data) {
-        setErrors(error.response.data);
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const apiError = error as ApiError;
+        if (apiError.response?.data) {
+          setErrors(apiError.response.data as Record<string, string>);
+        } else {
+          setErrors({ general: '儲存訂單時發生錯誤' });
+        }
       } else {
         setErrors({ general: '儲存訂單時發生錯誤' });
       }

@@ -34,7 +34,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
       setCustomer(customerResponse.data);
       setOrders(ordersResponse.data);
       setTransactions(transactionsResponse.data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法取得客戶資料');
       console.error('Error fetching customer:', err);
     } finally {
@@ -51,7 +51,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
     try {
       await api.delete(`/customers/${customer.id}/`);
       onBack();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError('無法刪除客戶');
       console.error('Error deleting customer:', err);
     }

@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Customer } from '../types/customer';
+import { CatchError, ApiError } from '../types/error';
 import api from '../services/api';
 
 interface CustomerImportProps {
@@ -221,7 +222,7 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
     for (let i = 0; i < rawData.length; i++) {
       try {
         const row = rawData[i];
-        const customerData: any = {};
+        const customerData: Partial<Customer> = {};
         
         mappings.forEach(mapping => {
           if (mapping.sourceField && row[mapping.sourceField] !== undefined) {
@@ -242,12 +243,24 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
 
         await api.post('/customers/', customerData);
         results.success++;
-      } catch (error: any) {
+      } catch (error: CatchError) {
         results.failed++;
-        const errorMsg = error.response?.data?.email?.[0] || 
-                        error.response?.data?.message || 
-                        error.message || 
-                        '未知錯誤';
+        let errorMsg = '未知錯誤';
+        
+        if (error && typeof error === 'object' && 'response' in error) {
+          const apiError = error as ApiError;
+          if (apiError.response?.data) {
+            const data = apiError.response.data;
+            if (typeof data === 'object' && 'email' in data && Array.isArray(data.email)) {
+              errorMsg = data.email[0] as string;
+            } else if (typeof data === 'object' && 'message' in data) {
+              errorMsg = data.message as string;
+            }
+          }
+        } else if (error && typeof error === 'object' && 'message' in error) {
+          errorMsg = (error as Error).message;
+        }
+        
         results.errors.push(`第 ${i + 1} 行：${errorMsg}`);
       }
       
