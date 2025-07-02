@@ -49,6 +49,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
     { value: 'cash', label: '現金' },
     { value: 'check', label: '支票' },
     { value: 'bank_transfer', label: '銀行轉帳' },
+    { value: 'apple_pay', label: 'Apple Pay' },
+    { value: 'google_pay', label: 'Google Pay' },
+    { value: 'line_pay', label: 'LINE Pay' },
     { value: 'other', label: '其他' },
   ];
 
