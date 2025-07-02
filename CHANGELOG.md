@@ -1,11 +1,17 @@
 # CHANGELOG
 
+## [v1.5] - 2025-07-02
+
+### 重新整理專案結構
+
+- 將 `orders`、` transactions`、`customer`、`reports` 等後端 apps 放進 `backend` 資料夾中
+
 ## [v1.4] - 2025-07-01
 
 ### 🎨 UI/UX 優化
 
-- **現代化登入頁面設計**: 全面重新設計登入頁面介面
-  - 採用玻璃擬態效果和漸層背景設計
+- **登入頁面設計**: 重新設計登入頁面介面
+  - 採玻璃擬態效果和漸層背景設計
   - 新增品牌圖示和現代化視覺元素
   - 流暢的動畫過渡效果
   - 改進輸入框設計，加入圖示和懸停效果
@@ -13,8 +19,9 @@
 ### ✨ 新增功能
 
 - **一鍵生成即時報表系統**: 完整的營運儀表板與數據分析功能
+
   - 關鍵營運指標一覽（客戶數、營收、訂單數、交易數）
-  - 多維度篩選器（日期區間、客戶來源、標籤、時間粒度）
+  - 多維度篩選器（日期區間、客戶來源、標籤、時間粒度），recharts
   - 豐富的圖表視覺化（趨勢圖、圓餅圖、柱狀圖、面積圖）
   - 即時數據統計與分析
   - 客戶價值分析與活躍度統計
@@ -37,14 +44,16 @@
 ### 📝 修改檔案
 
 **後端檔案**:
+
 - `reports/` - 新增完整的報表應用模組
-- `reports/views.py` - 統計API視圖（儀表板、趨勢、客戶、營收分析）
+- `reports/views.py` - 統計 API 視圖（儀表板、趨勢、客戶、營收分析）
 - `reports/urls.py` - 報表路由配置
-- `crm_backend/settings.py` - 新增reports應用
-- `crm_backend/urls.py` - 整合報表API路由
+- `crm_backend/settings.py` - 新增 reports 應用
+- `crm_backend/urls.py` - 整合報表 API 路由
 - `customers/management/commands/create_sample_data.py` - 測試數據生成
 
 **前端檔案**:
+
 - `frontend/src/components/Dashboard.tsx` - 營運儀表板主頁面
 - `frontend/src/components/Layout.tsx` - 新增儀表板導航
 - `frontend/src/App.tsx` - 路由整合與預設頁面調整
@@ -228,6 +237,6 @@
 
 - [ ] **API 速率限制** - 增強安全性與效能
 - [ ] **批次操作** - 大量資料匯入匯出
-- [ ] 
+- [ ]
 - [ ] **行動應用程式** - React Native 配套應用
 - [ ] **Webhook 支援** - 第三方整合

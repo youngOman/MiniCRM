@@ -1,8 +1,8 @@
-# AutoCRM Pro - 輕量型智慧全端 AI CRM 系統
+# MiniCRM Pro - 輕量型智慧全端 AI CRM 系統
 
 <div align="center">
 
-![AutoCRM Pro Logo](https://img.shields.io/badge/AutoCRM Pro-v1.0-blue?style=for-the-badge)
+![MiniCRM Pro Logo](https://img.shields.io/badge/MiniCRM Pro-v1.0-blue?style=for-the-badge)
 ![Django](https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django)
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
@@ -14,7 +14,7 @@
 
 ## 專案概述
 
-AutoCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計的高效率 CRM 系統。採用 Django REST API 後端與 React + TS 前端，具備靈活的資料管理、即時查詢、視覺化報表與 AI 智慧摘要，協助你用最輕量的方式打造最智慧的客戶經營流程，提供管理客戶關係、追蹤銷售業績以及分析業務表現所需的一切工具。
+MiniCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計的高效率 CRM 系統。採用 Django REST API 後端與 React + TS 前端，具備靈活的資料管理、即時查詢、視覺化報表與 AI 智慧摘要，協助你用最輕量的方式打造最智慧的客戶經營流程，提供管理客戶關係、追蹤銷售業績以及分析業務表現所需的一切工具。
 
 目前有三個主要功能模組：
 
@@ -101,7 +101,7 @@ AutoCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計�
 
 ### 前端
 
-- **框架**: React 18 with TS
+- **框架**: React 19 with TS
 - **樣式設計**: TailwindCSS 4
 - **路由管理**: React Router 6
 - **HTTP 客戶端**: Axios with interceptors
@@ -112,7 +112,7 @@ AutoCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計�
 
 - **環境管理**: Python venv
 - **套件管理**: pip (Python), npm (Node.js)
-- **程式碼品質**: ESLint, TypeScript 嚴格模式
+- **程式碼品質**: ESLint, TypeScript
 - **版本控制**: Git 與 .gitignore
 
 ---
@@ -123,7 +123,7 @@ AutoCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計�
 
 - **Python** 3.8+
 - **Node.js** 16+
-- **MySQL** (選用，內建 SQLite)
+- **MySQL** 5.7+ (或 SQLite 作為替代)
 - **Git**
 
 ### 1. 複製專案與設定
