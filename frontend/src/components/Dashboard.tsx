@@ -37,6 +37,20 @@ interface DashboardStats {
   };
 }
 
+interface Customer {
+  id: number;
+  first_name: string;
+  last_name: string;
+  total_orders: number;
+  total_spent: number;
+}
+
+interface CustomerTier {
+  tier: string;
+  count: number;
+  color: string;
+}
+
 interface TrendData {
   customer_trend: Array<{ date: string; count: number }>;
   order_trend: Array<{ date: string; count: number; total_amount: number }>;
@@ -47,6 +61,8 @@ interface TrendData {
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [trends, setTrends] = useState<TrendData | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerTiers, setCustomerTiers] = useState<CustomerTier[]>([]); // 客戶等級分布
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     date_from: format(subMonths(new Date(), 3), 'yyyy-MM-dd'),
@@ -58,6 +74,42 @@ const Dashboard: React.FC = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
 
+
+  // 客戶等級分類邏輯
+  const getCustomerTier = (totalSpent: number, totalOrders: number): { tier: string; color: string } => {
+    if (totalSpent >= 50000 && totalOrders >= 10) {
+      return { tier: '白金客戶', color: '#8B5CF6' };
+    } else if (totalSpent >= 20000 && totalOrders >= 5) {
+      return { tier: '黃金客戶', color: '#F59E0B' };
+    } else if (totalSpent >= 5000 && totalOrders >= 2) {
+      return { tier: '白銀客戶', color: '#6B7280' };
+    } else if (totalSpent > 0 && totalOrders >= 1) {
+      return { tier: '一般客戶', color: '#10B981' };
+    } else {
+      return { tier: '潛在客戶', color: '#EF4444' };
+    }
+  };
+
+  // 計算客戶等級分布
+  const calculateCustomerTiers = (customers: Customer[]): CustomerTier[] => {
+    const tierCounts = new Map<string, { count: number; color: string }>();
+    
+    customers.forEach(customer => {
+      const { tier, color } = getCustomerTier(customer.total_spent, customer.total_orders);
+      if (tierCounts.has(tier)) {
+        tierCounts.get(tier)!.count += 1;
+      } else {
+        tierCounts.set(tier, { count: 1, color });
+      }
+    });
+
+    return Array.from(tierCounts.entries()).map(([tier, { count, color }]) => ({
+      tier,
+      count,
+      color
+    }));
+  };
+
   useEffect(() => {
     fetchDashboardData();
   }, [filters]);
@@ -65,13 +117,26 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsResponse, trendsResponse] = await Promise.all([
+      const [statsResponse, trendsResponse, customersResponse] = await Promise.all([
         api.get('/reports/dashboard/', { params: filters }),
-        api.get('/reports/trends/', { params: filters })
+        api.get('/reports/trends/', { params: filters }),
+        api.get('/customers/', { 
+          params: { 
+            limit: 10000, // 增加限制以獲取更多客戶資料
+            date_from: filters.date_from,
+            date_to: filters.date_to,
+            source: filters.source,
+            tags: filters.tags
+          } 
+        })
       ]);
       
       setStats(statsResponse.data);
       setTrends(trendsResponse.data);
+      setCustomers(customersResponse.data.results || []);
+      // 計算客戶等級分布
+      const tiers = calculateCustomerTiers(customersResponse.data.results|| []);
+      setCustomerTiers(tiers);
     } catch (error) {
       console.error('載入儀表板數據失敗:', error);
     } finally {
@@ -267,9 +332,20 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={trends.order_trend}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
+              <XAxis 
+                dataKey="date" 
+                domain={['dataMin', 'dataMax']}
+                type="category"
+                tick={{ fontSize: 12 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
               <YAxis />
-              <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+              <Tooltip 
+                formatter={(value) => formatCurrency(Number(value))}
+                labelFormatter={(label) => `日期: ${label}`}
+              />
               <Area type="monotone" dataKey="total_amount" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
             </AreaChart>
           </ResponsiveContainer>
@@ -281,9 +357,17 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trends.customer_trend}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
+              <XAxis 
+                dataKey="date" 
+                domain={['dataMin', 'dataMax']}
+                type="category"
+                tick={{ fontSize: 12 }}
+                angle={-45}
+                textAnchor="end"
+                height={80}
+              />
               <YAxis />
-              <Tooltip />
+              <Tooltip labelFormatter={(label) => `日期: ${label}`} />
               <Line type="monotone" dataKey="count" stroke="#10B981" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>
@@ -325,6 +409,41 @@ const Dashboard: React.FC = () => {
               <Bar dataKey="total_amount" fill="#8B5CF6" />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+
+        {/* 客戶等級分布圓餅圖 */}
+        <div className="bg-white rounded-xl shadow-sm border p-6">
+          <h3 className="text-lg font-semibold mb-4">客戶等級分布</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={customerTiers}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({ tier, percent }) => `${tier} ${((percent ?? 0) * 100).toFixed(0)}%`}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="count"
+              >
+                {customerTiers.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            {customerTiers.map((tier, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded-full" 
+                  style={{ backgroundColor: tier.color }}
+                ></div>
+                <span className="text-sm text-gray-600">{tier.tier}: {tier.count}人</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

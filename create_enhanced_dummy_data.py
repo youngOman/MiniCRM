@@ -242,7 +242,7 @@ def create_enhanced_dummy_data():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         
-        payment_methods = ['credit_card', 'paypal', 'stripe', 'bank_transfer', 'apple_pay', 'google_pay','line_Pay', '']
+        payment_methods = ['credit_card', 'paypal', 'stripe', 'bank_transfer', 'apple_pay', 'google_pay','line_Pay']
         transaction_statuses = ['pending', 'completed', 'failed', 'refunded']
         
         # Get orders with their customer info and dates

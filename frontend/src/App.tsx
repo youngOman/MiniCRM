@@ -27,6 +27,7 @@ function App() {
             <Route path="customers" element={<CustomerList />} />
             <Route path="orders" element={<OrderList />} />
             <Route path="transactions" element={<TransactionList />} />
+            
           </Route>
           <Route
             path="*"

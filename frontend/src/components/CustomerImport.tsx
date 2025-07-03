@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Customer } from '../types/customer';
-import { CatchError, ApiError } from '../types/error';
+import { ApiError } from '../types/error';
 import api from '../services/api';
 
 interface CustomerImportProps {
@@ -193,7 +193,7 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
           const value = row[mapping.sourceField];
           if (mapping.targetField === 'is_active') {
             customer[mapping.targetField as keyof Customer] = 
-              ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toStrinfg().toLowerCase()) as any;
+              ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toString().toLowerCase()) as any;
           } else {
             customer[mapping.targetField as keyof Customer] = value as any;
           }

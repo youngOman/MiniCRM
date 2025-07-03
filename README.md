@@ -180,7 +180,7 @@ npm run dev
 - **前端介面**: http://localhost:5173
 - **後端 API**: http://localhost:8000
 - **管理後台**: http://localhost:8000/admin
-- **示範登入**: `www` / `young0921`
+- **示範登入**: `test_young` / `young0921`
 
 ---
 

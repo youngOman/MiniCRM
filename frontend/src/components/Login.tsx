@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/auth';
-import { CatchError } from '../types/error';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  
   const [credentials, setCredentials] = useState({
     username: '',
     password: '',
@@ -20,7 +20,7 @@ const Login: React.FC = () => {
     try {
       await authService.login(credentials);
       navigate('/dashboard');
-    } catch (err: CatchError) {
+    } catch (err) {
       if (err && typeof err === 'object' && 'response' in err) {
         const apiError = err as { response?: { data?: { detail?: string } } };
         setError(apiError.response?.data?.detail || 'Login failed. Please try again.');
@@ -156,7 +156,7 @@ const Login: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="text-sm text-blue-700 font-medium">
-                  測試體驗帳號：www / young0921
+                  測試體驗帳號：test_young / young0921
                 </p>
               </div>
             </div>
