@@ -152,6 +152,11 @@ const Dashboard: React.FC = () => {
     }).format(amount);
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return format(date, 'yyyy/MM/dd');
+  };
+
   const handleFilterChange = (field: string, value: string) => {
     setFilters(prev => ({ ...prev, [field]: value }));
   };
@@ -328,23 +333,23 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* 營收趨勢圖 */}
         <div className="bg-white rounded-xl shadow-sm border p-6">
-          <h3 className="text-lg font-semibold mb-4">營收趨勢</h3>
+          <h3 className="text-lg font-semibold mb-4">營收趨勢 ({filters.date_from} ~ {filters.date_to})</h3>
           <ResponsiveContainer width="100%" height={300}>
             <AreaChart data={trends.order_trend}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="date" 
-                domain={['dataMin', 'dataMax']}
-                type="category"
+                tickFormatter={formatDate}
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
                 height={80}
+                interval="preserveStartEnd"
               />
               <YAxis />
               <Tooltip 
                 formatter={(value) => formatCurrency(Number(value))}
-                labelFormatter={(label) => `日期: ${label}`}
+                labelFormatter={(label) => `日期: ${formatDate(label)}`}
               />
               <Area type="monotone" dataKey="total_amount" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
             </AreaChart>
@@ -353,21 +358,21 @@ const Dashboard: React.FC = () => {
 
         {/* 客戶增長趨勢 */}
         <div className="bg-white rounded-xl shadow-sm border p-6">
-          <h3 className="text-lg font-semibold mb-4">客戶增長趨勢</h3>
+          <h3 className="text-lg font-semibold mb-4">客戶增長趨勢 ({filters.date_from} ~ {filters.date_to})</h3>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trends.customer_trend}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="date" 
-                domain={['dataMin', 'dataMax']}
-                type="category"
+                tickFormatter={formatDate}
                 tick={{ fontSize: 12 }}
                 angle={-45}
                 textAnchor="end"
                 height={80}
+                interval="preserveStartEnd"
               />
               <YAxis />
-              <Tooltip labelFormatter={(label) => `日期: ${label}`} />
+              <Tooltip labelFormatter={(label) => `日期: ${formatDate(label)}`} />
               <Line type="monotone" dataKey="count" stroke="#10B981" strokeWidth={3} />
             </LineChart>
           </ResponsiveContainer>

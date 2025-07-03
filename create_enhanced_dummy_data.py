@@ -138,8 +138,8 @@ def create_enhanced_dummy_data():
             tags = ', '.join(random.sample(tags_list, random.randint(1, 3)))
             notes = f"Customer from {company} - {random.choice(['High value client', 'Regular customer', 'New prospect', 'Returning customer', 'Referral client'])}"
             
-            # Create customers over the last 2 years with more variation
-            created_at = now - timedelta(days=random.randint(1, 730))
+            # Create customers over the last 5 years with more variation
+            created_at = now - timedelta(days=random.randint(1, 1825))  # 5 years
             
             cursor.execute(customer_insert_query, (
                 first_name, last_name, email, phone, company, address, city, state, zip_code, 'USA',
@@ -176,8 +176,8 @@ def create_enhanced_dummy_data():
                 
                 total = subtotal + tax_amount + shipping_amount - discount_amount
                 
-                # Create orders spanning the last 18 months with seasonal patterns
-                days_back = random.randint(1, 540)  # 18 months
+                # Create orders spanning the last 5 years with seasonal patterns
+                days_back = random.randint(1, 1825)  # 5 years
                 
                 # Add seasonal variation (more orders in Nov-Dec, Mar-Apr, Jul-Aug)
                 month_factor = 1.0
@@ -286,7 +286,7 @@ def create_enhanced_dummy_data():
         print(f'Created {order_count} orders')
         print(f'Created {orderitem_count} order items')
         print(f'Created {transaction_count} transactions')
-        print('\n📊 Data spans 18 months with seasonal variations for better dashboard visualization')
+        print('\n📊 Data spans 5 years (2020-2025) with seasonal variations for better dashboard visualization')
         
     except Exception as e:
         print(f'Error: {e}')
