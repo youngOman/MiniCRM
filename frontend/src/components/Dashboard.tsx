@@ -77,9 +77,9 @@ const Dashboard: React.FC = () => {
 
   // 客戶等級分類邏輯
   const getCustomerTier = (totalSpent: number, totalOrders: number): { tier: string; color: string } => {
-    if (totalSpent >= 50000 && totalOrders >= 10) {
+    if (totalSpent >= 60000) {
       return { tier: '白金客戶', color: '#8B5CF6' };
-    } else if (totalSpent >= 20000 && totalOrders >= 5) {
+    } else if (totalSpent >= 20000 && totalOrders >= 1) {
       return { tier: '黃金客戶', color: '#F59E0B' };
     } else if (totalSpent >= 5000 && totalOrders >= 2) {
       return { tier: '白銀客戶', color: '#6B7280' };

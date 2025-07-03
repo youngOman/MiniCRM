@@ -67,26 +67,27 @@ MiniCRM Pro 是一個為輕量化的專為中小型企業與業務團隊設計�
 
 ### 會員資料管理
 
-![Customers Page](./images/customers_page.png)
+<!-- ![Customers Page](./images/customers_page.png) -->
 
 
 ### 訂單管理
 
-![Orders Page](./images/orders_page.png)
+<!-- ![Orders Page](./images/orders_page.png) -->
 
 
 ### 交易記錄
 
-![Transactions Page](./images/transactions_page.png)
-
+<!-- ![Transactions Page](./images/transactions_page.png) -->
 
 ### 搜尋與篩選資料
 
-![Search Results](./images/search_result.png)
+<!-- ![Search Results](./images/search_result.png) -->
 
-### 匯入客戶資料
+### 可一次匯入大量客戶資料
 
-![Import Customers](./images/import_customer_data.png)
+<!-- ![Import Customers](./images/import_customer_data.png) -->
+
+### 報表區
 
 ---
 
