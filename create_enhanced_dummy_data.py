@@ -167,7 +167,15 @@ def create_enhanced_dummy_data():
             num_orders = random.randint(1, 5)
             for j in range(num_orders):
                 order_number = f'ORD-{random.randint(10000000, 99999999):08X}'
-                subtotal = Decimal(random.uniform(100, 5000)).quantize(Decimal('0.01'))
+                # Create a weighted distribution for subtotal amounts
+                # 70% normal orders (100-2000), 20% medium orders (2000-10000), 10% large orders (10000-80000)
+                rand_val = random.random()
+                if rand_val < 0.7:
+                    subtotal = Decimal(random.uniform(100, 2000)).quantize(Decimal('0.01'))
+                elif rand_val < 0.9:
+                    subtotal = Decimal(random.uniform(2000, 10000)).quantize(Decimal('0.01'))
+                else:
+                    subtotal = Decimal(random.uniform(10000, 80000)).quantize(Decimal('0.01'))
                 tax_amount = (subtotal * Decimal('0.08')).quantize(Decimal('0.01'))
                 shipping_amount = Decimal('25.00') if subtotal < 1000 else Decimal('0.00')
                 discount_amount = Decimal('0.00')
