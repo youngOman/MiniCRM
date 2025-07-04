@@ -14,7 +14,7 @@ class Order(models.Model):
         ('refunded', 'Refunded'),
     ]
     
-    order_number = models.CharField(max_length=50, unique=True, editable=False)
+    order_number = models.CharField(max_length=50, unique=True, editable=False) # 訂單編號，唯一且不可編輯
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='orders')
     
     status = models.CharField(max_length=20, choices=ORDER_STATUS, default='pending')

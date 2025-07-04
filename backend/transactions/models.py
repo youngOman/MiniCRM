@@ -33,7 +33,7 @@ class Transaction(models.Model):
     ]
     
     transaction_id = models.CharField(max_length=50, unique=True, editable=False)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='transactions')
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='transactions') # 當關聯的 Customer被刪除時，此筆交易紀錄資料也會被刪除
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='transactions', null=True, blank=True)
     
     transaction_type = models.CharField(max_length=20, choices=TRANSACTION_TYPES, default='sale')
