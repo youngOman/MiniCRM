@@ -1,16 +1,12 @@
 # MiniCRM Pro - 輕量型智慧全端 AI CRM 系統
 
 <div align="center">
-
-<div align="center">
-  <img src="./images/flash.png" alt="MiniCRM Pro Logo" width="80" style="margin-bottom: 10px;" />
+  <img src="./images/miniCRM_dashboard.png" width="550" style="margin-bottom: 12px;" />
   <br/>
   <img src="https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django"/>
   <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react"/>
   <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript"/>
   <img src="https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss"/>
-</div>
-
 </div>
 
 ---
