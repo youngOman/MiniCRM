@@ -1,7 +1,7 @@
 # MiniCRM Pro - 輕量型智慧全端 AI CRM 系統
 
 <div align="center">
-  <img src="./images/miniCRM_dashboard.png" width="550" style="margin-bottom: 12px;" />
+  <img src="./images/miniCRM_dashboard.png" style="margin-bottom: 12px;" />
   <br/>
   <img src="https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django"/>
   <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react"/>
@@ -13,11 +13,11 @@
 
 ## 專案概述
 
-MiniCRM Pro 是一個為輕量型、免費開源、專為中小型企業與業務團隊設計、的高效率 CRM 系統，不需要複雜的設定或昂貴的授權費用或是繁雜的導入流程，沒有多餘且無用的功能，就是來協助您用最一目了然的方式打造最智慧的客戶經營流程，管理客戶關係追蹤銷售業績以及分析業務表現，並讓您的品牌可以進行後續的精準再行銷及提升顧客忠誠度及回流率。
+MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步的創業家、小型電商所設計的高效率 CRM 系統，不需要複雜的設定或昂貴的授權費用或是繁雜的導入流程，沒有多餘無用的功能，只保留了 CRM 最核心的功能，就是來協助您用最一目了然的方式打造最智慧的客戶經營流程，管理客戶關係追蹤銷售業績以及分析業務表現，並讓您的品牌可以進行後續的精準再行銷及提升顧客忠誠度及回流率。讓您瞭解公司是否朝正確方向邁進，或是否有不足之處。 清楚知道自己的客戶獲取成本 (CAC)
 
 具備簡潔的資料管理，營運儀表版、視覺化報表如營收趨勢、客戶增長趨勢、客戶來源分佈、付款方式分佈、客戶等級分佈、今日(新增客戶量、新增訂單、完成交易數)、本月、客戶指標(平均客戶價值、待處理訂單、轉換率) 等..
 
-與客戶生命週期價值 (CLV) 計算(開發中)、 AI 智慧摘要(開發中)
+- 開發中：成交率、追加銷售率、新淨收入、銷售週期長短與客戶生命週期價值 (CLV) 計算、 AI 智慧摘要(開發中)
 
 目前主要有四個功能模組：
 
@@ -355,10 +355,16 @@ npm run test:coverage
 
 ### 關聯關係
 
-- Customer → Orders (一對多)
-- Customer → Transactions (一對多)
-- Order → OrderItems (一對多)
-- Order → Transactions (一對多)
+1. User → Customer (1:M)
+   - 使用者可以建立和管理多個客戶
+2. Customer → Order (1:M)
+   - 客戶可以有多個訂單
+3. Order → OrderItem (1:M)
+   - 訂單可以包含多個商品項目
+4. Customer → Transaction (1:M)
+   - 客戶可以有多筆交易記錄
+5. Order → Transaction (1:M, Optional)
+   - 訂單可以關聯多筆交易（可選）
 
 ---
 

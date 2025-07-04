@@ -221,6 +221,60 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
                 </dl>
               </div>
 
+              {(customer.age || customer.gender || customer.product_categories_interest?.length || customer.seasonal_purchase_pattern) && (
+                <div className="md:col-span-2">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">個人偏好</h3>
+                  <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                    {customer.age && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">年齡</dt>
+                        <dd className="text-sm text-gray-900">{customer.age} 歲</dd>
+                      </div>
+                    )}
+                    {customer.gender && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">性別</dt>
+                        <dd className="text-sm text-gray-900">
+                          {customer.gender === 'male' && '男性'}
+                          {customer.gender === 'female' && '女性'}
+                          {customer.gender === 'other' && '其他'}
+                          {customer.gender === 'prefer_not_to_say' && '不願透露'}
+                        </dd>
+                      </div>
+                    )}
+                    {customer.seasonal_purchase_pattern && (
+                      <div>
+                        <dt className="text-sm font-medium text-gray-500">購買季節偏好</dt>
+                        <dd className="text-sm text-gray-900">
+                          {customer.seasonal_purchase_pattern === 'spring' && '春季購買'}
+                          {customer.seasonal_purchase_pattern === 'summer' && '夏季購買'}
+                          {customer.seasonal_purchase_pattern === 'autumn' && '秋季購買'}
+                          {customer.seasonal_purchase_pattern === 'winter' && '冬季購買'}
+                          {customer.seasonal_purchase_pattern === 'year_round' && '全年均勻'}
+                        </dd>
+                      </div>
+                    )}
+                    {customer.product_categories_interest && customer.product_categories_interest.length > 0 && (
+                      <div className="md:col-span-2">
+                        <dt className="text-sm font-medium text-gray-500">產品類別興趣</dt>
+                        <dd className="text-sm text-gray-900">
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {customer.product_categories_interest.map((category, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                              >
+                                {category}
+                              </span>
+                            ))}
+                          </div>
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+              )}
+
               {(customer.tags || customer.notes) && (
                 <div className="md:col-span-2">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">其他資訊</h3>

@@ -13,7 +13,14 @@ export interface Customer {
   country: string;
   source: string;
   tags?: string;
+  // 
   notes?: string;
+  age?: number;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
+  // 產品偏好欄位
+  product_categories_interest?: string[];
+  // 購買季節偏好欄位
+  seasonal_purchase_pattern?: 'spring' | 'summer' | 'autumn' | 'winter' | 'year_round';
   is_active: boolean;
   total_orders: number;
   total_spent: number | string;

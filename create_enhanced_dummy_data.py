@@ -1,5 +1,6 @@
 import pymysql
 import os
+import json
 from decimal import Decimal
 import random
 from datetime import datetime, timedelta
@@ -116,10 +117,15 @@ def create_enhanced_dummy_data():
         sources = ['website', 'social_media', 'referral', 'advertisement', 'trade_show', 'email_campaign', 'phone_call', 'walk_in']
         tags_list = ['enterprise', 'priority', 'marketing', 'agency', 'design', 'creative', 'consulting', 'business', 'ecommerce', 'retail', 'fintech', 'startup', 'vip', 'premium', 'budget', 'corporate', 'small_business', 'non_profit']
         
+        # 新增欄位的選項
+        genders = ['male', 'female', 'other', 'prefer_not_to_say']
+        seasonal_patterns = ['spring', 'summer', 'autumn', 'winter', 'year_round']
+        product_categories = ['電子產品', '服飾配件', '居家用品', '美妝保養', '運動健身', '書籍文具', '食品飲料', '旅遊票券', '汽車用品', '寵物用品']
+        
         customer_insert_query = """
         INSERT INTO customers_customer 
-        (first_name, last_name, email, phone, company, address, city, state, zip_code, country, source, tags, notes, is_active, created_at, updated_at, created_by_id, updated_by_id) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (first_name, last_name, email, phone, company, address, city, state, zip_code, country, source, tags, notes, age, gender, product_categories_interest, seasonal_purchase_pattern, is_active, created_at, updated_at, created_by_id, updated_by_id) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         
         now = datetime.now()
@@ -138,12 +144,23 @@ def create_enhanced_dummy_data():
             tags = ', '.join(random.sample(tags_list, random.randint(1, 3)))
             notes = f"Customer from {company} - {random.choice(['High value client', 'Regular customer', 'New prospect', 'Returning customer', 'Referral client'])}"
             
+            # 新增欄位的資料生成
+            age = random.randint(18, 75) if random.random() > 0.1 else None  # 90% 有年齡資料
+            gender = random.choice(genders) if random.random() > 0.2 else None  # 80% 有性別資料
+            
+            # 產品偏好：隨機選擇 1-3 個類別
+            interests = random.sample(product_categories, random.randint(1, 3)) if random.random() > 0.3 else []
+            product_interests_json = json.dumps(interests, ensure_ascii=False)
+            
+            # 季節性購買模式
+            seasonal_pattern = random.choice(seasonal_patterns) if random.random() > 0.4 else None  # 60% 有季節偏好
+            
             # Create customers over the last 5 years with more variation
             created_at = now - timedelta(days=random.randint(1, 1825))  # 5 years
             
             cursor.execute(customer_insert_query, (
                 first_name, last_name, email, phone, company, address, city, state, zip_code, 'USA',
-                source, tags, notes, 1, created_at, created_at, user_id, user_id
+                source, tags, notes, age, gender, product_interests_json, seasonal_pattern, 1, created_at, created_at, user_id, user_id
             ))
             customer_ids.append(cursor.lastrowid)
             if (i + 1) % 20 == 0:

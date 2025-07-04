@@ -252,7 +252,7 @@ const CustomerList: React.FC = () => {
               <tr key={customer.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div>
+                    <div className="flex-1">
                       <div className="text-sm font-medium text-gray-900">
                         <button
                           onClick={() => handleViewCustomer(customer)}
@@ -260,9 +260,21 @@ const CustomerList: React.FC = () => {
                         >
                           {customer.full_name}
                         </button>
+                        {customer.age && (
+                          <span className="ml-2 text-xs text-gray-400">
+                            ({customer.age}歲)
+                          </span>
+                        )}
                       </div>
-                      <div className="text-sm text-gray-500">
-                        ID: {customer.id}
+                      <div className="text-sm text-gray-500 flex items-center space-x-2">
+                        <span>ID: {customer.id}</span>
+                        {customer.gender && (
+                          <span className="text-xs">
+                            {customer.gender === 'male' && '♂️'}
+                            {customer.gender === 'female' && '♀️'}
+                            {customer.gender === 'other' && '⚧️'}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -275,15 +287,36 @@ const CustomerList: React.FC = () => {
                   {customer.company || '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                    {customer.source}
-                  </span>
+                  <div className="flex flex-col space-y-1">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {customer.source}
+                    </span>
+                    {customer.seasonal_purchase_pattern && (
+                      <span className="text-xs text-gray-500">
+                        購買季節偏好:
+                        {customer.seasonal_purchase_pattern === 'spring' && '🌸 春季'}
+                        {customer.seasonal_purchase_pattern === 'summer' && '☀️ 夏季'}
+                        {customer.seasonal_purchase_pattern === 'autumn' && '🍂 秋季'}
+                        {customer.seasonal_purchase_pattern === 'winter' && '❄️ 冬季'}
+                        {customer.seasonal_purchase_pattern === 'year_round' && '🔄 全年'}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {customer.total_orders}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  ${typeof customer.total_spent === 'number' ? customer.total_spent.toFixed(2) : parseFloat(customer.total_spent || '0').toFixed(2)}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">
+                    ${typeof customer.total_spent === 'number' ? customer.total_spent.toFixed(2) : parseFloat(customer.total_spent || '0').toFixed(2)}
+                  </div>
+                  {customer.product_categories_interest && customer.product_categories_interest.length > 0 && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      <span className="inline-flex items-center">
+                        對 {customer.product_categories_interest.length} 個產品類別感興趣
+                      </span>
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span

@@ -24,6 +24,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
     source: 'other',
     tags: '',
     notes: '',
+    // 新增的個人資訊欄位
+    age: '',
+    gender: '',
+    // 產品偏好欄位
+    product_categories_interest: [] as string[],
+    seasonal_purchase_pattern: '',
     is_active: true,
   });
   const [loading, setLoading] = useState(false);
@@ -35,6 +41,28 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
     { value: 'referral', label: '推薦介紹' },
     { value: 'advertisement', label: '廣告宣傳' },
     { value: 'other', label: '其他' },
+  ];
+
+  const genderOptions = [
+    { value: '', label: '請選擇' },
+    { value: 'male', label: '男性' },
+    { value: 'female', label: '女性' },
+    { value: 'other', label: '其他' },
+    { value: 'prefer_not_to_say', label: '不願透露' },
+  ];
+
+  const seasonalOptions = [
+    { value: '', label: '請選擇' },
+    { value: 'spring', label: '春季購買' },
+    { value: 'summer', label: '夏季購買' },
+    { value: 'autumn', label: '秋季購買' },
+    { value: 'winter', label: '冬季購買' },
+    { value: 'year_round', label: '全年均勻' },
+  ];
+
+  const productCategories = [
+    '電子產品', '服飾配件', '居家用品', '美妝保養', '運動健身',
+    '書籍文具', '食品飲料', '旅遊票券', '汽車用品', '寵物用品'
   ];
 
   useEffect(() => {
@@ -54,6 +82,12 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
         source: customer.source || 'other',
         tags: customer.tags || '',
         notes: customer.notes || '',
+        // 新增的個人資訊欄位
+        age: customer.age?.toString() || '',
+        gender: customer.gender || '',
+        // 產品偏好欄位
+        product_categories_interest: customer.product_categories_interest || [],
+        seasonal_purchase_pattern: customer.seasonal_purchase_pattern || '',
         is_active: customer.is_active ?? true,
       });
     }
@@ -87,13 +121,19 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
 
     setLoading(true);
     try {
+      // 準備提交數據，處理年齡的數字轉換
+      const submitData = {
+        ...formData,
+        age: formData.age ? parseInt(formData.age) : null,
+      };
+      
       let response;
       if (customer) {
-        console.log('Updating customer:', customer.id, formData);
-        response = await api.put(`/customers/${customer.id}/`, formData);
+        console.log('Updating customer:', customer.id, submitData);
+        response = await api.put(`/customers/${customer.id}/`, submitData);
       } else {
-        console.log('Creating new customer:', formData);
-        response = await api.post('/customers/', formData);
+        console.log('Creating new customer:', submitData);
+        response = await api.post('/customers/', submitData);
       }
       onSave(response.data);
     } catch (error: CatchError) {
@@ -392,6 +432,105 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
                       ))}
                     </select>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Personal Preferences Section */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">個人偏好</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="age" className="block text-sm font-semibold text-gray-700">
+                    年齡
+                  </label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="18"
+                    max="100"
+                    value={formData.age}
+                    onChange={handleChange}
+                    className={inputClass('age')}
+                    placeholder="請輸入年齡"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="gender" className="block text-sm font-semibold text-gray-700">
+                    性別
+                  </label>
+                  <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    className={inputClass('gender')}
+                  >
+                    {genderOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="seasonal_purchase_pattern" className="block text-sm font-semibold text-gray-700">
+                    購買季節偏好
+                  </label>
+                  <select
+                    id="seasonal_purchase_pattern"
+                    name="seasonal_purchase_pattern"
+                    value={formData.seasonal_purchase_pattern}
+                    onChange={handleChange}
+                    className={inputClass('seasonal_purchase_pattern')}
+                  >
+                    {seasonalOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    產品類別興趣
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {productCategories.map((category) => (
+                      <div key={category} className="flex items-center">
+                        <input
+                          id={`interest_${category}`}
+                          type="checkbox"
+                          checked={formData.product_categories_interest.includes(category)}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            const currentInterests = formData.product_categories_interest;
+                            let newInterests;
+                            
+                            if (isChecked) {
+                              newInterests = [...currentInterests, category];
+                            } else {
+                              newInterests = currentInterests.filter(item => item !== category);
+                            }
+                            
+                            setFormData(prev => ({
+                              ...prev,
+                              product_categories_interest: newInterests
+                            }));
+                          }}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors duration-200"
+                        />
+                        <label htmlFor={`interest_${category}`} className="ml-2 block text-sm text-gray-700">
+                          {category}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="mt-2 text-xs text-gray-500">選擇客戶感興趣的產品類別，有助於精準推薦</p>
                 </div>
               </div>
             </div>
