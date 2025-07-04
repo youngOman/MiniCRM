@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
     date_from: format(subMonths(new Date(), 3), 'yyyy-MM-dd'),
     date_to: format(new Date(), 'yyyy-MM-dd'),
     source: '',
-    tags: '',
+    // tags: '',
     period: 'month'
   });
 
@@ -126,7 +126,7 @@ const Dashboard: React.FC = () => {
             date_from: filters.date_from,
             date_to: filters.date_to,
             source: filters.source,
-            tags: filters.tags
+            // tags: filters.tags
           } 
         })
       ]);
@@ -166,7 +166,7 @@ const Dashboard: React.FC = () => {
       date_from: format(subMonths(new Date(), 3), 'yyyy-MM-dd'),
       date_to: format(new Date(), 'yyyy-MM-dd'),
       source: '',
-      tags: '',
+      // tags: '',
       period: 'month'
     });
   };
@@ -232,7 +232,7 @@ const Dashboard: React.FC = () => {
               <option value="other">其他</option>
             </select>
           </div>
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">標籤</label>
             <input
               type="text"
@@ -241,7 +241,7 @@ const Dashboard: React.FC = () => {
               placeholder="標籤關鍵字"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-          </div>
+          </div> */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">時間粒度</label>
             <select

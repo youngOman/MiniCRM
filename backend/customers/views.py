@@ -6,10 +6,10 @@ from django_filters import rest_framework as filters_drf
 from .models import Customer
 from .serializers import CustomerSerializer, CustomerCreateUpdateSerializer
 
-
+# 多新增一個篩選器，讓使用者可以根據創建日期範圍來過濾客戶資料
 class CustomerFilter(filters_drf.FilterSet):
-    date_from = filters_drf.DateFilter(field_name='created_at', lookup_expr='gte')
-    date_to = filters_drf.DateFilter(field_name='created_at', lookup_expr='lte')
+    date_from = filters_drf.DateFilter(field_name='created_at', lookup_expr='gte') # 大於等於創建日期
+    date_to = filters_drf.DateFilter(field_name='created_at', lookup_expr='lte') # 小於等於創建日期
     
     class Meta:
         model = Customer

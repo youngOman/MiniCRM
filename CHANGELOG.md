@@ -1,10 +1,30 @@
 # CHANGELOG
 
+## 待辦
+
+- 客戶生命週期價值 (CLV) 計算
+- PDF 報表匯出
+- 即時數據更新：WebSocket 即時推送
+
+- 新增客戶價值排行榜
+  - 客戶價值計算方式：
+  - 主要指標: total_spent (總消費金額)
+  - 次要指標: total_orders × 平均訂單價值
+  - 時間權重: 考慮客戶年齡 (今天 - created_at)
+  
+## 待處理BUG
+
+- 
+
 ## [v1.6] - 2025-07-04
 
-### 前端結構優化
-
 - 拆分 Dashboard.tsx 中的圖表成獨立組件
+- 將原本的上方選單結構調整為後台系統常見的左側導覽列（Sidebar）形式，更符合使用習慣
+  - Sidebar.tsx - 桌面版左側導覽列
+    - 簡單 slide transition 動畫
+    - selected 狀態以 gradient 藍色背景顯示
+  - MobileHeader.tsx - 手機版版頂部導覽
+    - 折疊式選單，點擊後展開
 
 ## [v1.6] - 2025-07-03
 
@@ -15,18 +35,14 @@
 - 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
 - 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
 
-1. **新增客戶等級分佈圓餅圖**
+1. 新增客戶等級分佈圓餅圖
   - 等級分類邏輯：
   - 白金客戶 (Platinum): total_spent >= 50000 且 total_orders >= 10
   - 黃金客戶 (Gold): total_spent >= 20000 且 total_orders >= 5
   - 白銀客戶 (Silver): total_spent >= 5000 且 total_orders >= 2
   - 一般客戶 (Regular): total_spent > 0 且 total_orders >= 1
   - 潛在客戶 (Potential): total_spent = 0 且 total_orders = 0
-2. **新增客戶價值排行榜**
-  - 客戶價值計算方式：
-  - 主要指標: total_spent (總消費金額)
-  - 次要指標: total_orders × 平均訂單價值
-  - 時間權重: 考慮客戶年齡 (今天 - created_at)
+
 
 ### 修復問題
 
