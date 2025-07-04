@@ -243,7 +243,7 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
 
         await api.post('/customers/', customerData);
         results.success++;
-      } catch (error: CatchError) {
+      } catch (error: unknown) {
         results.failed++;
         let errorMsg = '未知錯誤';
         

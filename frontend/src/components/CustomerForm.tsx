@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Customer } from '../types/customer';
-import { CatchError, ApiError } from '../types/error';
+import { ApiError } from '../types/error';
 import api from '../services/api';
 
 interface CustomerFormProps {
@@ -136,7 +136,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ customer, onSave, onCancel 
         response = await api.post('/customers/', submitData);
       }
       onSave(response.data);
-    } catch (error: CatchError) {
+    } catch (error: unknown) {
       console.error('Error saving customer:', error);
       if (error && typeof error === 'object' && 'response' in error) {
         const apiError = error as ApiError;

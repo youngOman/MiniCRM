@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Transaction } from '../types/transaction';
 import { Customer } from '../types/customer';
 import { Order } from '../types/order';
-import { CatchError, ApiError } from '../types/error';
+import { unknown, ApiError } from '../types/error';
 import api from '../services/api';
 
 interface TransactionFormProps {
@@ -152,7 +152,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSave, 
         response = await api.post('/transactions/', submitData);
       }
       onSave(response.data);
-    } catch (error: CatchError) {
+    } catch (error: unknown) {
       if (error && typeof error === 'object' && 'response' in error) {
         const apiError = error as ApiError;
         if (apiError.response?.data) {

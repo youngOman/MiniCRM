@@ -12,6 +12,3 @@ export interface ApiError {
   };
   message?: string;
 }
-
-// Generic error type for catch blocks
-export type CatchError = Error | ApiError | unknown;
