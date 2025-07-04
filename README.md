@@ -2,11 +2,14 @@
 
 <div align="center">
 
-![MiniCRM Pro Logo](./images/flash.png)
-![Django](https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django)
-![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss)
+<div align="center">
+  <img src="./images/flash.png" alt="MiniCRM Pro Logo" width="80" style="margin-bottom: 10px;" />
+  <br/>
+  <img src="https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django"/>
+  <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react"/>
+  <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript"/>
+  <img src="https://img.shields.io/badge/TailwindCSS-4-06B6D4?style=for-the-badge&logo=tailwindcss"/>
+</div>
 
 </div>
 
