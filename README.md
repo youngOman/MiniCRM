@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![MiniCRM Pro Logo](https://img.shields.io/badge/MiniCRM Pro-v1.0-blue?style=for-the-badge)
+![MiniCRM Pro Logo](./images/flash.png)
 ![Django](https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django)
 ![React](https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
