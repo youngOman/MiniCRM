@@ -26,7 +26,7 @@ const CustomerList: React.FC = () => {
 		async (url?: string) => {
 			try {
 				setLoading(true);
-				const endpoint = url || `/customers/${searchTerm ? `?search=${searchTerm}` : ""}`;
+				const endpoint = url || `/customers/${searchTerm ? `?search=${searchTerm}` : ""}`; //
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
 				setCustomers(response.data.results);
@@ -42,7 +42,7 @@ const CustomerList: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[searchTerm] // 明確指定依賴 searchTerm 以便在搜尋時重新獲取客戶資料
+		[searchTerm] // 明確指定依賴 searchTerm 以便在搜尋時重新獲取客戶資料，避免無限 re-render
 	);
 
 	useEffect(() => {
