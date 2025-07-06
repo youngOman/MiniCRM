@@ -2,26 +2,20 @@
 
 ## 待辦
 
-- 客戶生命週期價值 (CLV) 計算
-- PDF 報表匯出
-- 即時數據更新：WebSocket 即時推送
-
-- 新增客戶價值排行榜
-  - 客戶價值計算方式：
-  - 主要指標: total_spent (總消費金額)
-  - 次要指標: total_orders × 平均訂單價值
-  - 時間權重: 考慮客戶年齡 (今天 - created_at)
-- 匯出資料
-- 匯出報表
-- 季節性行銷：根據購買模式安排促銷活動
-- 產品推薦：根據產品類別的精準推薦
-
-1. 產品管理系統
-2. 銷售管理 (Sales Management)
-3. 行銷管理 (Marketing Management)
+1. 客戶生命週期價值 (CLV) 計算
+2. PDF 報表匯出
+3. 即時數據更新：WebSocket 即時推送
+4. 匯出資料、匯出報表
+5. 季節性行銷：根據購買模式安排促銷活動
+6. 產品推薦：根據產品類別的精準推薦
+7. 產品管理系統
+8. 銷售管理 (Sales Management)
+9. 行銷管理 (Marketing Management)
 
 - 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
 - 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
+
+- 前端列表顯示英文而非中文問題
 
 ## 待處理 BUG
 
@@ -43,12 +37,15 @@
 
 2. 建立產品管理的 Admin 管理介面
    1. 開發產品管理的 API Serializers
-   2. 開發產品管理的 API Views
-   3. 開發產品管理的 URL 路由
-   4. 整合產品管理到主要 URL 配置
-3. API Serializers - 資料序列化
-4. API Views - RESTful API 端點
-5. 前端介面 - React 組件
+   2. 建立產品管理的 API Views - RESTful API 端點並於 `urls.py` 中配置路由
+   3. 整合產品管理到主要 URL 配置
+   4. 建立產品管理的前端頁面組件
+      1. 定義產品的 types
+      2. 開發 ProductList.tsx 組件顯示產品列表
+      3. 在前端添加產品管理的路由和導航。在 Sidebar 中添加產品管理的導航項目
+      4. 在 App.tsx 中添加產品管理的路由
+      5. 在 App.tsx 中導入 ProductList 組件
+
 
 ## [v1.7] - 2025-07-06
 

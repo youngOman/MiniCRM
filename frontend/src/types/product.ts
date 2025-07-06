@@ -1,0 +1,100 @@
+export interface Category {
+  id: number;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Brand {
+  id: number;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Supplier {
+  id: number;
+  name: string;
+  contact_person?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Product {
+  id: number;
+  name: string;
+  sku: string;
+  description?: string;
+  category: Category;
+  brand: Brand;
+  supplier: Supplier;
+  base_price: string;
+  cost_price: string;
+  is_active: boolean;
+  is_digital: boolean;
+  weight?: string;
+  dimensions?: string;
+  meta_title?: string;
+  meta_description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProductVariant {
+  id: number;
+  product: number;
+  name: string;
+  sku: string;
+  price: string;
+  cost_price: string;
+  is_active: boolean;
+  weight?: string;
+  dimensions?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Inventory {
+  id: number;
+  product: number;
+  variant?: number;
+  quantity_on_hand: number;
+  quantity_reserved: number;
+  quantity_available: number;
+  reorder_level: number;
+  max_stock_level: number;
+  location?: string;
+  last_updated: string;
+}
+
+export interface StockMovement {
+  id: number;
+  product: number;
+  variant?: number;
+  movement_type: 'inbound' | 'outbound' | 'adjustment';
+  quantity: number;
+  reference_type?: string;
+  reference_id?: string;
+  notes?: string;
+  created_by?: number;
+  created_at: string;
+}
+
+export interface ProductStats {
+  total_products: number;
+  active_products: number;
+  total_categories: number;
+  total_brands: number;
+  total_suppliers: number;
+  low_stock_items: number;
+  out_of_stock_items: number;
+  total_inventory_value: string;
+}

@@ -6,6 +6,7 @@ import CustomerList from './components/CustomerList';
 import CustomerAnalytics from './components/CustomerAnalytics';
 import OrderList from './components/OrderList';
 import TransactionList from './components/TransactionList';
+import ProductList from './components/ProductList';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/auth';
 
@@ -29,6 +30,7 @@ function App() {
             <Route path="customer-analytics" element={<CustomerAnalytics />} />
             <Route path="orders" element={<OrderList />} />
             <Route path="transactions" element={<TransactionList />} />
+            <Route path="products" element={<ProductList />} />
             
           </Route>
           <Route
