@@ -30,9 +30,8 @@
 營銷儀表板新增，聚焦獲客、轉換、ROI
 
 - **開發產品管理**：
-
 - 與現有系統整合， OrderItem 新增 product_id 和 variant_id 欄位
-- 產品管理 ORM 模型
+1. 產品管理 ORM 模型
   - Category - 產品分類(單層，還不用多層)
   - Brand - 品牌管理 - 品牌名稱、官網
   - Supplier - 供應商管理 - 供應商信息和關係管理
@@ -42,10 +41,14 @@
   - StockMovement - 庫存異動記錄 - 進出庫記錄
   - PriceHistory - 價格歷史 - 歷史價格變動記錄
 
-1. Admin 管理介面 - 快速測試模型
-2. API Serializers - 資料序列化
-3. API Views - RESTful API 端點
-4. 前端介面 - React 組件
+2. 建立產品管理的 Admin 管理介面
+   1. 開發產品管理的 API Serializers
+   2. 開發產品管理的 API Views
+   3. 開發產品管理的 URL 路由
+   4. 整合產品管理到主要 URL 配置
+3. API Serializers - 資料序列化
+4. API Views - RESTful API 端點
+5. 前端介面 - React 組件
 
 ## [v1.7] - 2025-07-06
 
