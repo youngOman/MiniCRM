@@ -5,9 +5,20 @@ from decimal import Decimal
 import random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import re
 
 # Load environment variables
 load_dotenv()
+
+def generate_slug(text):
+    """生成 URL 友好的 slug"""
+    # 移除特殊字符，保留中英文和數字
+    text = re.sub(r'[^\w\s-]', '', text)
+    # 將空格替換為破折號
+    text = re.sub(r'[\s_-]+', '-', text)
+    # 轉為小寫
+    text = text.lower().strip('-')
+    return text
 
 # MySQL connection configuration from environment variables
 config = {
@@ -211,17 +222,28 @@ def create_enhanced_dummy_data():
         ]
         
         category_insert_query = """
-        INSERT INTO products_category (name, description, is_active, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO products_category (name, description, slug, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """
         
         category_ids = []
+        used_slugs = set()  # 追蹤已使用的 slug
+        
         for i, name in enumerate(category_names):
             description = f'{name}相關產品分類'
             created_at = now - timedelta(days=random.randint(365, 1825))
             
+            # 生成唯一的 slug
+            base_slug = generate_slug(name)
+            slug = base_slug
+            counter = 1
+            while slug in used_slugs:
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            used_slugs.add(slug)
+            
             cursor.execute(category_insert_query, (
-                name, description, 1, created_at, created_at
+                name, description, slug, 1, created_at, created_at
             ))
             category_ids.append(cursor.lastrowid)
         
@@ -325,8 +347,8 @@ def create_enhanced_dummy_data():
         product_insert_query = """
         INSERT INTO products_product (name, sku, description, category_id, brand_id, supplier_id, 
                                     base_price, cost_price, is_active, is_digital, weight, dimensions, 
-                                    meta_title, meta_description, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                    image_url, tax_rate, min_order_quantity, tags, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         
         product_ids = []
@@ -355,18 +377,29 @@ def create_enhanced_dummy_data():
             base_price = (cost_price * Decimal(random.uniform(1.3, 2.5))).quantize(Decimal('0.01'))
             
             is_digital = random.choice([True, False]) if random.random() < 0.1 else False  # 10% 數位商品
-            weight = f'{random.uniform(0.1, 50.0):.1f}kg' if not is_digital else None
-            dimensions = f'{random.randint(10, 100)}x{random.randint(10, 100)}x{random.randint(5, 50)}cm' if not is_digital else None
+            weight = random.uniform(0.1, 50.0) if not is_digital else None
+            # dimensions 不能為 NULL，數位商品也給予虛擬尺寸
+            if is_digital:
+                dimensions = ''  # 數位商品給空字串
+            else:
+                dimensions = f'{random.randint(10, 100)}x{random.randint(10, 100)}x{random.randint(5, 50)}cm'
             
-            meta_title = f'{name} - 優質商品'
-            meta_description = f'購買{name}，享受優質購物體驗。'
+            # 生成產品標籤
+            product_tags = ['熱門', '新品', '推薦', '限量', '特價', '精選', '暢銷', '優質', '進口', '台灣製造', '環保', '健康']
+            tags = random.sample(product_tags, random.randint(0, 3)) if random.random() > 0.3 else []
+            tags_json = json.dumps(tags, ensure_ascii=False)
+            
+            # 其他欄位
+            image_url = ''  # 空字串
+            tax_rate = Decimal('5.00')  # 預設稅率 5%
+            min_order_quantity = random.randint(1, 5)  # 最小訂購量 1-5
             
             created_at = now - timedelta(days=random.randint(1, 1095))  # 3 years
             
             cursor.execute(product_insert_query, (
                 name, sku, description, category_id, brand_id, supplier_id,
                 float(base_price), float(cost_price), 1, is_digital, weight, dimensions,
-                meta_title, meta_description, created_at, created_at
+                image_url, float(tax_rate), min_order_quantity, tags_json, created_at, created_at
             ))
             product_ids.append(cursor.lastrowid)
         
@@ -374,9 +407,9 @@ def create_enhanced_dummy_data():
         
         # Create inventory for products
         inventory_insert_query = """
-        INSERT INTO products_inventory (product_id, quantity_on_hand, quantity_reserved, quantity_available,
+        INSERT INTO products_inventory (product_id, quantity_on_hand, quantity_reserved,
                                       reorder_level, max_stock_level, location, last_updated)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         
         locations = ['倉庫A', '倉庫B', '倉庫C', '門市庫房', '配送中心', '主倉庫', '備品庫']
@@ -399,8 +432,8 @@ def create_enhanced_dummy_data():
         # Create some stock movements
         stock_movement_insert_query = """
         INSERT INTO products_stockmovement (product_id, movement_type, quantity, reference_type, 
-                                          reference_id, notes, created_by_id, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                                          reference_id, notes, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
         
         movement_types = ['inbound', 'outbound', 'adjustment']
@@ -425,7 +458,7 @@ def create_enhanced_dummy_data():
                 
                 cursor.execute(stock_movement_insert_query, (
                     product_id, movement_type, quantity, reference_type,
-                    reference_id, notes, user_id, movement_date
+                    reference_id, notes, movement_date
                 ))
         
         print(f'Created stock movements for products')
