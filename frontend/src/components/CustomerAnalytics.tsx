@@ -89,60 +89,9 @@ const CustomerAnalytics: React.FC = () => {
   const fetchAnalyticsData = async () => {
     setLoading(true);
     try {
-      // 暫時使用模擬數據，之後會創建真實的 API 端點
-      const mockData: CustomerAnalyticsData = {
-        age_analysis: [
-          { age_group: '18-25', count: 25, total_spent: 125000, avg_spent: 5000 },
-          { age_group: '26-35', count: 45, total_spent: 450000, avg_spent: 10000 },
-          { age_group: '36-45', count: 35, total_spent: 525000, avg_spent: 15000 },
-          { age_group: '46-55', count: 20, total_spent: 360000, avg_spent: 18000 },
-          { age_group: '56+', count: 15, total_spent: 300000, avg_spent: 20000 }
-        ],
-        gender_analysis: [
-          { gender: 'male', gender_display: '男性', count: 65, total_spent: 780000, avg_spent: 12000, avg_orders: 4.2 },
-          { gender: 'female', gender_display: '女性', count: 70, total_spent: 910000, avg_spent: 13000, avg_orders: 4.8 },
-          { gender: 'other', gender_display: '其他', count: 3, total_spent: 45000, avg_spent: 15000, avg_orders: 3.0 },
-          { gender: 'prefer_not_to_say', gender_display: '不願透露', count: 2, total_spent: 25000, avg_spent: 12500, avg_orders: 2.5 }
-        ],
-        product_preferences: [
-          { category: '電子產品', count: 45, percentage: 32.1, avg_spent: 15000, total_spent: 675000 },
-          { category: '服飾配件', count: 38, percentage: 27.1, avg_spent: 8000, total_spent: 304000 },
-          { category: '居家用品', count: 32, percentage: 22.9, avg_spent: 6000, total_spent: 192000 },
-          { category: '美妝保養', count: 28, percentage: 20.0, avg_spent: 7000, total_spent: 196000 },
-          { category: '運動健身', count: 25, percentage: 17.9, avg_spent: 9000, total_spent: 225000 },
-          { category: '書籍文具', count: 20, percentage: 14.3, avg_spent: 3000, total_spent: 60000 },
-          { category: '食品飲料', count: 18, percentage: 12.9, avg_spent: 4000, total_spent: 72000 },
-          { category: '旅遊票券', count: 15, percentage: 10.7, avg_spent: 20000, total_spent: 300000 },
-          { category: '汽車用品', count: 12, percentage: 8.6, avg_spent: 12000, total_spent: 144000 },
-          { category: '寵物用品', count: 10, percentage: 7.1, avg_spent: 5000, total_spent: 50000 }
-        ],
-        seasonal_analysis: [
-          { season: 'spring', season_display: '春季購買', count: 25, percentage: 29.4, avg_spent: 12000, total_spent: 300000, avg_orders: 4.2 },
-          { season: 'summer', season_display: '夏季購買', count: 20, percentage: 23.5, avg_spent: 15000, total_spent: 300000, avg_orders: 5.1 },
-          { season: 'autumn', season_display: '秋季購買', count: 18, percentage: 21.2, avg_spent: 14000, total_spent: 252000, avg_orders: 4.8 },
-          { season: 'winter', season_display: '冬季購買', count: 15, percentage: 17.6, avg_spent: 16000, total_spent: 240000, avg_orders: 5.5 },
-          { season: 'year_round', season_display: '全年均勻', count: 7, percentage: 8.2, avg_spent: 18000, total_spent: 126000, avg_orders: 6.2 }
-        ],
-        customer_segments: Array.from({ length: 50 }, (_, i) => ({
-          age: 20 + Math.floor(Math.random() * 40),
-          total_spent: Math.floor(Math.random() * 50000) + 1000,
-          total_orders: Math.floor(Math.random() * 15) + 1,
-          full_name: `客戶${i + 1}`,
-          gender: ['male', 'female', 'other'][Math.floor(Math.random() * 3)],
-          tier: ['一般客戶', '白銀客戶', '黃金客戶', '白金客戶'][Math.floor(Math.random() * 4)]
-        })),
-        overview: {
-          total_customers: 140,
-          customers_with_age: 125,
-          customers_with_gender: 130,
-          customers_with_preferences: 95,
-          customers_with_seasonal: 85,
-          avg_age: 36.5,
-          data_completeness: 78.6
-        }
-      };
-
-      setData(mockData);
+      // 使用真實的 API 端點獲取客戶分析數據
+      const response = await api.get('/reports/customer-demographics/', { params: filters });
+      setData(response.data);
     } catch (error) {
       console.error('載入客戶分析數據失敗:', error);
     } finally {

@@ -274,3 +274,243 @@ def revenue_analytics(request):
     }
     
     return Response(analytics)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def customer_demographics_analytics(request):
+    """
+    客戶人口統計分析 - 基於新增的個人化欄位
+    """
+    # 取得篩選參數
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    source = request.GET.get('source')
+    age_min = request.GET.get('age_min')
+    age_max = request.GET.get('age_max')
+    gender = request.GET.get('gender')
+    
+    # 基礎查詢集
+    customers_qs = Customer.objects.filter(is_active=True)
+    
+    # 應用篩選條件
+    if date_from:
+        try:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+            customers_qs = customers_qs.filter(created_at__date__gte=date_from)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
+            customers_qs = customers_qs.filter(created_at__date__lte=date_to)
+        except ValueError:
+            pass
+    
+    if source:
+        customers_qs = customers_qs.filter(source=source)
+    
+    if age_min:
+        try:
+            customers_qs = customers_qs.filter(age__gte=int(age_min))
+        except (ValueError, TypeError):
+            pass
+    
+    if age_max:
+        try:
+            customers_qs = customers_qs.filter(age__lte=int(age_max))
+        except (ValueError, TypeError):
+            pass
+    
+    if gender:
+        customers_qs = customers_qs.filter(gender=gender)
+    
+    # 1. 年齡分析
+    age_analysis = []
+    age_groups = [
+        ('18-25', 18, 25),
+        ('26-35', 26, 35),
+        ('36-45', 36, 45),
+        ('46-55', 46, 55),
+        ('56+', 56, 100)
+    ]
+    
+    for group_name, min_age, max_age in age_groups:
+        group_customers = customers_qs.filter(age__gte=min_age, age__lte=max_age)
+        total_spent = 0
+        total_orders = 0
+        
+        for customer in group_customers:
+            customer_orders = Order.objects.filter(customer=customer)
+            customer_total = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+            total_spent += customer_total
+            total_orders += customer_orders.count()
+        
+        count = group_customers.count()
+        age_analysis.append({
+            'age_group': group_name,
+            'count': count,
+            'total_spent': float(total_spent),
+            'avg_spent': float(total_spent / count) if count > 0 else 0.0
+        })
+    
+    # 2. 性別分析
+    gender_choices = [
+        ('male', '男性'),
+        ('female', '女性'),
+        ('other', '其他'),
+        ('prefer_not_to_say', '不願透露')
+    ]
+    
+    gender_analysis = []
+    for gender_code, gender_display in gender_choices:
+        gender_customers = customers_qs.filter(gender=gender_code)
+        total_spent = 0
+        total_orders = 0
+        
+        for customer in gender_customers:
+            customer_orders = Order.objects.filter(customer=customer)
+            customer_total = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+            total_spent += customer_total
+            total_orders += customer_orders.count()
+        
+        count = gender_customers.count()
+        gender_analysis.append({
+            'gender': gender_code,
+            'gender_display': gender_display,
+            'count': count,
+            'total_spent': float(total_spent),
+            'avg_spent': float(total_spent / count) if count > 0 else 0.0,
+            'avg_orders': float(total_orders / count) if count > 0 else 0.0
+        })
+    
+    # 3. 產品偏好分析
+    product_categories = [
+        '電子產品', '服飾配件', '居家用品', '美妝保養', '運動健身',
+        '書籍文具', '食品飲料', '旅遊票券', '汽車用品', '寵物用品'
+    ]
+    
+    product_preferences = []
+    total_customers_with_preferences = customers_qs.exclude(product_categories_interest__exact='[]').exclude(product_categories_interest__isnull=True).count()
+    
+    for category in product_categories:
+        # 使用 JSON 查詢來找到包含此類別的客戶
+        interested_customers = customers_qs.extra(
+            where=["JSON_SEARCH(product_categories_interest, 'one', %s) IS NOT NULL"],
+            params=[category]
+        )
+        
+        total_spent = 0
+        for customer in interested_customers:
+            customer_orders = Order.objects.filter(customer=customer)
+            customer_total = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+            total_spent += customer_total
+        
+        count = interested_customers.count()
+        product_preferences.append({
+            'category': category,
+            'count': count,
+            'percentage': float(count / total_customers_with_preferences * 100) if total_customers_with_preferences > 0 else 0.0,
+            'avg_spent': float(total_spent / count) if count > 0 else 0.0,
+            'total_spent': float(total_spent)
+        })
+    
+    # 4. 季節性偏好分析
+    seasonal_choices = [
+        ('spring', '春季購買'),
+        ('summer', '夏季購買'),
+        ('autumn', '秋季購買'),
+        ('winter', '冬季購買'),
+        ('year_round', '全年均勻')
+    ]
+    
+    seasonal_analysis = []
+    total_customers_with_seasonal = customers_qs.exclude(seasonal_purchase_pattern__isnull=True).exclude(seasonal_purchase_pattern__exact='').count()
+    
+    for season_code, season_display in seasonal_choices:
+        season_customers = customers_qs.filter(seasonal_purchase_pattern=season_code)
+        total_spent = 0
+        total_orders = 0
+        
+        for customer in season_customers:
+            customer_orders = Order.objects.filter(customer=customer)
+            customer_total = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+            total_spent += customer_total
+            total_orders += customer_orders.count()
+        
+        count = season_customers.count()
+        seasonal_analysis.append({
+            'season': season_code,
+            'season_display': season_display,
+            'count': count,
+            'percentage': float(count / total_customers_with_seasonal * 100) if total_customers_with_seasonal > 0 else 0.0,
+            'avg_spent': float(total_spent / count) if count > 0 else 0.0,
+            'total_spent': float(total_spent),
+            'avg_orders': float(total_orders / count) if count > 0 else 0.0
+        })
+    
+    # 5. 客戶細分矩陣數據
+    customer_segments = []
+    
+    # 計算客戶等級
+    def get_customer_tier(total_spent, total_orders):
+        if total_spent >= 60000:
+            return '白金客戶'
+        elif total_spent >= 20000 and total_orders >= 1:
+            return '黃金客戶'
+        elif total_spent >= 5000 and total_orders >= 2:
+            return '白銀客戶'
+        elif total_spent > 0 and total_orders >= 1:
+            return '一般客戶'
+        else:
+            return '潛在客戶'
+    
+    for customer in customers_qs.filter(age__isnull=False)[:100]:  # 限制返回數量以提高性能
+        customer_orders = Order.objects.filter(customer=customer)
+        total_spent = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+        total_orders = customer_orders.count()
+        
+        customer_segments.append({
+            'age': customer.age,
+            'total_spent': float(total_spent),
+            'total_orders': total_orders,
+            'full_name': customer.full_name,
+            'gender': customer.gender or 'unknown',
+            'tier': get_customer_tier(total_spent, total_orders)
+        })
+    
+    # 6. 數據概覽
+    overview = {
+        'total_customers': customers_qs.count(),
+        'customers_with_age': customers_qs.exclude(age__isnull=True).count(),
+        'customers_with_gender': customers_qs.exclude(gender__isnull=True).exclude(gender__exact='').count(),
+        'customers_with_preferences': total_customers_with_preferences,
+        'customers_with_seasonal': total_customers_with_seasonal,
+        'avg_age': float(customers_qs.exclude(age__isnull=True).aggregate(Avg('age'))['age__avg'] or 0),
+    }
+    
+    # 計算資料完整度
+    total_fields = 4  # age, gender, product_categories_interest, seasonal_purchase_pattern
+    completed_fields = 0
+    if overview['customers_with_age'] > 0:
+        completed_fields += 1
+    if overview['customers_with_gender'] > 0:
+        completed_fields += 1
+    if overview['customers_with_preferences'] > 0:
+        completed_fields += 1
+    if overview['customers_with_seasonal'] > 0:
+        completed_fields += 1
+    
+    overview['data_completeness'] = float(completed_fields / total_fields * 100)
+    
+    analytics = {
+        'age_analysis': age_analysis,
+        'gender_analysis': gender_analysis,
+        'product_preferences': product_preferences,
+        'seasonal_analysis': seasonal_analysis,
+        'customer_segments': customer_segments,
+        'overview': overview
+    }
+    
+    return Response(analytics)
