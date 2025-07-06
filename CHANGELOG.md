@@ -16,20 +16,20 @@
 - 季節性行銷：根據購買模式安排促銷活動
 - 產品推薦：根據產品類別的精準推薦
 
-1. 銷售管理 (Sales Management)
-2. 行銷管理 (Marketing Management)  
-3. 客戶服務 (Customer Service)
+1. 產品管理系統
+2. 銷售管理 (Sales Management)
+3. 行銷管理 (Marketing Management)
 
 ## 待處理 BUG
 
-## [v1.7] - 2025-07-06
+
+## [v1.8] - 2025-07-07
 
 - 年齡分析
   - 年齡分佈直方圖
   - 年齡群組 vs 客戶價值 (柱狀圖)
 
 - 性別分析
-
   - 性別分佈圓餅圖
   - 性別 vs 平均消費金額 (柱狀圖)
   - 性別 vs 購買頻率對比
@@ -47,9 +47,21 @@
 - 季節性購買偏好
   - 季節性偏好分佈圓餅圖
 
+
+## [v1.7] - 2025-07-06
+
+- 新增針對客戶的分析儀表板 (CustomerAnalytics.tsx)
+  - 6 個概覽指標卡片(總客戶數、有年齡資料、有性別資料、有產品偏好、平均年齡、資料完整度)
+  - AgeAnalysisChart - 年齡分布、年齡群組平均消費金額
+  - GenderAnalysisChart - 性別分布、性別平均消費金額、性別購買行為對比
+  - ProductPreferenceChart - 產品類別受歡迎程度和產品類別營收貢獻
+  - SeasonalAnalysisChart - 季節性購買偏好分佈、季節性購買表現分析
+  - CustomerSegmentMatrix -客戶細分矩陣（年齡 vs 消費金額）
+
 ## [v1.7] - 2025-07-05
 
 - 拆分 Dashboard.tsx 中的圖表成獨立組件
+  - 考慮未來圖表越來越多，開始依照不同主題分成五個分析頁面
 - 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
 - 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
 
