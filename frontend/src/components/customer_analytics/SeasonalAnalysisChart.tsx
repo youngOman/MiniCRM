@@ -128,7 +128,7 @@ const SeasonalAnalysisChart: React.FC<SeasonalAnalysisChartProps> = ({ data, typ
       <div className="mt-6">
         <h4 className="text-md font-medium mb-3">季節表現排名</h4>
         <div className="space-y-3">
-          {data
+          {[...data]
             .sort((a, b) => b.avg_spent - a.avg_spent)
             .map((item, index) => (
               <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
@@ -166,8 +166,8 @@ const SeasonalAnalysisChart: React.FC<SeasonalAnalysisChartProps> = ({ data, typ
         <div className="text-sm text-blue-800 space-y-1">
           {data.length > 0 && (
             <>
-              <div>• 最高消費季節：{data.sort((a, b) => b.avg_spent - a.avg_spent)[0]?.season_display} ({formatCurrency(data.sort((a, b) => b.avg_spent - a.avg_spent)[0]?.avg_spent)})</div>
-              <div>• 最受歡迎季節：{data.sort((a, b) => b.count - a.count)[0]?.season_display} ({data.sort((a, b) => b.count - a.count)[0]?.count} 人偏好)</div>
+              <div>• 最高消費季節：{[...data].sort((a, b) => b.avg_spent - a.avg_spent)[0]?.season_display} ({formatCurrency([...data].sort((a, b) => b.avg_spent - a.avg_spent)[0]?.avg_spent)})</div>
+              <div>• 最受歡迎季節：{[...data].sort((a, b) => b.count - a.count)[0]?.season_display} ({[...data].sort((a, b) => b.count - a.count)[0]?.count} 人偏好)</div>
               <div>• 建議重點關注高價值季節的促銷活動安排</div>
             </>
           )}
