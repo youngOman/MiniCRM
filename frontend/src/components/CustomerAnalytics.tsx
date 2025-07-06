@@ -8,8 +8,8 @@ import GenderAnalysisChart from './customer_analytics/GenderAnalysisChart';
 import ProductPreferenceChart from './customer_analytics/ProductPreferenceChart';
 import SeasonalAnalysisChart from './customer_analytics/SeasonalAnalysisChart';
 import CustomerSegmentMatrix from './customer_analytics/CustomerSegmentMatrix';
-import CustomerSourceChart from './dashboard/CustomerSourceChart';
-import CustomerTierChart from './dashboard/CustomerTierChart';
+import CustomerSourceChart from './customer_analytics/CustomerSourceChart';
+import CustomerTierChart from './customer_analytics/CustomerTierChart';
 
 // 數據接口定義
 interface AgeGroupData {

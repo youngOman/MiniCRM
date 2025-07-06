@@ -6,6 +6,7 @@ import api from '../services/api';
 import KPICards from './dashboard/KPICards';
 import RevenueTrendChart from './dashboard/RevenueTrendChart';
 import CustomerGrowthChart from './dashboard/CustomerGrowthChart';
+import OrderGrowthChart from './dashboard/OrderGrowthChart';
 import PaymentMethodChart from './dashboard/PaymentMethodChart';
 import DashboardFilters from './dashboard/DashboardFilters';
 import StatsCards from './dashboard/StatsCards';
@@ -144,6 +145,12 @@ const Dashboard: React.FC = () => {
         
         <CustomerGrowthChart 
           data={trends.customer_trend}
+          dateFrom={filters.date_from}
+          dateTo={filters.date_to}
+        />
+        
+        <OrderGrowthChart 
+          data={trends.order_trend}
           dateFrom={filters.date_from}
           dateTo={filters.date_to}
         />
