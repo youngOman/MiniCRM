@@ -17,14 +17,20 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 具備簡潔的資料管理，營運儀表版、視覺化報表如營收趨勢、客戶增長趨勢、客戶來源分佈、付款方式分佈、客戶等級分佈、今日(新增客戶量、新增訂單、完成交易數)、本月、客戶指標(平均客戶價值、待處理訂單、轉換率) 等..
 
+並且也支援一次多個自有品牌管理，以及供應商管理，並且可以針對不同品牌或供應商進行獨立的客戶資料、訂單、交易記錄..等
+
 - 開發中：成交率、追加銷售率、新淨收入、銷售週期長短與客戶生命週期價值 (CLV) 計算、 AI 智慧摘要(開發中)
 
-目前主要有四個功能模組：
+目前主要有五個功能模組：
 
 - customers (客戶管理)
-- orders (訂單管理)
+- orders (訂單管理) 
 - transactions (交易記錄)
-- reports (營銷分析儀表板儀表板)
+- products (產品管理)
+- reports (營銷分析儀表板)
+
+
+
 
 ## 核心功能
 
@@ -196,7 +202,7 @@ npm run dev
 - **完整客戶檔案** - 姓名、聯絡資訊、公司詳情、地址資料
 - **來源追蹤** - 監控客戶獲取管道
 - **標籤系統** - 靈活的自訂標籤分類
-- **活動歷史** - 完整的客戶互動稽核軌跡
+- **活動歷史** - 完整客戶互動稽核軌跡
 - **智慧搜尋** - 即時搜尋任何欄位資料
 
 ### 📦 訂單管理
@@ -214,6 +220,25 @@ npm run dev
 - **手續費計算** - 自動計算付款處理手續費
 - **閘道整合** - 為付款閘道整合做好準備
 - **財務報表** - 完整的交易歷史與分析
+
+### 📦 產品管理系統
+
+- **產品分類** - 單層分類系統，支持彈性產品歸類
+- **品牌管理** - 完整的品牌資訊、Logo、官網管理
+- **供應商管理** - 供應商聯絡資訊、付款條件、信用額度
+- **產品資訊** - SKU、價格、成本、重量、尺寸、圖片
+- **產品變體** - 支援顏色、尺寸等不同規格變化
+- **庫存管理** - 實時庫存追蹤、低庫存警示、再訂購點設定
+- **價格歷史** - 完整的價格變動記錄與分析
+- **庫存異動** - 詳細的入庫、出庫、調整、盤點記錄
+
+### 📊 智慧分析儀表板
+
+- **營銷分析** - 營收趨勢、客戶成長、訂單成長、付款方式分析
+- **客戶分析** - 年齡分布、性別分析、產品偏好、季節性行為
+- **客戶分層** - 白金/黃金/白銀/一般/潛在客戶自動分級
+- **數據完整度** - 客戶資料完整性監控與提升建議
+- **實時篩選** - 多維度日期、來源、屬性篩選功能
 
 ---
 
@@ -256,6 +281,37 @@ POST   /api/transactions/      # 建立新交易記錄
 GET    /api/transactions/{id}/ # 取得交易詳情
 PUT    /api/transactions/{id}/ # 更新交易記錄
 DELETE /api/transactions/{id}/ # 刪除交易記錄
+```
+
+### 產品管理端點
+
+```
+GET    /api/products/categories/        # 列出產品分類
+POST   /api/products/categories/        # 建立新分類
+GET    /api/products/brands/            # 列出品牌
+POST   /api/products/brands/            # 建立新品牌
+GET    /api/products/suppliers/         # 列出供應商
+POST   /api/products/suppliers/         # 建立新供應商
+GET    /api/products/                   # 列出產品 (含分頁)
+POST   /api/products/                   # 建立新產品
+GET    /api/products/{id}/              # 取得產品詳情
+PUT    /api/products/{id}/              # 更新產品
+DELETE /api/products/{id}/              # 刪除產品
+GET    /api/products/{id}/variants/     # 取得產品變體
+POST   /api/products/{id}/variants/     # 建立產品變體
+GET    /api/products/{id}/inventory/    # 取得庫存資訊
+PUT    /api/products/{id}/inventory/    # 更新庫存
+GET    /api/products/{id}/stock-movements/ # 取得庫存異動記錄
+```
+
+### 分析報表端點
+
+```
+GET    /api/reports/dashboard/              # 營銷分析儀表板數據
+GET    /api/reports/trends/                 # 趨勢分析數據
+GET    /api/reports/customer-analytics/     # 客戶分析數據
+GET    /api/reports/customer-demographics/  # 客戶人口統計分析
+GET    /api/reports/revenue-analytics/      # 營收分析數據
 ```
 
 ### 查詢參數
@@ -348,23 +404,40 @@ npm run test:coverage
 
 ### 核心模型
 
-- **Customer**: 個人資訊、聯絡詳情、來源追蹤
+- **Customer**: 個人資訊、聯絡詳情、來源追蹤、個人化偏好
 - **Order**: 訂單管理，包含項目與財務計算
-- **OrderItem**: 訂單內的個別商品
+- **OrderItem**: 訂單內的個別商品，關聯產品與變體
 - **Transaction**: 付款追蹤與財務記錄
+- **Product**: 產品主體資訊、價格、成本、庫存
+- **ProductVariant**: 產品變體（顏色、尺寸等規格）
+- **Category**: 產品分類管理
+- **Brand**: 品牌資訊管理
+- **Supplier**: 供應商資訊與關係管理
+- **Inventory**: 庫存管理與警示
+- **StockMovement**: 庫存異動記錄
+- **PriceHistory**: 價格變動歷史
 
 ### 關聯關係
 
-1. User → Customer (1:M)
-   - 使用者可以建立和管理多個客戶
-2. Customer → Order (1:M)
-   - 客戶可以有多個訂單
-3. Order → OrderItem (1:M)
-   - 訂單可以包含多個商品項目
-4. Customer → Transaction (1:M)
-   - 客戶可以有多筆交易記錄
-5. Order → Transaction (1:M, Optional)
-   - 訂單可以關聯多筆交易（可選）
+#### 客戶與訂單
+1. Customer → Order (1:M) - 客戶可以有多個訂單
+2. Order → OrderItem (1:M) - 訂單可以包含多個商品項目
+3. Customer → Transaction (1:M) - 客戶可以有多筆交易記錄
+4. Order → Transaction (1:M, Optional) - 訂單可以關聯多筆交易
+
+#### 產品管理
+5. Category → Product (1:M) - 分類包含多個產品
+6. Brand → Product (1:M) - 品牌擁有多個產品
+7. Supplier → Product (1:M) - 供應商供應多個產品
+8. Product → ProductVariant (1:M) - 產品可有多個變體
+9. Product → Inventory (1:1) - 產品對應庫存記錄
+10. ProductVariant → Inventory (1:1) - 變體對應庫存記錄
+11. Product → StockMovement (1:M) - 產品的庫存異動記錄
+12. Product → PriceHistory (1:M) - 產品的價格變動歷史
+
+#### 訂單與產品整合
+13. OrderItem → Product (M:1) - 訂單項目關聯產品
+14. OrderItem → ProductVariant (M:1, Optional) - 訂單項目可關聯產品變體
 
 ---
 
