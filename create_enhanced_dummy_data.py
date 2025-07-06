@@ -43,6 +43,15 @@ def create_enhanced_dummy_data():
         cursor.execute('DELETE FROM orders_orderitem')
         cursor.execute('DELETE FROM orders_order')
         cursor.execute('DELETE FROM customers_customer')
+        # Clear product related data
+        cursor.execute('DELETE FROM products_pricehistory')
+        cursor.execute('DELETE FROM products_stockmovement')
+        cursor.execute('DELETE FROM products_inventory')
+        cursor.execute('DELETE FROM products_productvariant')
+        cursor.execute('DELETE FROM products_product')
+        cursor.execute('DELETE FROM products_supplier')
+        cursor.execute('DELETE FROM products_brand')
+        cursor.execute('DELETE FROM products_category')
         
         # Get the user ID for 'young'
         cursor.execute("SELECT id FROM auth_user WHERE username = 'young'")
@@ -130,12 +139,32 @@ def create_enhanced_dummy_data():
         
         now = datetime.now()
         customer_ids = []
+        used_emails = set()  # 追蹤已使用的 email
+        domains = ['gmail.com', 'yahoo.com', 'outlook.com', 'company.com', 'business.net']
         
-        # Create 120 customers
-        for i in range(120):
+        # 生成 500 筆客戶資料
+        for i in range(500):
             first_name = random.choice(first_names)
             last_name = random.choice(last_names)
-            email = f"{first_name.lower()}.{last_name.lower()}@{random.choice(['gmail.com', 'yahoo.com', 'outlook.com', 'company.com', 'business.net'])}"
+            
+            # 確保 email 不重複
+            attempts = 0
+            while attempts < 10:  # 最多嘗試 10 次
+                domain = random.choice(domains)
+                if attempts == 0:
+                    email = f"{first_name.lower()}.{last_name.lower()}@{domain}"
+                else:
+                    # 如果重複，加上隨機數字
+                    email = f"{first_name.lower()}.{last_name.lower()}{random.randint(1, 999)}@{domain}"
+                
+                if email not in used_emails:
+                    used_emails.add(email)
+                    break
+                attempts += 1
+            else:
+                # 如果仍然重複，使用時間戳確保唯一性
+                email = f"{first_name.lower()}.{last_name.lower()}.{int(datetime.now().timestamp())}@{random.choice(domains)}"
+                used_emails.add(email)
             phone = f"+1-{random.randint(200, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}"
             company = random.choice(companies)
             address = f"{random.randint(100, 9999)} {random.choice(['Main St', 'Oak Ave', 'Pine St', 'Cedar Rd', 'Elm St', 'Broadway', 'First Ave', 'Second St', 'Park Ave', 'Market St'])}"
@@ -168,6 +197,239 @@ def create_enhanced_dummy_data():
         
         print(f'Created {len(customer_ids)} customers')
         
+        # Create product categories
+        category_names = [
+            '電子產品', '3C配件', '家電用品', '智慧型手機', '筆記型電腦',
+            '服飾配件', '男裝', '女裝', '童裝', '包包配件',
+            '居家用品', '傢俱', '寢具', '廚具', '清潔用品',
+            '美妝保養', '彩妝', '保養品', '香水', '美髮用品',
+            '運動健身', '運動服飾', '健身器材', '戶外用品', '運動鞋',
+            '書籍文具', '文具用品', '辦公用品', '教育用品', '藝術用品',
+            '食品飲料', '零食', '飲料', '保健食品', '有機食品',
+            '汽車用品', '汽車配件', '機車用品', '汽車保養', '行車記錄器',
+            '寵物用品', '寵物食品', '寵物玩具', '寵物保健', '寵物用品'
+        ]
+        
+        category_insert_query = """
+        INSERT INTO products_category (name, description, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        
+        category_ids = []
+        for i, name in enumerate(category_names):
+            description = f'{name}相關產品分類'
+            created_at = now - timedelta(days=random.randint(365, 1825))
+            
+            cursor.execute(category_insert_query, (
+                name, description, 1, created_at, created_at
+            ))
+            category_ids.append(cursor.lastrowid)
+        
+        print(f'Created {len(category_ids)} product categories')
+        
+        # Create brands
+        brand_names = [
+            'Apple', 'Samsung', 'Sony', 'LG', 'Panasonic', 'Philips', 'Bosch',
+            'Nike', 'Adidas', 'Uniqlo', 'Zara', 'H&M', 'Gap', 'Levi\'s',
+            'IKEA', 'Muji', 'Nitori', 'Francfranc', 'Hola',
+            'L\'Oreal', 'Maybelline', 'Clinique', 'Estee Lauder', 'Shiseido',
+            'Under Armour', 'Puma', 'New Balance', 'Asics', 'Mizuno',
+            'Pilot', 'Zebra', 'Uni', 'Staedtler', 'Faber-Castell',
+            'Coca-Cola', 'Pepsi', 'Nestle', 'Kellogg\'s', 'Quaker',
+            'Toyota', 'Honda', 'Nissan', 'Hyundai', 'BMW',
+            'Royal Canin', 'Purina', 'Hill\'s', 'Whiskas', 'Pedigree'
+        ]
+        
+        brand_insert_query = """
+        INSERT INTO products_brand (name, description, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        
+        brand_ids = []
+        for name in brand_names:
+            description = f'{name}品牌產品'
+            created_at = now - timedelta(days=random.randint(365, 1825))
+            
+            cursor.execute(brand_insert_query, (
+                name, description, 1, created_at, created_at
+            ))
+            brand_ids.append(cursor.lastrowid)
+        
+        print(f'Created {len(brand_ids)} brands')
+        
+        # Create suppliers
+        supplier_names = [
+            '台灣電子股份有限公司', '亞洲科技供應商', '全球電子批發商', '智慧產品供應商',
+            '時尚服飾供應商', '潮流服飾批發', '國際服裝供應商', '精品服飾批發',
+            '居家生活供應商', '傢俱批發商', '生活用品供應商', '設計傢俱供應商',
+            '美妝保養供應商', '化妝品批發商', '保養品供應商', '香水批發商',
+            '運動用品供應商', '健身器材批發', '戶外用品供應商', '運動服飾批發',
+            '文具用品供應商', '辦公用品批發', '教育用品供應商', '藝術用品批發',
+            '食品飲料供應商', '有機食品批發', '健康食品供應商', '飲料批發商',
+            '汽車用品供應商', '汽車配件批發', '機車用品供應商', '汽車保養批發',
+            '寵物用品供應商', '寵物食品批發', '寵物玩具供應商', '寵物保健批發'
+        ]
+        
+        supplier_insert_query = """
+        INSERT INTO products_supplier (name, contact_person, email, phone, address, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        supplier_ids = []
+        for name in supplier_names:
+            contact_person = f'{random.choice(first_names)} {random.choice(last_names)}'
+            email = f'{contact_person.replace(" ", "").lower()}@{name.replace(" ", "").lower()}.com'
+            phone = f'+886-{random.randint(2, 9)}-{random.randint(10000000, 99999999)}'
+            city_info = random.choice(cities)
+            address = f'{random.randint(1, 999)}號, {city_info[0]}, {city_info[1]} {city_info[2]}'
+            created_at = now - timedelta(days=random.randint(365, 1825))
+            
+            cursor.execute(supplier_insert_query, (
+                name, contact_person, email, phone, address, 1, created_at, created_at
+            ))
+            supplier_ids.append(cursor.lastrowid)
+        
+        print(f'Created {len(supplier_ids)} suppliers')
+        
+        # Create products
+        product_names = [
+            # 電子產品
+            'iPhone 15 Pro', 'Samsung Galaxy S24', 'MacBook Pro 14吋', 'iPad Air', 'AirPods Pro',
+            'Sony WH-1000XM5', 'LG 55吋 4K 電視', 'Dyson V15 吸塵器', 'Switch OLED 遊戲機',
+            # 服飾配件
+            'Nike Air Force 1', 'Adidas Stan Smith', 'Uniqlo 發熱衣', 'Zara 羊毛大衣', 'Levi\'s 牛仔褲',
+            'Coach 手提包', 'Casio 電子錶', 'Ray-Ban 太陽眼鏡', 'Converse 帆布鞋',
+            # 居家用品
+            'IKEA 沙發', 'Muji 收納盒', 'Nitori 床墊', 'Panasonic 電子鍋', 'Tiger 保溫瓶',
+            'Philips 空氣清淨機', 'Bosch 洗衣機', 'KitchenAid 攪拌機', 'Le Creuset 鑄鐵鍋',
+            # 美妝保養
+            'SK-II 精華液', 'Estee Lauder 粉底', 'Clinique 卸妝水', 'MAC 口紅', 'Shiseido 防曬乳',
+            'Lancome 睫毛膏', 'Kiehl\'s 精華油', 'Origins 面膜', 'Fresh 護唇膏',
+            # 運動健身
+            'Under Armour 運動鞋', 'Puma 運動服', 'New Balance 慢跑鞋', 'Asics 網球鞋',
+            'Mizuno 高爾夫球具', 'Wilson 網球拍', 'Spalding 籃球', 'Adidas 足球',
+            # 書籍文具
+            'Pilot 鋼筆', 'Zebra 原子筆', 'Uni 自動鉛筆', 'Staedtler 色鉛筆', 'Moleskine 筆記本',
+            'Post-it 便利貼', 'Scotch 膠帶', '3M 修正液', 'Pentel 螢光筆',
+            # 食品飲料
+            'Costa 咖啡豆', 'Haribo 軟糖', 'Ferrero Rocher 巧克力', 'Pringles 洋芋片',
+            'Coca-Cola 可樂', 'Red Bull 能量飲料', 'Evian 礦泉水', 'Lipton 茶包',
+            # 汽車用品
+            'Michelin 輪胎', 'Bosch 雨刷', 'Garmin 導航機', 'Thule 行李架', 'Castrol 機油',
+            '3M 隔熱紙', 'Pioneer 音響', 'Philips 車用燈泡', 'Meguiar\'s 清潔劑',
+            # 寵物用品
+            'Royal Canin 狗糧', 'Whiskas 貓糧', 'Hill\'s 處方糧', 'Purina 零食', 'Kong 玩具',
+            'Petmate 飼料碗', 'Flexi 牽繩', 'Catit 貓砂', 'Aqueon 魚缸'
+        ]
+        
+        product_insert_query = """
+        INSERT INTO products_product (name, sku, description, category_id, brand_id, supplier_id, 
+                                    base_price, cost_price, is_active, is_digital, weight, dimensions, 
+                                    meta_title, meta_description, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        product_ids = []
+        used_skus = set()  # 追蹤已使用的 SKU
+        
+        for i, name in enumerate(product_names):
+            # 確保 SKU 不重複
+            attempts = 0
+            while attempts < 10:
+                sku = f'SKU-{random.randint(100000, 999999)}'
+                if sku not in used_skus:
+                    used_skus.add(sku)
+                    break
+                attempts += 1
+            else:
+                # 如果仍然重複，使用索引確保唯一性
+                sku = f'SKU-{1000000 + i:06d}'
+                used_skus.add(sku)
+            description = f'{name}產品描述，高品質商品，值得信賴的選擇。'
+            category_id = random.choice(category_ids)
+            brand_id = random.choice(brand_ids)
+            supplier_id = random.choice(supplier_ids)
+            
+            # 價格設定
+            cost_price = Decimal(random.uniform(50, 5000)).quantize(Decimal('0.01'))
+            base_price = (cost_price * Decimal(random.uniform(1.3, 2.5))).quantize(Decimal('0.01'))
+            
+            is_digital = random.choice([True, False]) if random.random() < 0.1 else False  # 10% 數位商品
+            weight = f'{random.uniform(0.1, 50.0):.1f}kg' if not is_digital else None
+            dimensions = f'{random.randint(10, 100)}x{random.randint(10, 100)}x{random.randint(5, 50)}cm' if not is_digital else None
+            
+            meta_title = f'{name} - 優質商品'
+            meta_description = f'購買{name}，享受優質購物體驗。'
+            
+            created_at = now - timedelta(days=random.randint(1, 1095))  # 3 years
+            
+            cursor.execute(product_insert_query, (
+                name, sku, description, category_id, brand_id, supplier_id,
+                float(base_price), float(cost_price), 1, is_digital, weight, dimensions,
+                meta_title, meta_description, created_at, created_at
+            ))
+            product_ids.append(cursor.lastrowid)
+        
+        print(f'Created {len(product_ids)} products')
+        
+        # Create inventory for products
+        inventory_insert_query = """
+        INSERT INTO products_inventory (product_id, quantity_on_hand, quantity_reserved, quantity_available,
+                                      reorder_level, max_stock_level, location, last_updated)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        locations = ['倉庫A', '倉庫B', '倉庫C', '門市庫房', '配送中心', '主倉庫', '備品庫']
+        
+        for product_id in product_ids:
+            quantity_on_hand = random.randint(0, 500)
+            quantity_reserved = random.randint(0, min(quantity_on_hand, 50))
+            quantity_available = quantity_on_hand - quantity_reserved
+            reorder_level = random.randint(10, 50)
+            max_stock_level = random.randint(100, 1000)
+            location = random.choice(locations)
+            
+            cursor.execute(inventory_insert_query, (
+                product_id, quantity_on_hand, quantity_reserved, quantity_available,
+                reorder_level, max_stock_level, location, now
+            ))
+        
+        print(f'Created inventory for {len(product_ids)} products')
+        
+        # Create some stock movements
+        stock_movement_insert_query = """
+        INSERT INTO products_stockmovement (product_id, movement_type, quantity, reference_type, 
+                                          reference_id, notes, created_by_id, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        
+        movement_types = ['inbound', 'outbound', 'adjustment']
+        reference_types = ['purchase', 'sale', 'adjustment', 'return']
+        
+        for product_id in product_ids:
+            # 每個產品創建 2-5 個庫存異動記錄
+            num_movements = random.randint(2, 5)
+            for _ in range(num_movements):
+                movement_type = random.choice(movement_types)
+                quantity = random.randint(1, 100)
+                if movement_type == 'outbound':
+                    quantity = -quantity
+                elif movement_type == 'adjustment':
+                    quantity = random.randint(-50, 50)
+                
+                reference_type = random.choice(reference_types)
+                reference_id = f'REF-{random.randint(1000, 9999)}'
+                notes = f'{movement_type} - {reference_type} #{reference_id}'
+                
+                movement_date = now - timedelta(days=random.randint(1, 365))
+                
+                cursor.execute(stock_movement_insert_query, (
+                    product_id, movement_type, quantity, reference_type,
+                    reference_id, notes, user_id, movement_date
+                ))
+        
+        print(f'Created stock movements for products')
+        
         # Insert sample orders with better date distribution
         order_insert_query = """
         INSERT INTO orders_order 
@@ -177,13 +439,25 @@ def create_enhanced_dummy_data():
         
         order_statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled']
         order_ids = []
+        used_order_numbers = set()  # 追蹤已使用的訂單號碼
         
         # Create orders distributed over time
         for customer_id in customer_ids:
             # Each customer gets 1-5 orders
             num_orders = random.randint(1, 5)
             for j in range(num_orders):
-                order_number = f'ORD-{random.randint(10000000, 99999999):08X}'
+                # 確保訂單號碼不重複
+                attempts = 0
+                while attempts < 10:
+                    order_number = f'ORD-{random.randint(10000000, 99999999):08X}'
+                    if order_number not in used_order_numbers:
+                        used_order_numbers.add(order_number)
+                        break
+                    attempts += 1
+                else:
+                    # 使用時間戳確保唯一性
+                    order_number = f'ORD-{int(datetime.now().timestamp())}-{customer_id}-{j}'
+                    used_order_numbers.add(order_number)
                 # Create a weighted distribution for subtotal amounts
                 # 70% normal orders (100-2000), 20% medium orders (2000-10000), 10% large orders (10000-80000)
                 rand_val = random.random()
@@ -269,6 +543,7 @@ def create_enhanced_dummy_data():
         
         payment_methods = ['credit_card', 'paypal', 'stripe', 'bank_transfer', 'apple_pay', 'google_pay','line_Pay']
         transaction_statuses = ['pending', 'completed', 'failed', 'refunded']
+        used_transaction_ids = set()  # 追蹤已使用的交易 ID
         
         # Get orders with their customer info and dates
         cursor.execute("SELECT id, customer_id, total, order_date FROM orders_order")
@@ -277,7 +552,18 @@ def create_enhanced_dummy_data():
         for order_id, customer_id, order_total, order_date in orders:
             # 85% chance to create a transaction
             if random.random() < 0.85:
-                transaction_id = f'TXN-{random.randint(10000000, 99999999):08X}'
+                # 確保交易 ID 不重複
+                attempts = 0
+                while attempts < 10:
+                    transaction_id = f'TXN-{random.randint(10000000, 99999999):08X}'
+                    if transaction_id not in used_transaction_ids:
+                        used_transaction_ids.add(transaction_id)
+                        break
+                    attempts += 1
+                else:
+                    # 使用訂單 ID 確保唯一性
+                    transaction_id = f'TXN-{order_id}-{int(datetime.now().timestamp())}'
+                    used_transaction_ids.add(transaction_id)
                 amount = Decimal(str(order_total))
                 fee_amount = (amount * Decimal('0.029')).quantize(Decimal('0.01'))  # 2.9% fee
                 net_amount = amount - fee_amount
@@ -305,12 +591,30 @@ def create_enhanced_dummy_data():
         orderitem_count = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM transactions_transaction")
         transaction_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_category")
+        category_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_brand")
+        brand_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_supplier")
+        supplier_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_product")
+        product_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_inventory")
+        inventory_count = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM products_stockmovement")
+        movement_count = cursor.fetchone()[0]
         
         print('\n✅ Enhanced dummy data creation completed!')
         print(f'Created {customer_count} customers')
         print(f'Created {order_count} orders')
         print(f'Created {orderitem_count} order items')
         print(f'Created {transaction_count} transactions')
+        print(f'Created {category_count} product categories')
+        print(f'Created {brand_count} brands')
+        print(f'Created {supplier_count} suppliers')
+        print(f'Created {product_count} products')
+        print(f'Created {inventory_count} inventory records')
+        print(f'Created {movement_count} stock movements')
         print('\n📊 Data spans 5 years (2020-2025) with seasonal variations for better dashboard visualization')
         
     except Exception as e:
