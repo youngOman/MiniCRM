@@ -6,9 +6,7 @@ import api from '../services/api';
 import KPICards from './dashboard/KPICards';
 import RevenueTrendChart from './dashboard/RevenueTrendChart';
 import CustomerGrowthChart from './dashboard/CustomerGrowthChart';
-import CustomerSourceChart from './dashboard/CustomerSourceChart';
 import PaymentMethodChart from './dashboard/PaymentMethodChart';
-import CustomerTierChart from './dashboard/CustomerTierChart';
 import DashboardFilters from './dashboard/DashboardFilters';
 import StatsCards from './dashboard/StatsCards';
 
@@ -42,19 +40,6 @@ interface DashboardStats {
   };
 }
 
-interface Customer {
-  id: number;
-  first_name: string;
-  last_name: string;
-  total_orders: number;
-  total_spent: number;
-}
-
-interface CustomerTier {
-  tier: string;
-  count: number;
-  color: string;
-}
 
 interface TrendData {
   customer_trend: Array<{ date: string; count: number }>;
@@ -66,8 +51,6 @@ interface TrendData {
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [trends, setTrends] = useState<TrendData | null>(null);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [customerTiers, setCustomerTiers] = useState<CustomerTier[]>([]); // 客戶等級分布
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     date_from: format(subMonths(new Date(), 3), 'yyyy-MM-dd'),
@@ -77,40 +60,6 @@ const Dashboard: React.FC = () => {
     period: 'month'
   });
 
-  // 客戶等級分類邏輯
-  const getCustomerTier = (totalSpent: number, totalOrders: number): { tier: string; color: string } => {
-    if (totalSpent >= 60000) {
-      return { tier: '白金客戶', color: '#8B5CF6' };
-    } else if (totalSpent >= 20000 && totalOrders >= 1) {
-      return { tier: '黃金客戶', color: '#F59E0B' };
-    } else if (totalSpent >= 5000 && totalOrders >= 2) {
-      return { tier: '白銀客戶', color: '#6B7280' };
-    } else if (totalSpent > 0 && totalOrders >= 1) {
-      return { tier: '一般客戶', color: '#10B981' };
-    } else {
-      return { tier: '潛在客戶', color: '#EF4444' };
-    }
-  };
-
-  // 計算客戶等級分布
-  const calculateCustomerTiers = (customers: Customer[]): CustomerTier[] => {
-    const tierCounts = new Map<string, { count: number; color: string }>();
-    
-    customers.forEach(customer => {
-      const { tier, color } = getCustomerTier(customer.total_spent, customer.total_orders);
-      if (tierCounts.has(tier)) {
-        tierCounts.get(tier)!.count += 1;
-      } else {
-        tierCounts.set(tier, { count: 1, color });
-      }
-    });
-
-    return Array.from(tierCounts.entries()).map(([tier, { count, color }]) => ({
-      tier,
-      count,
-      color
-    }));
-  };
 
   useEffect(() => {
     fetchDashboardData();
@@ -119,26 +68,13 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsResponse, trendsResponse, customersResponse] = await Promise.all([
+      const [statsResponse, trendsResponse] = await Promise.all([
         api.get('/reports/dashboard/', { params: filters }),
-        api.get('/reports/trends/', { params: filters }),
-        api.get('/customers/', { 
-          params: { 
-            limit: 10000, // 增加限制以獲取更多客戶資料
-            date_from: filters.date_from,
-            date_to: filters.date_to,
-            source: filters.source,
-            // tags: filters.tags
-          } 
-        })
+        api.get('/reports/trends/', { params: filters })
       ]);
       
       setStats(statsResponse.data);
       setTrends(trendsResponse.data);
-      setCustomers(customersResponse.data.results || []);
-      // 計算客戶等級分布
-      const tiers = calculateCustomerTiers(customersResponse.data.results|| []);
-      setCustomerTiers(tiers);
     } catch (error) {
       console.error('載入儀表板數據失敗:', error);
     } finally {
@@ -181,8 +117,8 @@ const Dashboard: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       {/* 頁面標題 */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">營運儀表板</h1>
-        <p className="text-gray-600">一鍵掌握關鍵營運指標與趨勢分析</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">營銷分析儀表板</h1>
+        <p className="text-gray-600">掌握營銷效果、客戶獲取與轉換分析</p>
       </div>
 
       {/* 篩選器 */}
@@ -212,16 +148,8 @@ const Dashboard: React.FC = () => {
           dateTo={filters.date_to}
         />
         
-        <CustomerSourceChart 
-          data={stats.customer_stats.customer_sources}
-        />
-        
         <PaymentMethodChart 
           data={stats.transaction_stats.payment_methods}
-        />
-        
-        <CustomerTierChart 
-          data={customerTiers}
         />
       </div>
 

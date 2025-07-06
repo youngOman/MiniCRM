@@ -20,59 +20,49 @@
 2. 銷售管理 (Sales Management)
 3. 行銷管理 (Marketing Management)
 
+- 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
+- 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
+
 ## 待處理 BUG
 
 ## [v1.8] - 2025-07-07
 
-- 年齡分析
-
-  - 年齡分佈直方圖
-  - 年齡群組 vs 客戶價值 (柱狀圖)
-
-- 性別分析
-
-  - 性別分佈圓餅圖
-  - 性別 vs 平均消費金額 (柱狀圖)
-  - 性別 vs 購買頻率對比
-  - 性別 vs 客戶等級分佈
-
-- 產品偏好分析
-
-  - 產品偏好熱力圖 - 了解哪些產品組合最受歡迎
-  - 產品偏好 vs 消費金額熱力圖
-
-- 偏好 vs 人口統計
-
-  - 年齡群組 vs 產品偏好堆疊圖
-  - 性別 vs 產品偏好對比圖
-  - 高價值客戶的產品偏好分析
-
-- 季節性購買偏好
-  - 季節性偏好分佈圓餅圖
+營銷儀表板新增，聚焦獲客、轉換、ROI
 
 ## [v1.7] - 2025-07-06
 
+- 營運總覽 -> 營銷儀表板，移除：
+  - 客戶等級分布圓餅圖 → 移到客戶分析
+  - 客戶來源分布 → 移到客戶分析
+  
+
 - 新增針對客戶的分析儀表板 (CustomerAnalytics.tsx)
   - 6 個概覽指標卡片(總客戶數、有年齡資料、有性別資料、有產品偏好、平均年齡、資料完整度)
-  - AgeAnalysisChart - 年齡分布、年齡群組平均消費金額
-  - GenderAnalysisChart - 性別分布、性別平均消費金額、性別購買行為對比
-  - ProductPreferenceChart - 產品類別受歡迎程度和產品類別營收貢獻
-  - SeasonalAnalysisChart - 季節性購買偏好分佈、季節性購買表現分析
-  - CustomerSegmentMatrix -客戶細分矩陣（年齡 vs 消費金額）
+  - AgeAnalysisChart
+    - 年齡分布
+    - 年齡群組平均消費金額
+  - GenderAnalysisChart
+    - 性別分布
+    - 性別平均消費金額
+    - 性別購買行為對比
+  - ProductPreferenceChart
+    - 產品類別受歡迎程度
+    - 產品類別營收貢獻
+  - SeasonalAnalysisChart
+    - 季節性購買偏好分佈
+    - 季節性購買表現分析
+  - CustomerSegmentMatrix
+    - 客戶細分矩陣（年齡 vs 消費金額）
 
 ### 修復問題
 
-> 問題原因：Cannot assign to read only property '0' of object '[object Array]'
-> 錯誤發生是因為直接對只讀陣列使用 .sort() 方法。當陣列來自 React props 或 state 時，
-> 從 data.sort(...) → [...data].sort(...)，  使用展開運算符 [...data]，創建陣列的淺拷貝，然後對拷貝進行排序，就不會修改原始的只讀陣列。
-
+- 客戶分析儀表板，下拉選單選擇篩選條件會導致 Cannot assign to read only property '0' of object '[object Array]'
+  > 錯誤發生是因為直接對只讀陣列使用 .sort() 方法。當陣列來自 React props 或 state 時，
+  > 從 data.sort(...) → [...data].sort(...)， 使用展開運算符 [...data]，創建陣列的淺拷貝，然後對拷貝進行排序，就不會修改原始的只讀陣列。
 
 ## [v1.7] - 2025-07-05
 
-- 拆分 Dashboard.tsx 中的圖表成獨立組件
-  - 考慮未來圖表越來越多，開始依照不同主題分成五個分析頁面
-- 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
-- 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
+- 拆分 Dashboard.tsx 中的圖表成獨立 components
 
 ## [v1.6] - 2025-07-04
 
@@ -203,7 +193,7 @@
 
 前端:
 
-- `frontend/src/components/Dashboard.tsx` - 營運儀表板主頁面
+- `frontend/src/components/Dashboard.tsx` - 營銷分析儀表板頁面
 - `frontend/src/components/Layout.tsx` - 新增儀表板導航
 - `frontend/src/App.tsx` - 路由整合與預設頁面調整
 - `frontend/src/components/Login.tsx` - 登入後導向儀表板

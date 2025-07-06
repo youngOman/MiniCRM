@@ -480,7 +480,42 @@ def customer_demographics_analytics(request):
             'tier': get_customer_tier(total_spent, total_orders)
         })
     
-    # 6. 數據概覽
+    # 6. 客戶來源分析
+    customer_sources = list(customers_qs.values('source').annotate(count=Count('id')).order_by('-count'))
+    
+    # 7. 客戶等級分析
+    customer_tiers = []
+    tier_counts = {'白金客戶': 0, '黃金客戶': 0, '白銀客戶': 0, '一般客戶': 0, '潛在客戶': 0}
+    tier_colors = {'白金客戶': '#8B5CF6', '黃金客戶': '#F59E0B', '白銀客戶': '#6B7280', '一般客戶': '#10B981', '潛在客戶': '#EF4444'}
+    
+    for customer in customers_qs:
+        customer_orders = Order.objects.filter(customer=customer)
+        total_spent = customer_orders.aggregate(Sum('total'))['total__sum'] or 0
+        total_orders = customer_orders.count()
+        
+        # 計算客戶等級
+        if total_spent >= 60000:
+            tier = '白金客戶'
+        elif total_spent >= 20000 and total_orders >= 1:
+            tier = '黃金客戶'
+        elif total_spent >= 5000 and total_orders >= 2:
+            tier = '白銀客戶'
+        elif total_spent > 0 and total_orders >= 1:
+            tier = '一般客戶'
+        else:
+            tier = '潛在客戶'
+        
+        tier_counts[tier] += 1
+    
+    for tier, count in tier_counts.items():
+        if count > 0:
+            customer_tiers.append({
+                'tier': tier,
+                'count': count,
+                'color': tier_colors[tier]
+            })
+
+    # 8. 數據概覽
     overview = {
         'total_customers': customers_qs.count(),
         'customers_with_age': customers_qs.exclude(age__isnull=True).count(),
@@ -510,6 +545,8 @@ def customer_demographics_analytics(request):
         'product_preferences': product_preferences,
         'seasonal_analysis': seasonal_analysis,
         'customer_segments': customer_segments,
+        'customer_sources': customer_sources,
+        'customer_tiers': customer_tiers,
         'overview': overview
     }
     

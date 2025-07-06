@@ -24,7 +24,7 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 - customers (客戶管理)
 - orders (訂單管理)
 - transactions (交易記錄)
-- reports (營運儀表板)
+- reports (營銷分析儀表板儀表板)
 
 ## 核心功能
 

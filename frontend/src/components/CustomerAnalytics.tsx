@@ -8,6 +8,8 @@ import GenderAnalysisChart from './customer_analytics/GenderAnalysisChart';
 import ProductPreferenceChart from './customer_analytics/ProductPreferenceChart';
 import SeasonalAnalysisChart from './customer_analytics/SeasonalAnalysisChart';
 import CustomerSegmentMatrix from './customer_analytics/CustomerSegmentMatrix';
+import CustomerSourceChart from './dashboard/CustomerSourceChart';
+import CustomerTierChart from './dashboard/CustomerTierChart';
 
 // 數據接口定義
 interface AgeGroupData {
@@ -53,12 +55,25 @@ interface CustomerSegmentData {
   tier: string;
 }
 
+interface CustomerSourceData {
+  source: string;
+  count: number;
+}
+
+interface CustomerTierData {
+  tier: string;
+  count: number;
+  color: string;
+}
+
 interface CustomerAnalyticsData {
   age_analysis: AgeGroupData[];
   gender_analysis: GenderData[];
   product_preferences: ProductCategoryData[];
   seasonal_analysis: SeasonalData[];
   customer_segments: CustomerSegmentData[];
+  customer_sources: CustomerSourceData[];
+  customer_tiers: CustomerTierData[];
   overview: {
     total_customers: number;
     customers_with_age: number;
@@ -269,6 +284,12 @@ const CustomerAnalytics: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <SeasonalAnalysisChart data={data.seasonal_analysis} type="distribution" />
         <SeasonalAnalysisChart data={data.seasonal_analysis} type="performance" />
+      </div>
+
+      {/* 客戶來源和等級分析 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <CustomerSourceChart data={data.customer_sources} />
+        <CustomerTierChart data={data.customer_tiers} />
       </div>
 
       {/* 客戶細分矩陣 */}
