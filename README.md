@@ -71,11 +71,6 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 ## 核心功能
 
-### 客戶資料彈性匯入
-
-- 支援手動新增或批次匯入（CSV / Excel）
-- 多欄位對應設計，可選擇忽略不必要欄位
-- 匯入支援欄位對應與容錯，不完整資料亦可導入
 
 ### 進階搜尋與即時篩選
 
@@ -116,11 +111,16 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 ### 客戶資料管理
 
-可手動新增客戶，也可在該客戶詳情頁面直接查詢 該客戶的歷史訂單與交易記錄、總消費金額、活躍度..等
+- 可手動新增、編輯客戶資料，可編輯 姓名、Email、電話、地址、公司、年齡、性別、購買季節偏好、購買產品類別偏好、備註...等欄位
+- 也可直接在該客戶詳情頁面直接查詢：該客戶的歷史訂單與交易記錄、總消費金額、活躍度..等
 
 ![Customers Page](./images/customer.png)
 
 ### 匯入多筆客戶資料流程
+
+- 支援手動新增或批次匯入（CSV / Excel）
+- 多欄位對應設計，可選擇忽略不必要欄位
+- 匯入具容錯能力，即使缺少總消費額、年齡、地址..等欄位也可成功導入，可後續補齊資料，預設顯示「未提供」
 
 ![Customers Import](./images/customer_import.png)
 
@@ -132,15 +132,25 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 ### 交易記錄
 
-<!-- ![Transactions Page](./images/transactions_page.png) -->
+- 可依照 交易狀態、交易類型 下拉選單快速篩選交易記錄，並可直接在該交易記錄內連結到該筆訂單
+- 可手動新增交易記錄，編輯 交易類型、付款方式、付款狀態、金流串接資訊、金流回應、處理時間
+
+![Transactions Page](./images/transaction_all.png)
 
 ### 搜尋與篩選資料
 
-<!-- ![Search Results](./images/search_result.png) -->
+- 客戶管理系統
 
-### 可一次匯入大量客戶資料
+<!-- ![Search Results](./images/customer_search.png) -->
 
-<!-- ![Import Customers](./images/import_customer_data.png) -->
+- 訂單管理系統：搜尋 Joseph 開頭，訂單狀態為處理中的搜尋結果
+
+![Search Results](./images/order_search.png)
+
+
+### 營銷分析儀表板
+
+![dashboard](./images/dashboard.png)
 
 ### 客戶分析儀表板
 
