@@ -417,13 +417,12 @@ def create_enhanced_dummy_data():
         for product_id in product_ids:
             quantity_on_hand = random.randint(0, 500)
             quantity_reserved = random.randint(0, min(quantity_on_hand, 50))
-            quantity_available = quantity_on_hand - quantity_reserved
             reorder_level = random.randint(10, 50)
             max_stock_level = random.randint(100, 1000)
             location = random.choice(locations)
             
             cursor.execute(inventory_insert_query, (
-                product_id, quantity_on_hand, quantity_reserved, quantity_available,
+                product_id, quantity_on_hand, quantity_reserved,
                 reorder_level, max_stock_level, location, now
             ))
         

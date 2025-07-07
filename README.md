@@ -23,14 +23,26 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 目前主要有五個功能模組：
 
-- customers (客戶管理)
-- orders (訂單管理) 
-- transactions (交易記錄)
-- products (產品管理)
-- reports (營銷分析儀表板)
+- **customers** (客戶管理)
+- **orders** (訂單管理)
+- **transactions** (交易記錄)
+- **products** (產品管理)
+- **reports** (營銷分析儀表板)
 
 
+**客戶分析頁面**：
 
+- 🏠 **客戶總覽** - 快速掌握客戶基本統計與導航
+- 👥 **客戶人口分析** - 年齡、性別分布與消費行為深度分析
+- 🛒 **客戶行為分析** - 產品偏好、季節性購買模式分析
+- 🎯 **客戶分群分析** - 來源渠道、等級分布與細分策略
+
+#### 產品管理系統
+
+- **完整的產品生態**：分類、品牌、供應商、產品、庫存管理
+- **庫存追蹤**：實時庫存監控、異動記錄、低庫存警示
+- **價格管理**：歷史價格追蹤、變動記錄
+- **變體支援**：產品規格（顏色、尺寸）管理
 
 ## 核心功能
 
@@ -97,7 +109,27 @@ MiniCRM Pro 是個輕量型、免費開源、專為中小型企業、剛起步�
 
 <!-- ![Import Customers](./images/import_customer_data.png) -->
 
-### 報表區
+### 客戶分析儀表板
+
+#### 客戶總覽頁面
+
+<!-- ![Customer Overview](./images/customer_overview.png) -->
+
+#### 客戶人口分析
+
+<!-- ![Customer Demographics](./images/customer_demographics.png) -->
+
+#### 客戶行為分析
+
+<!-- ![Customer Behavior](./images/customer_behavior.png) -->
+
+#### 客戶分群分析
+
+<!-- ![Customer Segmentation](./images/customer_segmentation.png) -->
+
+### 產品管理系統
+
+<!-- ![Product Management](./images/product_management.png) -->
 
 ---
 
@@ -194,6 +226,71 @@ npm run dev
 - **示範登入**: `test_young` / `young0921`
 
 ---
+
+## 📋 詳細功能介紹
+
+### 客戶分析儀表板 (Customer Analytics)
+
+**🏠 客戶總覽 (`/customer-overview`)**
+
+- 6 大關鍵指標卡片：總客戶數、資料完整度、平均年齡等
+- 快速導航卡片，一鍵跳轉到專門分析頁面
+- 統一的篩選器：日期範圍、客戶來源、年齡、性別
+
+**👥 客戶人口分析 (`/customer-demographics`)**
+
+- 年齡分析：年齡分布圖表、年齡群組消費行為分析
+- 性別分析：性別分布、消費金額對比、購買行為差異
+- 互動式圖表，支援數據深度探索
+
+**🛒 客戶行為分析 (`/customer-behavior`)**
+
+- 產品偏好分析：熱門產品類別、營收貢獻度分析
+- 季節性分析：季節購買模式、表現趨勢對比
+- 策略建議卡片：針對分析結果提供行銷建議
+
+**🎯 客戶分群分析 (`/customer-segmentation`)**
+
+- 客戶來源分析：各渠道獲客效果對比
+- 客戶等級分析：白金/黃金/白銀/一般客戶分布
+- 客戶細分矩陣：年齡 vs 消費金額散點圖分析
+- 精準行銷策略建議
+
+### 產品管理系統 (Product Management)
+
+**📦 完整產品生態管理**
+
+- **產品分類**: 多層級分類管理，支援 URL 友好的 slug
+- **品牌管理**: 品牌資訊、Logo、官網連結管理
+- **供應商管理**: 供應商資料、聯絡人、信用額度管理
+- **產品主檔**: SKU、描述、價格、分類、品牌、供應商關聯
+
+**📊 庫存與異動追蹤**
+
+- **實時庫存**: 現有庫存、預留庫存、可用庫存計算
+- **庫存警示**: 低庫存、缺貨警示系統
+- **異動記錄**: 入庫、出庫、調整、盤點等所有異動追蹤
+- **多倉管理**: 支援多個倉庫位置管理
+
+**💰 價格與變體管理**
+
+- **價格歷史**: 完整的價格變動記錄與追蹤
+- **產品變體**: 顏色、尺寸等不同規格管理
+- **成本管控**: 成本價格與售價管理，利潤率計算
+
+### 營銷分析儀表板 (Marketing Dashboard)
+
+**📈 關鍵營運指標**
+
+- 營收趨勢圖表、客戶成長曲線、訂單增長分析
+- 轉換率計算、客戶獲取成本 (CAC) 追蹤
+- 多維度 KPI 卡片：今日、本月、總計數據
+
+**💳 交易與付款分析**
+
+- 付款方式分布圓餅圖
+- 交易狀態統計
+- 營收來源分析
 
 ## 🎯 功能特色
 
@@ -420,12 +517,14 @@ npm run test:coverage
 ### 關聯關係
 
 #### 客戶與訂單
+
 1. Customer → Order (1:M) - 客戶可以有多個訂單
 2. Order → OrderItem (1:M) - 訂單可以包含多個商品項目
 3. Customer → Transaction (1:M) - 客戶可以有多筆交易記錄
 4. Order → Transaction (1:M, Optional) - 訂單可以關聯多筆交易
 
 #### 產品管理
+
 5. Category → Product (1:M) - 分類包含多個產品
 6. Brand → Product (1:M) - 品牌擁有多個產品
 7. Supplier → Product (1:M) - 供應商供應多個產品
@@ -436,6 +535,7 @@ npm run test:coverage
 12. Product → PriceHistory (1:M) - 產品的價格變動歷史
 
 #### 訂單與產品整合
+
 13. OrderItem → Product (M:1) - 訂單項目關聯產品
 14. OrderItem → ProductVariant (M:1, Optional) - 訂單項目可關聯產品變體
 
