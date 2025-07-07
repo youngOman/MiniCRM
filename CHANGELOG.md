@@ -29,6 +29,9 @@
 
 1. CLOUDFLARE 申請 DNS
 2. nslookup `minicrm.akebee.com`，看是否有解析到 IP
+3. VPS 主機把專案 clone 下來
+   1. python3 -m venv venv，建立並啟用虛擬環境並執行 `pip install -r requirements.txt`
+4. 注意！！！前端的 api 端點也要改 `frontend/src/services/api.ts`
 
 ## [v1.8.1] - 2025-07-09
 
