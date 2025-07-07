@@ -25,6 +25,11 @@
 
 2. 產品管理 CRUD
 
+**嘗試部署至 VPS 主機**
+
+1. CLOUDFLARE 申請 DNS
+2. nslookup `minicrm.akebee.com`，看是否有解析到 IP
+
 ## [v1.8.1] - 2025-07-09
 
 1. **客戶分析儀表板拆分與重構**

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Transaction } from '../types/transaction';
 import { Customer } from '../types/customer';
 import { Order } from '../types/order';
-import { unknown, ApiError } from '../types/error';
+import { ApiError } from '../types/error';
 import api from '../services/api';
 
 interface TransactionFormProps {
