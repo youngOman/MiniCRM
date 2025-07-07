@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// const API_BASE_URL = 'http://localhost:8000/api';
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:8000/api';
+// const API_BASE_URL = '/api';
 
 // Create axios instance
 const api = axios.create({
@@ -45,7 +45,7 @@ api.interceptors.response.use(
           // Retry original request
           originalRequest.headers.Authorization = `Bearer ${access}`;
           return api(originalRequest);
-        } catch (refreshError) {
+        } catch {
           // Refresh failed, redirect to login
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');

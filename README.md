@@ -1,4 +1,4 @@
-# MiniCRM Pro - 輕量型、全方位 AI CRM 系統
+# MiniCRM Pro - 輕量型、一站式 AI CRM 系統
 
 <div align="center">
   <img src="./images/MiniCRM.png" style="margin-bottom: 12px;" />

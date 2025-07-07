@@ -19,6 +19,8 @@
 
 ## 待處理 BUG
 
+- 產品管理搜尋，每打一個字就會發出一次請求，導致不斷 re-render
+
 ## [v1.9] - 2025-07-10
 
 **產品管理系統開發**
@@ -31,6 +33,10 @@
 2. nslookup `minicrm.akebee.com`，看是否有解析到 IP
 3. VPS 主機把專案 clone 下來
    1. python3 -m venv venv，建立並啟用虛擬環境並執行 `pip install -r requirements.txt`
+   2. 新增對應的 nginx.conf 配置檔
+   3. sudo certbot certonly --expand -d xxx.com -d minicrm.akebee.com，申請 SSL 憑證
+   4. uwsgi uwsgi.ini 試跑，前端 `run build` 完，訪問網頁確定可以就來建 service
+   5. 建立 systemd 服務檔案 `/etc/systemd/system/minicrm-uwsgi.service`，設定自動啟用服務
 4. 注意！！！前端的 api 端點也要改 `frontend/src/services/api.ts`
 
 ## [v1.8.1] - 2025-07-09

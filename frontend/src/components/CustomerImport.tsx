@@ -3,21 +3,12 @@ import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 import { Customer } from '../types/customer';
 import { ApiError } from '../types/error';
+import { FieldMapping, ImportData } from '../types/customerImport';
 import api from '../services/api';
 
 interface CustomerImportProps {
   onImportComplete: () => void;
   onCancel: () => void;
-}
-
-interface ImportData {
-  [key: string]: string | number | boolean;
-}
-
-interface FieldMapping {
-  sourceField: string;
-  targetField: string;
-  required: boolean;
 }
 
 const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCancel }) => {
@@ -132,7 +123,7 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
     // Initialize mappings
     const initialMappings: FieldMapping[] = customerFields.map(field => ({
       sourceField: findBestMatch(field.key, field.label, cleanHeaders),
-      targetField: field.key,
+      targetField: field.key as keyof Customer,
       required: field.required
     }));
     
@@ -192,10 +183,10 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
         if (mapping.sourceField && row[mapping.sourceField] !== undefined) {
           const value = row[mapping.sourceField];
           if (mapping.targetField === 'is_active') {
-            customer[mapping.targetField as keyof Customer] = 
-              ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toString().toLowerCase()) as any;
+            customer.is_active = ['true', '1', 'yes', '是', 'active', '啟用']
+              .includes(value.toString().toLowerCase());
           } else {
-            customer[mapping.targetField as keyof Customer] = value as any;
+            (customer as Record<keyof Customer, unknown>)[mapping.targetField] = value;
           }
         }
       });
@@ -227,70 +218,12 @@ const CustomerImport: React.FC<CustomerImportProps> = ({ onImportComplete, onCan
         mappings.forEach(mapping => {
           if (mapping.sourceField && row[mapping.sourceField] !== undefined) {
             const value = row[mapping.sourceField];
-            const targetField = mapping.targetField;
             
-            // 使用類型安全的方式設定值
-            switch (targetField) {
-              case 'is_active':
-                customerData.is_active = ['true', '1', 'yes', '是', 'active', '啟用']
-                  .includes(value.toString().toLowerCase());
-                break;
-              case 'first_name':
-                customerData.first_name = value.toString();
-                break;
-              case 'last_name':
-                customerData.last_name = value.toString();
-                break;
-              case 'email':
-                customerData.email = value.toString();
-                break;
-              case 'phone':
-                customerData.phone = value.toString();
-                break;
-              case 'company':
-                customerData.company = value.toString();
-                break;
-              case 'address':
-                customerData.address = value.toString();
-                break;
-              case 'city':
-                customerData.city = value.toString();
-                break;
-              case 'state':
-                customerData.state = value.toString();
-                break;
-              case 'zip_code':
-                customerData.zip_code = value.toString();
-                break;
-              case 'country':
-                customerData.country = value.toString();
-                break;
-              case 'source':
-                customerData.source = value.toString();
-                break;
-              case 'tags':
-                customerData.tags = value.toString();
-                break;
-              case 'notes':
-                customerData.notes = value.toString();
-                break;
-              case 'age':
-                customerData.age = Number(value);
-                break;
-              case 'gender':
-                if (['male', 'female', 'other', 'prefer_not_to_say'].includes(value.toString())) {
-                  customerData.gender = value.toString() as Customer['gender'];
-                }
-                break;
-              case 'seasonal_purchase_pattern':
-                if (['spring', 'summer', 'autumn', 'winter', 'year_round'].includes(value.toString())) {
-                  customerData.seasonal_purchase_pattern = value.toString() as Customer['seasonal_purchase_pattern'];
-                }
-                break;
-              default:
-                // 對於其他欄位，使用型別斷言但保持更安全
-                (customerData as Record<string, unknown>)[targetField] = value;
-                break;
+            if (mapping.targetField === 'is_active') {
+              customerData.is_active = 
+                ['true', '1', 'yes', '是', 'active', '啟用'].includes(value.toString().toLowerCase());
+            } else {
+              (customerData as Record<keyof Customer, unknown>)[mapping.targetField] = value;
             }
           }
         });
