@@ -17,6 +17,7 @@
 
 - 前端列表顯示英文而非中文問題
 - 導入 Redux 來管理專案 跨元件的資料流狀態
+
 ## 待處理 BUG
 
 - 產品管理搜尋，每打一個字就會發出一次請求，導致不斷 re-render
@@ -25,9 +26,18 @@
 
 **產品管理系統開發**
 
-2. 產品管理 CRUD
+1. 產品管理 CRUD
+   1. 產品 Form 表單頁面，編輯、新增
+2. 產品 detail 詳情頁面
 
-**嘗試部署至 VPS 主機**
+- 基本資訊 Tab：產品名稱、SKU、價格、成本、分類、品牌、供應商
+- 產品變體 Tab：顯示所有產品變體，支援新增/編輯/刪除
+- 庫存狀況 Tab：實時庫存、預留庫存、可用庫存、庫存警示
+- 庫存異動 Tab：完整的入庫/出庫/調整記錄
+
+3.
+
+**部署上線**
 
 1. CLOUDFLARE 申請 DNS
 2. nslookup `minicrm.akebee.com`，看是否有解析到 IP
@@ -38,6 +48,12 @@
    4. uwsgi uwsgi.ini 試跑，前端 `run build` 完，訪問網頁確定可以就來建 service
    5. 建立 systemd 服務檔案 `/etc/systemd/system/minicrm-uwsgi.service`，設定自動啟用服務
 4. 注意！！！前端的 api 端點也要改 `frontend/src/services/api.ts`
+
+### 修復問題
+
+1. ProductDetail 中庫存資料結構錯誤（應該是單一物件而非陣列）
+2. `http://localhost:8000/api/products/products/159/stock-movements/ 404 (Not Found)`，將 stock-movements 的 API 路徑從 `/products/products/{id}/stock-movements/` 改為 `/products/stock-movements/?product=${id}`
+
 
 ## [v1.8.1] - 2025-07-09
 

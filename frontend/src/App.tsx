@@ -12,6 +12,7 @@ import {
 import OrderList from './components/OrderList';
 import TransactionList from './components/TransactionList';
 import ProductList from './components/ProductList';
+import ProductDetail from './components/ProductDetail';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/auth';
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="orders" element={<OrderList />} />
             <Route path="transactions" element={<TransactionList />} />
             <Route path="products" element={<ProductList />} />
+            <Route path="products/:id" element={<ProductDetail />} />
             
           </Route>
           <Route

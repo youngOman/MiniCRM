@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Product } from "../types/product";
 import { PaginatedResponse } from "../types/common";
 import api from "../services/api";
 
 const ProductList: React.FC = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -161,7 +163,10 @@ const ProductList: React.FC = () => {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-4">
+                  <button 
+                    onClick={() => navigate(`/products/${product.id}`)}
+                    className="text-blue-600 hover:text-blue-900 mr-4"
+                  >
                     檢視
                   </button>
                   <button className="text-indigo-600 hover:text-indigo-900 mr-4">
