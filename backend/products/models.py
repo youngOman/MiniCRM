@@ -165,7 +165,7 @@ class Product(models.Model):
 
 
 class ProductVariant(models.Model):
-    """產品變體模型 - 處理顏色、尺寸等不同規格"""
+    """產品款式變體模型 - 處理顏色、尺寸等不同規格"""
     product = models.ForeignKey(
         Product, 
         on_delete=models.CASCADE,
@@ -193,8 +193,8 @@ class ProductVariant(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新時間')
 
     class Meta:
-        verbose_name = '產品變體'
-        verbose_name_plural = '產品變體'
+        verbose_name = '產品款式變體'
+        verbose_name_plural = '產品款式變體'
         ordering = ['product', 'name']
 
     def __str__(self):
@@ -215,7 +215,7 @@ class Inventory(models.Model):
         null=True, 
         blank=True,
         related_name='inventory',
-        verbose_name='產品變體'
+        verbose_name='產品款式變體'
     )
     quantity_on_hand = models.PositiveIntegerField(default=0, verbose_name='現有庫存')
     quantity_reserved = models.PositiveIntegerField(default=0, verbose_name='已預留庫存')
@@ -278,7 +278,7 @@ class StockMovement(models.Model):
         null=True, 
         blank=True,
         related_name='stock_movements',
-        verbose_name='產品變體'
+        verbose_name='產品款式變體'
     )
     movement_type = models.CharField(
         max_length=20, 
@@ -319,7 +319,7 @@ class PriceHistory(models.Model):
         null=True, 
         blank=True,
         related_name='price_history',
-        verbose_name='產品變體'
+        verbose_name='產品款式變體'
     )
     old_price = models.DecimalField(
         max_digits=10, 

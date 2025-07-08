@@ -93,8 +93,8 @@ class Migration(migrations.Migration):
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='variants', to='products.product', verbose_name='產品')),
             ],
             options={
-                'verbose_name': '產品變體',
-                'verbose_name_plural': '產品變體',
+                'verbose_name': '產品款式變體',
+                'verbose_name_plural': '產品款式變體',
                 'ordering': ['product', 'name'],
             },
         ),
@@ -130,7 +130,7 @@ class Migration(migrations.Migration):
                 ('notes', models.TextField(blank=True, verbose_name='備註')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='異動時間')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='stock_movements', to='products.product', verbose_name='產品')),
-                ('variant', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='stock_movements', to='products.productvariant', verbose_name='產品變體')),
+                ('variant', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='stock_movements', to='products.productvariant', verbose_name='產品款式變體')),
             ],
             options={
                 'verbose_name': '庫存異動記錄',
@@ -154,7 +154,7 @@ class Migration(migrations.Migration):
                 ('created_by', models.CharField(max_length=100, verbose_name='變更人員')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='建立時間')),
                 ('product', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='price_history', to='products.product', verbose_name='產品')),
-                ('variant', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='price_history', to='products.productvariant', verbose_name='產品變體')),
+                ('variant', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='price_history', to='products.productvariant', verbose_name='產品款式變體')),
             ],
             options={
                 'verbose_name': '價格歷史',
@@ -173,7 +173,7 @@ class Migration(migrations.Migration):
                 ('location', models.CharField(blank=True, max_length=100, verbose_name='庫存位置')),
                 ('last_updated', models.DateTimeField(auto_now=True, verbose_name='最後更新時間')),
                 ('product', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='inventory', to='products.product', verbose_name='產品')),
-                ('variant', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='inventory', to='products.productvariant', verbose_name='產品變體')),
+                ('variant', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='inventory', to='products.productvariant', verbose_name='產品款式變體')),
             ],
             options={
                 'verbose_name': '庫存',

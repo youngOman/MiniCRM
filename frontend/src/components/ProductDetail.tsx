@@ -127,7 +127,7 @@ const ProductDetail: React.FC = () => {
         <nav className="-mb-px flex space-x-8">
           {[
             { key: 'info', label: '基本資訊' },
-            { key: 'variants', label: '產品變體' },
+            { key: 'variants', label: '產品款式變體' },
             { key: 'inventory', label: '庫存狀況' },
             { key: 'movements', label: '庫存異動' }
           ].map((tab) => (
@@ -228,11 +228,11 @@ const ProductDetail: React.FC = () => {
           </div>
         )}
 
-        {/* 產品變體 */}
+        {/* 產品款式變體 */}
         {activeTab === 'variants' && (
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">產品變體</h3>
+              <h3 className="text-lg font-semibold text-gray-900">產品款式變體</h3>
               <button className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                 新增變體
               </button>

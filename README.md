@@ -380,8 +380,8 @@ POST   /api/products/                   # 建立新產品
 GET    /api/products/{id}/              # 取得產品詳情
 PUT    /api/products/{id}/              # 更新產品
 DELETE /api/products/{id}/              # 刪除產品
-GET    /api/products/{id}/variants/     # 取得產品變體
-POST   /api/products/{id}/variants/     # 建立產品變體
+GET    /api/products/{id}/variants/     # 取得產品款式變體
+POST   /api/products/{id}/variants/     # 建立產品款式變體
 GET    /api/products/{id}/inventory/    # 取得庫存資訊
 PUT    /api/products/{id}/inventory/    # 更新庫存
 GET    /api/products/{id}/stock-movements/ # 取得庫存異動記錄
@@ -492,7 +492,7 @@ npm run test:coverage
 - **OrderItem**: 訂單內的個別商品，關聯產品與變體
 - **Transaction**: 付款追蹤與財務記錄
 - **Product**: 產品主體資訊、價格、成本、庫存
-- **ProductVariant**: 產品變體（顏色、尺寸等規格）
+- **ProductVariant**: 產品款式變體（顏色、尺寸等規格）
 - **Category**: 產品分類管理
 - **Brand**: 品牌資訊管理
 - **Supplier**: 供應商資訊與關係管理
@@ -523,7 +523,7 @@ npm run test:coverage
 #### 訂單與產品整合
 
 13. OrderItem → Product (M:1) - 訂單項目關聯產品
-14. OrderItem → ProductVariant (M:1, Optional) - 訂單項目可關聯產品變體
+14. OrderItem → ProductVariant (M:1, Optional) - 訂單項目可關聯產品款式變體
 
 ---
 
