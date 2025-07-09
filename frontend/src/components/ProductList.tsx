@@ -141,15 +141,15 @@ const ProductList: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.category.name}</div>
-                  <div className="text-sm text-gray-500">{product.brand.name}</div>
+                  <div className="text-sm text-gray-900">{product.category_name}</div>
+                  <div className="text-sm text-gray-500">{product.brand_name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">售價: ${product.base_price}</div>
                   <div className="text-sm text-gray-500">成本: ${product.cost_price}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{product.supplier.name}</div>
+                  <div className="text-sm text-gray-900">{product.supplier_name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${

@@ -70,6 +70,20 @@
 2. `http://localhost:8000/api/products/products/159/stock-movements/ 404 (Not Found)`，將 stock-movements 的 API 路徑從 `/products/products/{id}/stock-movements/` 改為 `/products/stock-movements/?product=${id}`
 3. 修復 `TypeError:categories.map is not a function`，有些產品可能一開始沒有設置供應商、產品分類、品牌分類..等，多設定空陣列作為預設值 + 確保資料是陣列格式
 4. 更新產品會出現 400 Error (請求資料格式有問題)，`用戶沒填重量 Weight，送出空字串`、`價格欄位 NaN` 問題
+5. 送出表單後，分類資訊像是 產品分類、品牌、供應商 都沒有更新成功？
+   - 直接使用 parseInt() 轉換 category、brand、supplier，但如果這些欄位是空字串，parseInt("") 會回傳 NaN，這會導致後端收到無效的資料。
+6. 前端產品在 ProductDetailSerializer 中，category, brand, supplier 欄位只包含 ID，而不是完整的物件。完整的名稱資訊在 category_name, brand_name,supplier_name 欄位中，所以前端要改讀 category_name...來顯示
+   - 後端 ProductDetailSerializer 回傳的是：
+     ```json
+     {
+     	"category": 186, // 只有 ID
+     	"category_name": "3C 配件", // 完整名稱
+     	"brand": 205,
+     	"brand_name": "Adidas",
+     	"supplier": 146,
+     	"supplier_name": "亞洲科技供應商"
+     }
+     ```
 
 ## [v1.8.1] - 2025-07-09
 

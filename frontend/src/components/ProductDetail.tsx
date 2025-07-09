@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Product, ProductVariant, Inventory, StockMovement } from '../types/product';
 import api from '../services/api';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [product, setProduct] = useState<Product | null>(null);
   const [variants, setVariants] = useState<ProductVariant[]>([]);
@@ -19,7 +20,7 @@ const ProductDetail: React.FC = () => {
     if (id) {
       fetchProductDetails();
     }
-  }, [id]);
+  }, [id, location.pathname]); // 監聽路徑變化，當用戶從編輯頁面返回時重新載入
 
   const fetchProductDetails = async () => {
     try {
@@ -204,17 +205,17 @@ const ProductDetail: React.FC = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">產品分類</label>
-                  <p className="mt-1 text-sm text-gray-900">{product.category.name}</p>
+                  <p className="mt-1 text-sm text-gray-900">{product.category_name || '未設定'}</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">品牌</label>
-                  <p className="mt-1 text-sm text-gray-900">{product.brand.name}</p>
+                  <p className="mt-1 text-sm text-gray-900">{product.brand_name || '未設定'}</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">供應商</label>
-                  <p className="mt-1 text-sm text-gray-900">{product.supplier.name}</p>
+                  <p className="mt-1 text-sm text-gray-900">{product.supplier_name || '未設定'}</p>
                 </div>
 
                 <div className="pt-4 border-t">

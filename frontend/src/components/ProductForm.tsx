@@ -84,11 +84,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 	useEffect(() => {
 		const fetchOptions = async () => {
 			try {
-				const [categoriesRes, brandsRes, suppliersRes] = await Promise.all([
-					api.get("/products/categories/?is_active=true"), 
-					api.get("/products/brands/?is_active=true"), 
-					api.get("/products/suppliers/?is_active=true")
-				]);
+				const [categoriesRes, brandsRes, suppliersRes] = await Promise.all([api.get("/products/categories/?is_active=true"), api.get("/products/brands/?is_active=true"), api.get("/products/suppliers/?is_active=true")]);
 
 				// 確保資料是陣列格式
 				setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : categoriesRes.data?.results || []);
@@ -183,7 +179,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 		// 價格驗證
 		const basePrice = parseFloat(formData.base_price);
 		const costPrice = parseFloat(formData.cost_price);
-		
+
 		if (!formData.base_price || isNaN(basePrice) || basePrice <= 0) {
 			newErrors.base_price = "售價必須大於0";
 		}
@@ -237,9 +233,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 			const submitData: any = {
 				name: formData.name.trim(),
 				sku: formData.sku.trim(),
-				category: parseInt(formData.category),
-				brand: parseInt(formData.brand),
-				supplier: parseInt(formData.supplier),
 				base_price: parseFloat(formData.base_price).toFixed(2),
 				cost_price: parseFloat(formData.cost_price).toFixed(2),
 				tax_rate: parseFloat(formData.tax_rate).toFixed(2),
@@ -248,6 +241,28 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 				is_digital: formData.is_digital,
 				tags: formData.tags,
 			};
+
+			// 處理關聯欄位
+			if (formData.category && formData.category.trim()) {
+				const categoryId = parseInt(formData.category);
+				if (!isNaN(categoryId) && categoryId > 0) {
+					submitData.category = categoryId;
+				}
+			}
+
+			if (formData.brand && formData.brand.trim()) {
+				const brandId = parseInt(formData.brand);
+				if (!isNaN(brandId) && brandId > 0) {
+					submitData.brand = brandId;
+				}
+			}
+
+			if (formData.supplier && formData.supplier.trim()) {
+				const supplierId = parseInt(formData.supplier);
+				if (!isNaN(supplierId) && supplierId > 0) {
+					submitData.supplier = supplierId;
+				}
+			}
 
 			// 只在有值時才加入可選欄位
 			if (formData.description && formData.description.trim()) {
@@ -269,8 +284,6 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 				submitData.image_url = formData.image_url.trim();
 			}
 
-			console.log("提交資料:", submitData);
-
 			if (mode === "edit" && id) {
 				await api.put(`/products/products/${id}/`, submitData);
 			} else {
@@ -280,20 +293,18 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 			navigate(mode === "edit" ? `/products/${id}` : "/products");
 		} catch (error) {
 			console.error("提交失敗:", error);
-			console.error("錯誤詳情:", error instanceof AxiosError ? error.response?.data : error);
 
 			if (error instanceof AxiosError && error.response?.data) {
 				const apiErrors = error.response.data;
-				console.log("API 錯誤回應:", apiErrors);
-				
+
 				if (typeof apiErrors === "object" && apiErrors !== null) {
 					// 處理欄位錯誤
 					const formErrors: Record<string, string> = {};
-					Object.keys(apiErrors).forEach(key => {
+					Object.keys(apiErrors).forEach((key) => {
 						const errorValue = apiErrors[key];
 						if (Array.isArray(errorValue)) {
 							formErrors[key] = errorValue[0];
-						} else if (typeof errorValue === 'string') {
+						} else if (typeof errorValue === "string") {
 							formErrors[key] = errorValue;
 						}
 					});
@@ -351,11 +362,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>產品分類 *</label>
 								<select name='category' value={formData.category} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.category ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇分類</option>
-									{Array.isArray(categories) && categories.map((category) => (
-										<option key={category.id} value={category.id}>
-											{category.name}
-										</option>
-									))}
+									{Array.isArray(categories) &&
+										categories.map((category) => (
+											<option key={category.id} value={category.id}>
+												{category.name}
+											</option>
+										))}
 								</select>
 								{errors.category && <p className='mt-1 text-sm text-red-600'>{errors.category}</p>}
 							</div>
@@ -365,11 +377,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>品牌 *</label>
 								<select name='brand' value={formData.brand} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.brand ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇品牌</option>
-									{Array.isArray(brands) && brands.map((brand) => (
-										<option key={brand.id} value={brand.id}>
-											{brand.name}
-										</option>
-									))}
+									{Array.isArray(brands) &&
+										brands.map((brand) => (
+											<option key={brand.id} value={brand.id}>
+												{brand.name}
+											</option>
+										))}
 								</select>
 								{errors.brand && <p className='mt-1 text-sm text-red-600'>{errors.brand}</p>}
 							</div>
@@ -379,11 +392,12 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>供應商 *</label>
 								<select name='supplier' value={formData.supplier} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.supplier ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇供應商</option>
-									{Array.isArray(suppliers) && suppliers.map((supplier) => (
-										<option key={supplier.id} value={supplier.id}>
-											{supplier.name}
-										</option>
-									))}
+									{Array.isArray(suppliers) &&
+										suppliers.map((supplier) => (
+											<option key={supplier.id} value={supplier.id}>
+												{supplier.name}
+											</option>
+										))}
 								</select>
 								{errors.supplier && <p className='mt-1 text-sm text-red-600'>{errors.supplier}</p>}
 							</div>
@@ -436,18 +450,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 稅率 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>稅率 (%)</label>
-								<input 
-									type='number' 
-									name='tax_rate' 
-									value={formData.tax_rate} 
-									onChange={handleInputChange} 
-									step='0.01' 
-									min='0' 
-									max='100' 
-									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-										errors.tax_rate ? "border-red-500" : "border-gray-300"
-									}`}
-								/>
+								<input type='number' name='tax_rate' value={formData.tax_rate} onChange={handleInputChange} step='0.01' min='0' max='100' className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.tax_rate ? "border-red-500" : "border-gray-300"}`} />
 								{errors.tax_rate && <p className='mt-1 text-sm text-red-600'>{errors.tax_rate}</p>}
 							</div>
 						</div>
@@ -461,17 +464,15 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 重量 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>重量 (g)</label>
-								<input 
-									type='number' 
-									name='weight' 
-									value={formData.weight} 
-									onChange={handleInputChange} 
-									step='0.01' 
-									min='0' 
-									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-										errors.weight ? "border-red-500" : "border-gray-300"
-									}`}
-									placeholder='輸入重量' 
+								<input
+									type='number'
+									name='weight'
+									value={formData.weight}
+									onChange={handleInputChange}
+									step='0.01'
+									min='0'
+									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.weight ? "border-red-500" : "border-gray-300"}`}
+									placeholder='輸入重量'
 								/>
 								{errors.weight && <p className='mt-1 text-sm text-red-600'>{errors.weight}</p>}
 							</div>
@@ -485,15 +486,13 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 最小訂購量 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>最小訂購量</label>
-								<input 
-									type='number' 
-									name='min_order_quantity' 
-									value={formData.min_order_quantity} 
-									onChange={handleInputChange} 
-									min='1' 
-									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-										errors.min_order_quantity ? "border-red-500" : "border-gray-300"
-									}`}
+								<input
+									type='number'
+									name='min_order_quantity'
+									value={formData.min_order_quantity}
+									onChange={handleInputChange}
+									min='1'
+									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.min_order_quantity ? "border-red-500" : "border-gray-300"}`}
 								/>
 								{errors.min_order_quantity && <p className='mt-1 text-sm text-red-600'>{errors.min_order_quantity}</p>}
 							</div>

@@ -41,6 +41,9 @@ export interface Product {
   category: Category;
   brand: Brand;
   supplier: Supplier;
+  category_name?: string;
+  brand_name?: string;
+  supplier_name?: string;
   base_price: string;
   cost_price: string;
   is_active: boolean;
