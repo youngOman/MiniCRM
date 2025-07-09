@@ -159,6 +159,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 	const validateForm = (): boolean => {
 		const newErrors: Record<string, string> = {};
 
+		// 必填欄位驗證
 		if (!formData.name.trim()) {
 			newErrors.name = "產品名稱為必填項目";
 		}
@@ -179,16 +180,42 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 			newErrors.supplier = "供應商為必填項目";
 		}
 
-		if (!formData.base_price || parseFloat(formData.base_price) <= 0) {
+		// 價格驗證
+		const basePrice = parseFloat(formData.base_price);
+		const costPrice = parseFloat(formData.cost_price);
+		
+		if (!formData.base_price || isNaN(basePrice) || basePrice <= 0) {
 			newErrors.base_price = "售價必須大於0";
 		}
 
-		if (!formData.cost_price || parseFloat(formData.cost_price) <= 0) {
+		if (!formData.cost_price || isNaN(costPrice) || costPrice <= 0) {
 			newErrors.cost_price = "成本價必須大於0";
 		}
 
-		if (parseFloat(formData.base_price) <= parseFloat(formData.cost_price)) {
+		if (!isNaN(basePrice) && !isNaN(costPrice) && basePrice <= costPrice) {
 			newErrors.base_price = "售價必須大於成本價";
+		}
+
+		// 可選欄位驗證
+		if (formData.weight && formData.weight.trim()) {
+			const weight = parseFloat(formData.weight);
+			if (isNaN(weight) || weight < 0) {
+				newErrors.weight = "重量必須是有效的數字";
+			}
+		}
+
+		if (formData.tax_rate) {
+			const taxRate = parseFloat(formData.tax_rate);
+			if (isNaN(taxRate) || taxRate < 0 || taxRate > 100) {
+				newErrors.tax_rate = "稅率必須在0-100之間";
+			}
+		}
+
+		if (formData.min_order_quantity) {
+			const minOrder = parseInt(formData.min_order_quantity);
+			if (isNaN(minOrder) || minOrder < 1) {
+				newErrors.min_order_quantity = "最小訂購量必須大於0";
+			}
 		}
 
 		setErrors(newErrors);
@@ -206,8 +233,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 		setErrors({});
 
 		try {
-			const submitData = {
-				...formData,
+			// 準備提交資料，確保所有欄位格式正確
+			const submitData: any = {
+				name: formData.name.trim(),
+				sku: formData.sku.trim(),
 				category: parseInt(formData.category),
 				brand: parseInt(formData.brand),
 				supplier: parseInt(formData.supplier),
@@ -215,11 +244,32 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 				cost_price: parseFloat(formData.cost_price).toFixed(2),
 				tax_rate: parseFloat(formData.tax_rate).toFixed(2),
 				min_order_quantity: parseInt(formData.min_order_quantity),
-				weight: formData.weight ? parseFloat(formData.weight) : null,
-				dimensions: formData.dimensions || null,
-				image_url: formData.image_url || null,
-				description: formData.description || null,
+				is_active: formData.is_active,
+				is_digital: formData.is_digital,
+				tags: formData.tags,
 			};
+
+			// 只在有值時才加入可選欄位
+			if (formData.description && formData.description.trim()) {
+				submitData.description = formData.description.trim();
+			}
+
+			if (formData.weight && formData.weight.trim()) {
+				const weightValue = parseFloat(formData.weight);
+				if (!isNaN(weightValue) && weightValue > 0) {
+					submitData.weight = weightValue.toFixed(2);
+				}
+			}
+
+			if (formData.dimensions && formData.dimensions.trim()) {
+				submitData.dimensions = formData.dimensions.trim();
+			}
+
+			if (formData.image_url && formData.image_url.trim()) {
+				submitData.image_url = formData.image_url.trim();
+			}
+
+			console.log("提交資料:", submitData);
 
 			if (mode === "edit" && id) {
 				await api.put(`/products/products/${id}/`, submitData);
@@ -230,11 +280,24 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 			navigate(mode === "edit" ? `/products/${id}` : "/products");
 		} catch (error) {
 			console.error("提交失敗:", error);
+			console.error("錯誤詳情:", error instanceof AxiosError ? error.response?.data : error);
 
 			if (error instanceof AxiosError && error.response?.data) {
 				const apiErrors = error.response.data;
+				console.log("API 錯誤回應:", apiErrors);
+				
 				if (typeof apiErrors === "object" && apiErrors !== null) {
-					setErrors(apiErrors);
+					// 處理欄位錯誤
+					const formErrors: Record<string, string> = {};
+					Object.keys(apiErrors).forEach(key => {
+						const errorValue = apiErrors[key];
+						if (Array.isArray(errorValue)) {
+							formErrors[key] = errorValue[0];
+						} else if (typeof errorValue === 'string') {
+							formErrors[key] = errorValue;
+						}
+					});
+					setErrors(formErrors);
 				} else {
 					setErrors({ general: "提交失敗，請稍後再試" });
 				}
@@ -373,7 +436,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 稅率 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>稅率 (%)</label>
-								<input type='number' name='tax_rate' value={formData.tax_rate} onChange={handleInputChange} step='0.01' min='0' max='100' className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500' />
+								<input 
+									type='number' 
+									name='tax_rate' 
+									value={formData.tax_rate} 
+									onChange={handleInputChange} 
+									step='0.01' 
+									min='0' 
+									max='100' 
+									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+										errors.tax_rate ? "border-red-500" : "border-gray-300"
+									}`}
+								/>
+								{errors.tax_rate && <p className='mt-1 text-sm text-red-600'>{errors.tax_rate}</p>}
 							</div>
 						</div>
 					</div>
@@ -386,7 +461,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 重量 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>重量 (g)</label>
-								<input type='number' name='weight' value={formData.weight} onChange={handleInputChange} step='0.01' min='0' className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500' placeholder='輸入重量' />
+								<input 
+									type='number' 
+									name='weight' 
+									value={formData.weight} 
+									onChange={handleInputChange} 
+									step='0.01' 
+									min='0' 
+									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+										errors.weight ? "border-red-500" : "border-gray-300"
+									}`}
+									placeholder='輸入重量' 
+								/>
+								{errors.weight && <p className='mt-1 text-sm text-red-600'>{errors.weight}</p>}
 							</div>
 
 							{/* 尺寸 */}
@@ -398,7 +485,17 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 							{/* 最小訂購量 */}
 							<div>
 								<label className='block text-sm font-medium text-gray-700 mb-1'>最小訂購量</label>
-								<input type='number' name='min_order_quantity' value={formData.min_order_quantity} onChange={handleInputChange} min='1' className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500' />
+								<input 
+									type='number' 
+									name='min_order_quantity' 
+									value={formData.min_order_quantity} 
+									onChange={handleInputChange} 
+									min='1' 
+									className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+										errors.min_order_quantity ? "border-red-500" : "border-gray-300"
+									}`}
+								/>
+								{errors.min_order_quantity && <p className='mt-1 text-sm text-red-600'>{errors.min_order_quantity}</p>}
 							</div>
 
 							{/* 圖片網址 */}
