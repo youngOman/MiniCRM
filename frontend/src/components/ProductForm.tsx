@@ -84,13 +84,22 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 	useEffect(() => {
 		const fetchOptions = async () => {
 			try {
-				const [categoriesRes, brandsRes, suppliersRes] = await Promise.all([api.get<Category[]>("/products/categories/?is_active=true"), api.get<Brand[]>("/products/brands/?is_active=true"), api.get<Supplier[]>("/products/suppliers/?is_active=true")]);
+				const [categoriesRes, brandsRes, suppliersRes] = await Promise.all([
+					api.get("/products/categories/?is_active=true"), 
+					api.get("/products/brands/?is_active=true"), 
+					api.get("/products/suppliers/?is_active=true")
+				]);
 
-				setCategories(categoriesRes.data);
-				setBrands(brandsRes.data);
-				setSuppliers(suppliersRes.data);
+				// 確保資料是陣列格式
+				setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : categoriesRes.data?.results || []);
+				setBrands(Array.isArray(brandsRes.data) ? brandsRes.data : brandsRes.data?.results || []);
+				setSuppliers(Array.isArray(suppliersRes.data) ? suppliersRes.data : suppliersRes.data?.results || []);
 			} catch (error) {
 				console.error("載入選項數據失敗:", error);
+				// 設定空陣列作為預設值
+				setCategories([]);
+				setBrands([]);
+				setSuppliers([]);
 			}
 		};
 
@@ -279,7 +288,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>產品分類 *</label>
 								<select name='category' value={formData.category} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.category ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇分類</option>
-									{categories.map((category) => (
+									{Array.isArray(categories) && categories.map((category) => (
 										<option key={category.id} value={category.id}>
 											{category.name}
 										</option>
@@ -293,7 +302,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>品牌 *</label>
 								<select name='brand' value={formData.brand} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.brand ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇品牌</option>
-									{brands.map((brand) => (
+									{Array.isArray(brands) && brands.map((brand) => (
 										<option key={brand.id} value={brand.id}>
 											{brand.name}
 										</option>
@@ -307,7 +316,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ mode }) => {
 								<label className='block text-sm font-medium text-gray-700 mb-1'>供應商 *</label>
 								<select name='supplier' value={formData.supplier} onChange={handleInputChange} className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.supplier ? "border-red-500" : "border-gray-300"}`}>
 									<option value=''>請選擇供應商</option>
-									{suppliers.map((supplier) => (
+									{Array.isArray(suppliers) && suppliers.map((supplier) => (
 										<option key={supplier.id} value={supplier.id}>
 											{supplier.name}
 										</option>

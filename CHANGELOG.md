@@ -56,6 +56,7 @@
 
 1. ProductDetail 中庫存資料結構錯誤（應該是單一物件而非陣列）
 2. `http://localhost:8000/api/products/products/159/stock-movements/ 404 (Not Found)`，將 stock-movements 的 API 路徑從 `/products/products/{id}/stock-movements/` 改為 `/products/stock-movements/?product=${id}`
+3. 修復 `TypeError:categories.map is not a function`，有些產品可能一開始沒有設置供應商、產品分類、品牌分類..等，多設定空陣列作為預設值 + 確保資料是陣列格式
 
 ## [v1.8.1] - 2025-07-09
 
