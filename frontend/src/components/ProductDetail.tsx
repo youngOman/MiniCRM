@@ -113,7 +113,10 @@ const ProductDetail: React.FC = () => {
           </span>
         </div>
         <div className="flex space-x-2">
-          <button className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+          <button 
+            onClick={() => navigate(`/products/${product.id}/edit`)}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
             編輯產品
           </button>
           <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">

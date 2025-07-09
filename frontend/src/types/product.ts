@@ -2,6 +2,7 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
+  slug?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -11,6 +12,8 @@ export interface Brand {
   id: number;
   name: string;
   description?: string;
+  logo_url?: string;
+  website?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -23,6 +26,8 @@ export interface Supplier {
   email?: string;
   phone?: string;
   address?: string;
+  payment_terms?: string;
+  credit_limit?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -42,8 +47,10 @@ export interface Product {
   is_digital: boolean;
   weight?: string;
   dimensions?: string;
-  meta_title?: string;
-  meta_description?: string;
+  image_url?: string;
+  tax_rate?: string;
+  min_order_quantity?: number;
+  tags?: string[];
   created_at: string;
   updated_at: string;
 }
