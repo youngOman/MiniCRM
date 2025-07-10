@@ -13,6 +13,7 @@ const CustomerList: React.FC = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
 	const [searchTerm, setSearchTerm] = useState("");
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 	const [pagination, setPagination] = useState({
 		count: 0,
 		next: null as string | null,
@@ -22,11 +23,23 @@ const CustomerList: React.FC = () => {
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 	const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
+	// Debouncing effect for search term
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, 500); // 500ms delay
+
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [searchTerm]);
+
+
 	const fetchCustomers = React.useCallback(
 		async (url?: string) => {
 			try {
 				setLoading(true);
-				const endpoint = url || `/customers/${searchTerm ? `?search=${searchTerm}` : ""}`; //
+				const endpoint = url || `/customers/${debouncedSearchTerm ? `?search=${debouncedSearchTerm}` : ""}`;
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
 				setCustomers(response.data.results);
@@ -42,12 +55,12 @@ const CustomerList: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[searchTerm] // 明確指定依賴 searchTerm 以便在搜尋時重新獲取客戶資料，避免無限 re-render
+		[debouncedSearchTerm] // 明確指定依賴 debouncedSearchTerm 以便在搜尋時重新獲取客戶資料，避免無限 re-render
 	);
 
 	useEffect(() => {
 		fetchCustomers();
-	}, [searchTerm, fetchCustomers]);
+	}, [debouncedSearchTerm, fetchCustomers]);
 
 	// Refresh function to force reload of current page
 	const refreshCustomers = async () => {
@@ -186,6 +199,11 @@ const CustomerList: React.FC = () => {
 						onChange={(e) => setSearchTerm(e.target.value)}
 						className='w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm'
 					/>
+					{searchTerm !== debouncedSearchTerm && (
+						<div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+							<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+						</div>
+					)}
 					<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'>
 						<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
 							<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />

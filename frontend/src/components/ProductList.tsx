@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "../types/product";
 import { PaginatedResponse } from "../types/common";
@@ -28,33 +28,31 @@ const ProductList: React.FC = () => {
     };
   }, [searchTerm]);
 
-  const fetchProducts = useCallback(
-    async (url?: string) => {
-      try {
-        setLoading(true);
-        const endpoint = url || `/products/products/${debouncedSearchTerm ? `?search=${debouncedSearchTerm}` : ""}`;
-        const response = await api.get<PaginatedResponse<Product>>(endpoint);
 
-        setProducts(response.data.results);
-        setPagination({
-          count: response.data.count,
-          next: response.data.next,
-          previous: response.data.previous,
-        });
-      } catch (err: unknown) {
-        setError("Failed to fetch products");
-        console.error("Error fetching products:", err);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [debouncedSearchTerm]
-  );
+  const fetchProducts = async (url?: string) => {
+    try {
+      setLoading(true);
+      const endpoint = url || `/products/products/${debouncedSearchTerm ? `?search=${debouncedSearchTerm}` : ""}`;
+      const response = await api.get<PaginatedResponse<Product>>(endpoint);
+
+      setProducts(response.data.results);
+      setPagination({
+        count: response.data.count,
+        next: response.data.next,
+        previous: response.data.previous,
+      });
+    } catch (err: unknown) {
+      setError("Failed to fetch products");
+      console.error("Error fetching products:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Initial load and when debounced search term changes
   useEffect(() => {
     fetchProducts();
-  }, [debouncedSearchTerm, fetchProducts]);
+  }, [debouncedSearchTerm]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
