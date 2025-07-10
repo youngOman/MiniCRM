@@ -46,15 +46,27 @@ const CustomerDemographics: React.FC = () => {
     age_max: '',
     gender: ''
   });
+  const [debouncedFilters, setDebouncedFilters] = useState(filters);
+
+  // Debouncing effect for filters
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedFilters(filters);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [filters]);
 
   useEffect(() => {
     fetchDemographicsData();
-  }, [filters]);
+  }, [debouncedFilters]);
 
   const fetchDemographicsData = async () => {
     setLoading(true);
     try {
-      const response = await api.get('/reports/customer-demographics/', { params: filters });
+      const response = await api.get('/reports/customer-demographics/', { params: debouncedFilters });
       setData(response.data);
     } catch (error) {
       console.error('載入客戶人口分析數據失敗:', error);
