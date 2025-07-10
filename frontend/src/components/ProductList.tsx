@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Product } from "../types/product";
 import { PaginatedResponse } from "../types/common";
@@ -10,17 +10,29 @@ const ProductList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [pagination, setPagination] = useState({
     count: 0,
     next: null as string | null,
     previous: null as string | null,
   });
 
-  const fetchProducts = React.useCallback(
+  // Debouncing effect for search term
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // 500ms delay
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  const fetchProducts = useCallback(
     async (url?: string) => {
       try {
         setLoading(true);
-        const endpoint = url || `/products/products/${searchTerm ? `?search=${searchTerm}` : ""}`;
+        const endpoint = url || `/products/products/${debouncedSearchTerm ? `?search=${debouncedSearchTerm}` : ""}`;
         const response = await api.get<PaginatedResponse<Product>>(endpoint);
 
         setProducts(response.data.results);
@@ -36,16 +48,18 @@ const ProductList: React.FC = () => {
         setLoading(false);
       }
     },
-    [searchTerm]
+    [debouncedSearchTerm]
   );
 
+  // Initial load and when debounced search term changes
   useEffect(() => {
     fetchProducts();
-  }, [searchTerm, fetchProducts]);
+  }, [debouncedSearchTerm, fetchProducts]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchProducts();
+    // Force immediate search by setting debounced term
+    setDebouncedSearchTerm(searchTerm);
   };
 
   const handlePrevious = () => {
@@ -91,13 +105,20 @@ const ProductList: React.FC = () => {
 
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="flex space-x-4">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="搜尋產品名稱、SKU..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        />
+        <div className="flex-1 relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="搜尋產品名稱、SKU..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          {searchTerm !== debouncedSearchTerm && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+            </div>
+          )}
+        </div>
         <button
           type="submit"
           className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg transition-colors"
