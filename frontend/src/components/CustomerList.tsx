@@ -12,8 +12,13 @@ const CustomerList: React.FC = () => {
 	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState("");
-	const [searchTerm, setSearchTerm] = useState("");
-	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+	// 搜尋功能相關狀態
+	const [searchTerm, setSearchTerm] = useState(""); // 使用者輸入的搜尋關鍵字
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // 延遲處理後的搜尋關鍵字
+	
+	// 排序功能相關狀態
+	const [sortBy, setSortBy] = useState(""); // 使用者選擇的排序方式
+	const [debouncedSortBy, setDebouncedSortBy] = useState(""); // 延遲處理後的排序方式
 	const [pagination, setPagination] = useState({
 		count: 0,
 		next: null as string | null,
@@ -23,23 +28,64 @@ const CustomerList: React.FC = () => {
 	const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 	const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null);
 
-	// Debouncing effect for search term
+	// 搜尋防抖處理：避免使用者每打一個字就發送 API 請求
+	// 當使用者停止輸入 500ms 後才真正執行搜尋
 	useEffect(() => {
 		const handler = setTimeout(() => {
 			setDebouncedSearchTerm(searchTerm);
-		}, 500); // 500ms delay
+		}, 500); // 等待 500 毫秒
 
+		// 清理函數：如果使用者在 500ms 內又輸入新字元，就取消前一次的計時器
 		return () => {
 			clearTimeout(handler);
 		};
 	}, [searchTerm]);
 
+	// 排序防抖處理：避免下拉選單快速切換時發送過多 API 請求
+	// 排序選擇後 300ms 才執行，比搜尋快一點因為通常不會頻繁切換
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedSortBy(sortBy);
+		}, 300); // 等待 300 毫秒
 
+		// 清理函數：取消前一次的排序計時器
+		return () => {
+			clearTimeout(handler);
+		};
+	}, [sortBy]);
+
+
+	// 獲取客戶列表的主要函數，支援搜尋和排序功能
 	const fetchCustomers = React.useCallback(
 		async (url?: string) => {
 			try {
 				setLoading(true);
-				const endpoint = url || `/customers/${debouncedSearchTerm ? `?search=${debouncedSearchTerm}` : ""}`;
+				
+				// 如果有傳入特定 URL（通常是分頁連結）就使用該 URL
+				// 否則組裝新的 API 端點，包含搜尋和排序參數
+				let endpoint = url;
+				if (!url) {
+					// 基本 API 路徑
+					endpoint = '/customers/';
+					
+					// 組裝查詢參數（search 和 ordering）
+					const params = new URLSearchParams();
+					
+					// 如果有搜尋關鍵字，加入 search 參數
+					if (debouncedSearchTerm) {
+						params.append('search', debouncedSearchTerm);
+					}
+					
+					// 如果有選擇排序方式，加入 ordering 參數
+					if (debouncedSortBy) {
+						params.append('ordering', debouncedSortBy);
+					}
+					
+					// 如果有參數，加在 URL 後面
+					if (params.toString()) {
+						endpoint += '?' + params.toString();
+					}
+				}
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
 				setCustomers(response.data.results);
@@ -55,12 +101,12 @@ const CustomerList: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[debouncedSearchTerm] // 明確指定依賴 debouncedSearchTerm 以便在搜尋時重新獲取客戶資料，避免無限 re-render
+		[debouncedSearchTerm, debouncedSortBy] // 當搜尋關鍵字或排序方式改變時，重新獲取客戶資料
 	);
 
 	useEffect(() => {
 		fetchCustomers();
-	}, [debouncedSearchTerm, fetchCustomers]);
+	}, [debouncedSearchTerm, debouncedSortBy, fetchCustomers]); // 監聽搜尋和排序狀態變化
 
 	// Refresh function to force reload of current page
 	const refreshCustomers = async () => {
@@ -189,25 +235,74 @@ const CustomerList: React.FC = () => {
 				</div>
 			</div>
 
-			{/* Search */}
-			<div className='max-w-md'>
-				<div className='relative group'>
-					<input
-						type='text'
-						placeholder='搜尋客戶...'
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						className='w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm'
-					/>
-					{searchTerm !== debouncedSearchTerm && (
-						<div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-							<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+			{/* 搜尋和排序區域 */}
+			<div className='flex flex-col sm:flex-row gap-4 max-w-4xl'>
+				{/* 搜尋框 */}
+				<div className='flex-1 max-w-md'>
+					<div className='relative group'>
+						<input
+							type='text'
+							placeholder='搜尋客戶...'
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							className='w-full px-4 py-3 pl-12 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm'
+						/>
+						{/* 搜尋中的轉圈動畫：當使用者輸入中且還未達到 debounce 時間時顯示 */}
+						{searchTerm !== debouncedSearchTerm && (
+							<div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+							</div>
+						)}
+						{/* 搜尋圖示 */}
+						<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'>
+							<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+							</svg>
 						</div>
-					)}
-					<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'>
-						<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-							<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
-						</svg>
+					</div>
+				</div>
+
+				{/* 排序下拉選單 */}
+				<div className='w-full sm:w-64'>
+					<div className='relative group'>
+						<select
+							value={sortBy}
+							onChange={(e) => setSortBy(e.target.value)}
+							className='w-full px-4 py-3 pl-12 pr-10 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50/50 hover:bg-white focus:bg-white group-hover:border-gray-300 text-sm appearance-none cursor-pointer'
+						>
+							{/* 預設不排序 */}
+							<option value=''>不排序</option>
+							{/* 總消費額由低到高（ASC = 遞增） */}
+							<option value='total_spent'>總消費額：由低到高</option>
+							{/* 總消費額由高到低（DESC = 遞減） */}
+							<option value='-total_spent'>總消費額：由高到低</option>
+							{/* 額外的排序選項，方便未來擴充 */}
+							<option value='full_name'>姓名：A-Z</option>
+							<option value='-full_name'>姓名：Z-A</option>
+							<option value='created_at'>加入時間：由舊到新</option>
+							<option value='-created_at'>加入時間：由新到舊</option>
+						</select>
+						
+						{/* 排序中的轉圈動畫：當選擇排序且還未達到 debounce 時間時顯示 */}
+						{sortBy !== debouncedSortBy && (
+							<div className="absolute right-12 top-1/2 transform -translate-y-1/2">
+								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+							</div>
+						)}
+						
+						{/* 排序圖示 */}
+						<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none'>
+							<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 4h13M3 8h9m-9 4h6m0 0l-3-3m3 3l3-3m-3 3v12' />
+							</svg>
+						</div>
+						
+						{/* 下拉箭頭 */}
+						<div className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none'>
+							<svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+							</svg>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -3,26 +3,29 @@
 ## 待辦
 
 1. 客戶生命週期價值 (CLV) 計算
-2. PDF 報表匯出
-3. 即時數據更新：WebSocket 即時推送
-4. 匯出資料、匯出報表
-5. 季節性行銷：根據購買模式安排促銷活動
-6. 產品推薦：根據產品類別的精準推薦
-7. 銷售管理 (Sales Management)
-8. 行銷管理 (Marketing Management)
-
-- 客戶管理新增依 總消費額 ASC、DESC 排序 下拉選單
-- 訂單管理新增依 日期 ASC、DESC 排序 下拉選單
+   - 計算客戶的終身價值 (CLV)，考慮平均訂單價值、購買頻率和客戶壽命週期
+   - 提供 CLV 分析報告，幫助制定行銷策略
+2. 即時更新：WebSocket 即時推送
+3. 匯出資料、匯出 PDF 報表
+4. 產品推薦：根據產品類別的精準推薦、季節性行銷：根據購買模式安排促銷活動
+5. 銷售管理 (Sales Management)
+6. 行銷管理 (Marketing Management)
 
 - 前端列表顯示英文而非中文問題
 - 離線模式
 - 多平台整合：與 Notion、Google Workspace 等業務工具整合
-- AI 整合客戶資料，透過提示銷售人員採取下一個建議動作的方式，將銷售流程自動化。-
+- 整合客戶資料，透過 AI 提示銷售人員採取下一個建議動作的方式，將銷售流程自動化-提高 ROAS（廣告投資報酬率）。
 - AI 預測幫助代表優先處理最重要的交易並預測銷售
 
 ## 待處理 BUG
 
+## [v1.10] - 2025-07-11
 
+- 客戶管理新增 根據總消費額 ASC、DESC 排序 下拉選單
+  -  新增排序狀態和下拉選單
+  -  修改 API 請求支援排序參數
+  -  測試排序功能
+- 訂單管理新增 根據日期 ASC、DESC 排序 下拉選單
 
 ## [v1.9] - 2025-07-10
 
@@ -68,7 +71,7 @@
 
 ### 修復問題
 
-1. 修復產品管理頁面，產品搜尋每打一個字，畫面就會rerender一次
+1. 修復產品管理頁面，產品搜尋每打一個字，畫面就會 rerender 一次
 2. ProductDetail 中庫存資料結構錯誤（應該是單一物件而非陣列）
 3. `http://localhost:8000/api/products/products/159/stock-movements/ 404 (Not Found)`，將 stock-movements 的 API 路徑從 `/products/products/{id}/stock-movements/` 改為 `/products/stock-movements/?product=${id}`
 4. 修復 `TypeError:categories.map is not a function`，有些產品可能一開始沒有設置供應商、產品分類、品牌分類..等，多設定空陣列作為預設值 + 確保資料是陣列格式
