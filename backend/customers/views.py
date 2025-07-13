@@ -3,6 +3,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as filters_drf
+from django.db.models import Sum, Count, Value, DecimalField
+from django.db.models.functions import Coalesce
 from .models import Customer
 from .serializers import CustomerSerializer, CustomerCreateUpdateSerializer
 
@@ -17,12 +19,38 @@ class CustomerFilter(filters_drf.FilterSet):
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
+    # 保留基本的 queryset 屬性給 DRF 路由使用
     queryset = Customer.objects.all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = CustomerFilter
     search_fields = ['first_name', 'last_name', 'email', 'company', 'phone']
-    ordering_fields = ['first_name', 'last_name', 'email', 'created_at', 'updated_at']
+    # 加入 annotated_total_spent 和 annotated_total_orders 到可排序欄位
+    ordering_fields = ['created_at', 'updated_at', 'annotated_total_spent', 'annotated_total_orders']
     ordering = ['-created_at']
+    
+    def get_queryset(self):
+        """
+        自定義 queryset，加入計算欄位以支援 total_spent 和 total_orders 排序
+        這樣就可以在前端使用 ?ordering=total_spent 或 ?ordering=-total_spent 來排序
+        """
+        queryset = Customer.objects.all()
+        
+        # 使用 Django ORM 的聚合功能計算每個客戶的總消費額和總訂單數
+        # 這樣就可以在資料庫層面進行排序，而不需要在 Python 層面處理
+        queryset = queryset.annotate(
+            # 計算總消費額：將該客戶所有訂單的 total 欄位相加
+            # 使用 Coalesce 處理 NULL 值，如果 Sum 結果是 NULL（沒有訂單）就設為 0
+            annotated_total_spent=Coalesce(
+                Sum('orders__total'), 
+                Value(0), 
+                output_field=DecimalField(max_digits=10, decimal_places=2)
+            ),
+            # 計算總訂單數：計算該客戶的訂單數量
+            # 使用不同名稱避免與模型 property 衝突
+            annotated_total_orders=Count('orders')
+        )
+        
+        return queryset
     
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:

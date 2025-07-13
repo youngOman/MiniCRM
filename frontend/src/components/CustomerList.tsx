@@ -86,6 +86,11 @@ const CustomerList: React.FC = () => {
 						endpoint += '?' + params.toString();
 					}
 				}
+				// 除錯：印出實際發送的 API 請求 URL
+				console.log('🔍 API 請求 URL:', endpoint);
+				console.log('📋 搜尋關鍵字:', debouncedSearchTerm);
+				console.log('📊 排序方式:', debouncedSortBy);
+				
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
 				setCustomers(response.data.results);
@@ -273,12 +278,13 @@ const CustomerList: React.FC = () => {
 							{/* 預設不排序 */}
 							<option value=''>不排序</option>
 							{/* 總消費額由低到高（ASC = 遞增） */}
-							<option value='total_spent'>總消費額：由低到高</option>
+							<option value='annotated_total_spent'>總消費額：由低到高</option>
 							{/* 總消費額由高到低（DESC = 遞減） */}
-							<option value='-total_spent'>總消費額：由高到低</option>
-							{/* 額外的排序選項，方便未來擴充 */}
-							<option value='full_name'>姓名：A-Z</option>
-							<option value='-full_name'>姓名：Z-A</option>
+							<option value='-annotated_total_spent'>總消費額：由高到低</option>
+							{/* 訂單數排序 */}
+							<option value='annotated_total_orders'>訂單數：由少到多</option>
+							<option value='-annotated_total_orders'>訂單數：由多到少</option>
+							{/* 時間排序選項 */}
 							<option value='created_at'>加入時間：由舊到新</option>
 							<option value='-created_at'>加入時間：由新到舊</option>
 						</select>

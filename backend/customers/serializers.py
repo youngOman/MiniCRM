@@ -4,8 +4,24 @@ from .models import Customer
 
 class CustomerSerializer(serializers.ModelSerializer):
     full_name = serializers.ReadOnlyField()
-    total_orders = serializers.IntegerField(read_only=True)
-    total_spent = serializers.FloatField(read_only=True)
+    # 使用 SerializerMethodField 來取得 annotated 欄位或 property 作為後備
+    total_orders = serializers.SerializerMethodField()
+    total_spent = serializers.SerializerMethodField()
+    
+    def get_total_orders(self, obj):
+        """
+        優先使用 annotated_total_orders，如果沒有則使用 property
+        """
+        return getattr(obj, 'annotated_total_orders', obj.total_orders_property)
+    
+    def get_total_spent(self, obj):
+        """
+        優先使用 annotated_total_spent，如果沒有則使用 property
+        """
+        annotated_value = getattr(obj, 'annotated_total_spent', None)
+        if annotated_value is not None:
+            return float(annotated_value)
+        return float(obj.total_spent_property)
     
     class Meta:
         model = Customer

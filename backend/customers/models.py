@@ -77,9 +77,17 @@ class Customer(models.Model):
         return f"{self.first_name} {self.last_name}"
     
     @property
-    def total_orders(self):
+    def total_orders_property(self):
+        """
+        重新命名原有的 property 方法避免與 annotate 欄位衝突
+        在 ViewSet 中我們使用 annotate 的 total_orders，效能更好
+        """
         return self.orders.count()
     
     @property
-    def total_spent(self):
+    def total_spent_property(self):
+        """
+        重新命名原有的 property 方法避免與 annotate 欄位衝突
+        在 ViewSet 中我們使用 annotate 的 total_spent，效能更好
+        """
         return sum(order.total for order in self.orders.all())
