@@ -63,8 +63,11 @@ const CustomerList: React.FC = () => {
 				
 				// 如果有傳入特定 URL（通常是分頁連結）就使用該 URL
 				// 否則組裝新的 API 端點，包含搜尋和排序參數
-				let endpoint = url;
-				if (!url) {
+				let endpoint: string;
+				if (url) {
+					// 使用傳入的 URL（分頁等）
+					endpoint = url;
+				} else {
 					// 基本 API 路徑
 					endpoint = '/customers/';
 					
@@ -86,18 +89,16 @@ const CustomerList: React.FC = () => {
 						endpoint += '?' + params.toString();
 					}
 				}
-				// 除錯：印出實際發送的 API 請求 URL
-				console.log('🔍 API 請求 URL:', endpoint);
-				console.log('📋 搜尋關鍵字:', debouncedSearchTerm);
-				console.log('📊 排序方式:', debouncedSortBy);
 				
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
-				setCustomers(response.data.results);
+				// 確保 response.data 符合 PaginatedResponse 類型，使用類型斷言避免 TypeScript 錯誤
+				const data: PaginatedResponse<Customer> = response.data;
+				setCustomers(data.results);
 				setPagination({
-					count: response.data.count,
-					next: response.data.next,
-					previous: response.data.previous,
+					count: data.count,
+					next: data.next,
+					previous: data.previous,
 				});
 			} catch (err: unknown) {
 				setError("Failed to fetch customers");
