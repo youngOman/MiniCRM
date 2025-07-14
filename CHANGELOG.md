@@ -5,9 +5,6 @@
 1. 獲客成本 CAC 計算
    1. 總行銷費用 ÷ 新獲得客戶數量
    2. CAC = (廣告費 + 行銷人員薪資 + 行銷工具費用 + 其他獲客相關費用) ÷ 新客戶數量
-2. 客戶生命週期價值 (CLV) 計算
-   - 計算客戶的終身價值 (CLV)，考慮平均訂單價值、購買頻率和客戶壽命週期
-   - 提供 CLV 分析報告，幫助制定行銷策略
 
 - 不同客戶來源的 CAC（網站、廣告、推薦等）
 - 按時間區間計算 CAC 趨勢
@@ -29,6 +26,55 @@
   - 整合客戶資料，透過 AI 提示銷售人員採取下一個建議動作的方式，將銷售流程自動化-提高 ROAS（廣告投資報酬率）。
 
 ## 待處理 BUG
+
+## [v1.12] - 2025-07-14
+
+### 🎯 客戶生命週期價值 (CLV) 分析系統
+
+- **可以**
+  - 關注最有價值的客戶群體
+  - 追蹤不同獲客渠道的客戶價值表現
+  - 制定基於 CLV 的精準行銷策略
+  - 監控客戶價值趨勢變化
+
+- **新增「客戶價值分析」專門頁面** (`/customer-value-analytics`)
+  - CLV 概覽統計：平均 CLV、總客戶價值、月平均購買頻率、有消費客戶數
+  - 客戶價值分布：低價值、中價值、高價值、頂級客戶四級分群分析
+  - 來源 CLV 分析：各獲客渠道 (官網、社群、推薦、廣告) 的客戶價值表現對比
+  - 頂級客戶排行：CLV 前 20 名客戶詳細列表，包含金、銀、銅牌標示
+  - 月度 CLV 趨勢：時間序列分析新客戶價值變化
+
+### 後端 API
+
+- **新增 CLV 計算引擎** (`reports/views.py`)
+  - `calculate_avg_clv()`: 計算平均客戶生命週期價值
+  - `calculate_avg_purchase_frequency()`: 計算月平均購買頻率
+  - `customer_clv_analytics()`: 完整的 CLV 分析 API
+- **新增 API 端點**: `GET /api/reports/customer-clv/`
+  - 支援日期範圍、來源篩選
+
+### 前端界面優化
+
+- **主儀表板增強**: 新增平均 CLV 和高價值客戶數 KPI 卡片
+- **側邊欄導航**: 新增「客戶價值分析」選項 (💰 圖示)
+- **客戶總覽頁面**: 新增「客戶價值分析」快速導航卡片
+
+### 🔧 技術改進 (Technical Improvements)
+
+- 修復 Django 聚合錯誤、重構 CLV 計算邏輯，避免在 annotated 字段上使用聚合函數
+- 使用批次計算減少數據庫查詢次數
+
+---
+
+## [v1.11] - 2025-07-14
+
+### 新增功能
+
+- 修正 CustomerList 組件的 API 請求邏輯，確保使用正確的 endpoint 並避免 TypeScript 錯誤
+- 顧客 models.py 新增計算 訂單數、總消費額 property，後端寫自定義 queryset 讓前端能使用 `?ordering=total_spent` 或 `?ordering=-total_spent` 來排序
+- 新增根據總消費額 ASC/DESC 排序的下拉選單功能 in CustomerList component
+- 新增 debouncing for filters in 客戶分群分析、客戶人口分析、客戶行為分析
+- debouncing for customer and product search functionality
 
 ## [v1.11] - 2025-07-13
 

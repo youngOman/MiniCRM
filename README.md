@@ -18,7 +18,8 @@
 3. 管理客戶關係追蹤銷售業績以及分析業務表現，並讓您可進行後續的精準再行銷及提升顧客忠誠度及回流率。瞭解公司是否朝正確方向邁進，或是否有不足之處。清楚知道客戶獲取成本 (CAC)、用戶終生價值 CLV(Customer Lifetime Value)。並獲得更多潛在客戶、提升生產力，以及提升客戶滿意度
 4. 具備簡潔的資料管理，視覺化儀表板與報表包含 客戶增長趨勢、客戶來源分佈、付款方式分佈、客戶等級分佈、今日(新增客戶量、新增訂單、完成交易數)、本月、客戶指標(平均客戶價值、待處理訂單、轉換率) 等..
 5. 支援同時管理多個品牌與供應商，不同品牌或供應商可進行獨立的客戶資料管理(訂單、交易記錄..等)
-6. (開發中)：成交率、追加銷售率、新淨收入、銷售週期長短與客戶生命週期價值 (CLV) 計算、 AI 智慧摘要
+6. **客戶生命週期價值 (CLV) 分析**：完整的 CLV 計算與分析系統，包含客戶價值分布、來源分析、頂級客戶排行、月度趨勢等深度洞察
+7. (開發中)：成交率、追加銷售率、新淨收入、銷售週期長短、客戶獲取成本 (CAC)、 AI 智慧摘要
 
 ## 核心功能模組
 
@@ -46,6 +47,12 @@
 - **客戶人口分析**：年齡/性別分布、消費行為深度分析
 - **客戶行為分析**：產品偏好、季節性購買模式分析、策略建議
 - **客戶分群分析**：客戶來源效果、等級分布、細分矩陣
+- **客戶終身價值(CLV)分析**：
+  - CLV 概覽統計：平均 CLV、總客戶價值、購買頻率
+  - 客戶價值分布：低/中/高/頂級客戶分群分析
+  - 來源 CLV 分析：各獲客渠道的客戶價值表現
+  - 頂級客戶排行：CLV 前 20 名客戶詳細列表
+  - 月度 CLV 趨勢：時間序列價值變化分析
 - **批次資料匯入**：
   - 支援 CSV / Excel 檔案格式
   - 彈性欄位對應，可選擇忽略不必要欄位
@@ -344,7 +351,70 @@ GET    /api/reports/dashboard/              # 營銷分析儀表板數據
 GET    /api/reports/trends/                 # 趨勢分析數據
 GET    /api/reports/customer-analytics/     # 客戶分析數據
 GET    /api/reports/customer-demographics/  # 客戶人口統計分析
+GET    /api/reports/customer-clv/           # 客戶生命週期價值 (CLV) 分析
 GET    /api/reports/revenue-analytics/      # 營收分析數據
+```
+
+### 客戶價值分析 (CLV) 端點詳細說明
+
+```
+GET    /api/reports/customer-clv/
+```
+
+**支援的查詢參數：**
+
+- `date_from`: 開始日期 (YYYY-MM-DD)
+- `date_to`: 結束日期 (YYYY-MM-DD)
+- `source`: 客戶來源篩選
+
+**回傳數據結構範例：**
+
+```json
+{
+	"clv_overview": {
+		"total_customers": 150,
+		"customers_with_orders": 120,
+		"avg_clv": 25000.5,
+		"total_clv": 3000060.0,
+		"avg_purchase_frequency": 2.5
+	},
+	"clv_segments": [
+		{
+			"segment": "頂級客戶",
+			"count": 15,
+			"total_value": 750000.0,
+			"avg_clv": 50000.0,
+			"percentage": 12.5
+		}
+	],
+	"clv_by_source": [
+		{
+			"source": "website",
+			"count": 80,
+			"avg_clv": 28000.0,
+			"total_clv": 2240000.0,
+			"avg_orders": 3.2
+		}
+	],
+	"top_customers": [
+		{
+			"id": 1,
+			"full_name": "王小明",
+			"email": "wang@example.com",
+			"total_spent": 85000.0,
+			"total_orders": 12,
+			"avg_order_value": 7083.33
+		}
+	],
+	"monthly_clv_trend": [
+		{
+			"month": "2024-12",
+			"new_customers": 25,
+			"avg_clv": 22000.0,
+			"total_clv": 550000.0
+		}
+	]
+}
 ```
 
 ### 查詢參數

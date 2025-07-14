@@ -236,10 +236,11 @@ const CustomerOverview: React.FC = () => {
             </div>
           </div>
         </div>
+
       </div>
 
       {/* 快速導航卡片 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div 
           className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer"
           onClick={() => navigate('/customer-demographics')}
@@ -277,6 +278,20 @@ const CustomerOverview: React.FC = () => {
             <div className="text-2xl">🎯</div>
           </div>
           <p className="text-gray-600 text-sm mb-4">了解客戶來源渠道和等級分布，制定精準行銷策略</p>
+          <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+            查看詳細分析 →
+          </button>
+        </div>
+
+        <div 
+          className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => navigate('/customer-value-analytics')}
+        >
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">客戶價值分析</h3>
+            <div className="text-2xl">💰</div>
+          </div>
+          <p className="text-gray-600 text-sm mb-4">深度分析客戶生命週期價值 (CLV)、消費模式與商業價值</p>
           <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
             查看詳細分析 →
           </button>

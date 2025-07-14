@@ -26,6 +26,10 @@ interface DashboardStats {
     new_customers_this_month: number;
     avg_customer_value: number;
     customer_sources: Array<{ source: string; count: number }>;
+    avg_clv: number;
+    avg_order_value: number;
+    avg_purchase_frequency: number;
+    high_value_customers: number;
   };
   order_stats: {
     orders_today: number;
@@ -133,6 +137,7 @@ const Dashboard: React.FC = () => {
       <KPICards 
         overview={stats.overview}
         transactionStats={stats.transaction_stats}
+        customerStats={stats.customer_stats}
       />
 
       {/* 圖表區域 */}

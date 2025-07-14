@@ -7,7 +7,8 @@ import {
   CustomerOverview, 
   CustomerDemographics, 
   CustomerBehavior, 
-  CustomerSegmentation 
+  CustomerSegmentation,
+  CustomerValueAnalytics
 } from './components/customer_analytics/pages';
 import OrderList from './components/OrderList';
 import TransactionList from './components/TransactionList';
@@ -38,6 +39,7 @@ function App() {
             <Route path="customer-demographics" element={<CustomerDemographics />} />
             <Route path="customer-behavior" element={<CustomerBehavior />} />
             <Route path="customer-segmentation" element={<CustomerSegmentation />} />
+            <Route path="customer-value-analytics" element={<CustomerValueAnalytics />} />
             <Route path="orders" element={<OrderList />} />
             <Route path="transactions" element={<TransactionList />} />
             <Route path="products" element={<ProductList />} />

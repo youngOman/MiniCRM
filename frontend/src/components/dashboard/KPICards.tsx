@@ -14,12 +14,19 @@ interface TransactionStats {
   total_fees: number;
 }
 
+interface CustomerStats {
+  avg_clv: number;
+  high_value_customers: number;
+  avg_purchase_frequency: number;
+}
+
 interface KPICardsProps {
   overview: OverviewStats;
   transactionStats: TransactionStats;
+  customerStats: CustomerStats;
 }
 
-const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats }) => {
+const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, customerStats }) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('zh-TW', {
       style: 'currency',
@@ -29,7 +36,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
       {/* 總客戶數 */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between">
@@ -90,6 +97,22 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats }) => {
             <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
               <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"></path>
               <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd"></path>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* 平均客戶價值 (CLV) */}
+      <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-pink-100 text-sm">平均 CLV</p>
+            <p className="text-3xl font-bold">{formatCurrency(customerStats.avg_clv)}</p>
+            <p className="text-pink-200 text-sm mt-1">高價值客戶 {customerStats.high_value_customers} 人</p>
+          </div>
+          <div className="text-pink-200">
+            <svg className="w-12 h-12" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"></path>
             </svg>
           </div>
         </div>

@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Count, Sum, Avg, Q
-from django.db.models.functions import TruncDate, TruncMonth, TruncYear
+from django.db.models import Count, Sum, Avg, Q, F, DecimalField, Value
+from django.db.models.functions import TruncDate, TruncMonth, TruncYear, Coalesce
 from django.utils import timezone
 from datetime import datetime, timedelta
+from decimal import Decimal
 from customers.models import Customer
 from orders.models import Order
 from transactions.models import Transaction
@@ -73,6 +74,13 @@ def dashboard_stats(request):
             'avg_customer_value': float(transactions_qs.values('customer').annotate(
                 customer_total=Sum('amount')).aggregate(Avg('customer_total'))['customer_total__avg'] or 0),
             'customer_sources': list(customers_qs.values('source').annotate(count=Count('id')).order_by('-count')),
+            # CLV 相關指標
+            'avg_clv': float(calculate_avg_clv(customers_qs)),
+            'avg_order_value': float(orders_qs.aggregate(Avg('total'))['total__avg'] or 0),
+            'avg_purchase_frequency': float(calculate_avg_purchase_frequency(customers_qs)),
+            'high_value_customers': customers_qs.annotate(
+                total_spent=Coalesce(Sum('orders__total'), Value(0), output_field=DecimalField())
+            ).filter(total_spent__gte=10000).count(),
         },
         'order_stats': {
             'orders_today': orders_qs.filter(order_date__date=timezone.now().date()).count(),
@@ -548,6 +556,270 @@ def customer_demographics_analytics(request):
         'customer_sources': customer_sources,
         'customer_tiers': customer_tiers,
         'overview': overview
+    }
+    
+    return Response(analytics)
+
+
+def calculate_avg_clv(customers_qs):
+    """
+    計算平均客戶生命週期價值 (CLV)
+    CLV = 客戶總消費額的平均值
+    
+    這裡使用歷史 CLV（每個客戶總消費額的平均）
+    """
+    customer_totals = []
+    
+    for customer in customers_qs.filter(orders__isnull=False).distinct():
+        customer_total = customer.orders.aggregate(total=Sum('total'))['total'] or 0
+        customer_totals.append(float(customer_total))
+    
+    if not customer_totals:
+        return 0
+    
+    return sum(customer_totals) / len(customer_totals)
+
+
+def calculate_avg_purchase_frequency(customers_qs):
+    """
+    計算平均購買頻率（每月訂單數）
+    """
+    from django.db.models import Count
+    from datetime import date
+    
+    # 計算有訂單的客戶數和總訂單數
+    customers_with_orders = customers_qs.filter(orders__isnull=False).distinct()
+    
+    if not customers_with_orders.exists():
+        return 0
+    
+    total_orders = Order.objects.filter(customer__in=customers_with_orders).count()
+    
+    # 計算平均客戶生命週期（月）
+    total_months = 0
+    customer_count = 0
+    
+    for customer in customers_with_orders:
+        # 計算客戶從註冊到現在的月數
+        customer_age_days = (date.today() - customer.created_at.date()).days
+        customer_age_months = max(customer_age_days / 30, 1)  # 至少1個月
+        total_months += customer_age_months
+        customer_count += 1
+    
+    if customer_count == 0:
+        return 0
+    
+    avg_customer_age_months = total_months / customer_count
+    avg_orders_per_customer = total_orders / customer_count
+    
+    # 月平均購買頻率 = 平均訂單數 / 平均客戶年齡(月)
+    return avg_orders_per_customer / avg_customer_age_months if avg_customer_age_months > 0 else 0
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def customer_clv_analytics(request):
+    """
+    客戶生命週期價值 (CLV) 專門分析
+    """
+    from django.db.models import Min, Max
+    
+    # 取得篩選參數
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    source = request.GET.get('source')
+    
+    # 基礎查詢集
+    customers_qs = Customer.objects.filter(is_active=True)
+    
+    # 應用篩選條件
+    if date_from:
+        try:
+            date_from = datetime.strptime(date_from, '%Y-%m-%d').date()
+            customers_qs = customers_qs.filter(created_at__date__gte=date_from)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            date_to = datetime.strptime(date_to, '%Y-%m-%d').date()
+            customers_qs = customers_qs.filter(created_at__date__lte=date_to)
+        except ValueError:
+            pass
+    
+    if source:
+        customers_qs = customers_qs.filter(source=source)
+    
+    # 計算 CLV 相關指標
+    customers_with_data = customers_qs.annotate(
+        total_spent=Coalesce(Sum('orders__total'), Value(0), output_field=DecimalField()),
+        total_orders=Count('orders'),
+        first_order_date=Min('orders__order_date'),
+        last_order_date=Max('orders__order_date'),
+        customer_age_days=timezone.now().date() - F('created_at__date')
+    ).filter(total_orders__gt=0)
+    
+    # 1. CLV 概覽統計
+    # 重新計算不使用 annotated 字段的聚合
+    total_customers = customers_qs.count()
+    customers_with_orders = customers_qs.filter(orders__isnull=False).distinct().count()
+    
+    # 計算平均 CLV：每個客戶的總消費額平均
+    customer_totals = []
+    for customer in customers_qs.filter(orders__isnull=False).distinct():
+        customer_total = customer.orders.aggregate(total=Sum('total'))['total'] or 0
+        customer_totals.append(float(customer_total))
+    
+    avg_clv = sum(customer_totals) / len(customer_totals) if customer_totals else 0
+    total_clv = sum(customer_totals)
+    
+    clv_overview = {
+        'total_customers': total_customers,
+        'customers_with_orders': customers_with_orders,
+        'avg_clv': avg_clv,
+        'median_clv': 0,  # 需要額外計算
+        'total_clv': total_clv,
+        'avg_order_value': float(Order.objects.filter(customer__in=customers_qs).aggregate(Avg('total'))['total__avg'] or 0),
+        'avg_purchase_frequency': float(calculate_avg_purchase_frequency(customers_qs)),
+    }
+    
+    # 2. CLV 分布分析
+    clv_segments = []
+    clv_ranges = [
+        ('低價值客戶', 0, 1000),
+        ('中價值客戶', 1000, 5000),
+        ('高價值客戶', 5000, 20000),
+        ('頂級客戶', 20000, float('inf'))
+    ]
+    
+    # 建立客戶總消費額字典
+    customer_clv_dict = {}
+    for customer in customers_qs.filter(orders__isnull=False).distinct():
+        customer_total = customer.orders.aggregate(total=Sum('total'))['total'] or 0
+        customer_clv_dict[customer.id] = float(customer_total)
+    
+    for segment_name, min_clv, max_clv in clv_ranges:
+        segment_customers = []
+        segment_total_value = 0
+        
+        for customer_id, clv in customer_clv_dict.items():
+            if max_clv == float('inf'):
+                if clv >= min_clv:
+                    segment_customers.append(customer_id)
+                    segment_total_value += clv
+            else:
+                if min_clv <= clv < max_clv:
+                    segment_customers.append(customer_id)
+                    segment_total_value += clv
+        
+        count = len(segment_customers)
+        total_customers_with_orders = len(customer_clv_dict)
+        
+        clv_segments.append({
+            'segment': segment_name,
+            'count': count,
+            'total_value': segment_total_value,
+            'avg_clv': segment_total_value / count if count > 0 else 0,
+            'percentage': round(count / total_customers_with_orders * 100, 1) if total_customers_with_orders > 0 else 0
+        })
+    
+    # 3. 按來源的 CLV 分析
+    source_clv_dict = {}
+    
+    for customer in customers_qs.filter(orders__isnull=False).distinct():
+        source = customer.source
+        customer_total = customer.orders.aggregate(total=Sum('total'))['total'] or 0
+        customer_orders = customer.orders.count()
+        
+        if source not in source_clv_dict:
+            source_clv_dict[source] = {
+                'customers': [],
+                'total_clv': 0,
+                'total_orders': 0
+            }
+        
+        source_clv_dict[source]['customers'].append(customer.id)
+        source_clv_dict[source]['total_clv'] += float(customer_total)
+        source_clv_dict[source]['total_orders'] += customer_orders
+    
+    clv_by_source = []
+    for source, data in source_clv_dict.items():
+        count = len(data['customers'])
+        avg_clv = data['total_clv'] / count if count > 0 else 0
+        avg_orders = data['total_orders'] / count if count > 0 else 0
+        
+        clv_by_source.append({
+            'source': source,
+            'count': count,
+            'avg_clv': avg_clv,
+            'total_clv': data['total_clv'],
+            'avg_orders': avg_orders
+        })
+    
+    # 按平均 CLV 排序
+    clv_by_source.sort(key=lambda x: x['avg_clv'], reverse=True)
+    
+    # 4. 頂級客戶列表 (CLV 前20名)
+    # 排序客戶 CLV 字典並取前20名
+    sorted_customers = sorted(customer_clv_dict.items(), key=lambda x: x[1], reverse=True)[:20]
+    
+    top_customers_list = []
+    for customer_id, total_spent in sorted_customers:
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            customer_orders = customer.orders.count()
+            
+            customer_data = {
+                'id': customer.id,
+                'first_name': customer.first_name,
+                'last_name': customer.last_name,
+                'email': customer.email,
+                'source': customer.source,
+                'created_at': customer.created_at,
+                'total_spent': total_spent,
+                'total_orders': customer_orders,
+                'full_name': f"{customer.first_name} {customer.last_name}",
+                'avg_order_value': total_spent / customer_orders if customer_orders > 0 else 0
+            }
+            top_customers_list.append(customer_data)
+        except Customer.DoesNotExist:
+            continue
+    
+    # 5. 月度 CLV 趨勢（新客戶的平均 CLV）
+    monthly_trends = {}
+    
+    for customer in customers_qs.filter(orders__isnull=False).distinct():
+        month = customer.created_at.strftime('%Y-%m')
+        customer_total = customer.orders.aggregate(total=Sum('total'))['total'] or 0
+        
+        if month not in monthly_trends:
+            monthly_trends[month] = {
+                'new_customers': 0,
+                'total_clv': 0,
+                'customer_clvs': []
+            }
+        
+        monthly_trends[month]['new_customers'] += 1
+        monthly_trends[month]['total_clv'] += float(customer_total)
+        monthly_trends[month]['customer_clvs'].append(float(customer_total))
+    
+    monthly_clv_trend = []
+    for month, data in sorted(monthly_trends.items()):
+        avg_clv = data['total_clv'] / data['new_customers'] if data['new_customers'] > 0 else 0
+        
+        monthly_clv_trend.append({
+            'month': month,
+            'new_customers': data['new_customers'],
+            'avg_clv': avg_clv,
+            'total_clv': data['total_clv']
+        })
+    
+    analytics = {
+        'clv_overview': clv_overview,
+        'clv_segments': clv_segments,
+        'clv_by_source': clv_by_source,
+        'top_customers': top_customers_list,
+        'monthly_clv_trend': monthly_clv_trend,
     }
     
     return Response(analytics)
