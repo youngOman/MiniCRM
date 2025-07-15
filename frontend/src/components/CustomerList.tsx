@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Customer } from "../types/customer";
 import { PaginatedResponse } from "../types/common";
 import api from "../services/api";
@@ -15,7 +15,7 @@ const CustomerList: React.FC = () => {
 	// 搜尋功能相關狀態
 	const [searchTerm, setSearchTerm] = useState(""); // 使用者輸入的搜尋關鍵字
 	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(""); // 延遲處理後的搜尋關鍵字
-	
+
 	// 排序功能相關狀態
 	const [sortBy, setSortBy] = useState(""); // 使用者選擇的排序方式
 	const [debouncedSortBy, setDebouncedSortBy] = useState(""); // 延遲處理後的排序方式
@@ -54,13 +54,12 @@ const CustomerList: React.FC = () => {
 		};
 	}, [sortBy]);
 
-
 	// 獲取客戶列表的主要函數，支援搜尋和排序功能
-	const fetchCustomers = React.useCallback(
+	const fetchCustomers = useCallback(
 		async (url?: string) => {
 			try {
 				setLoading(true);
-				
+
 				// 如果有傳入特定 URL（通常是分頁連結）就使用該 URL
 				// 否則組裝新的 API 端點，包含搜尋和排序參數
 				let endpoint: string;
@@ -69,27 +68,27 @@ const CustomerList: React.FC = () => {
 					endpoint = url;
 				} else {
 					// 基本 API 路徑
-					endpoint = '/customers/';
-					
+					endpoint = "/customers/";
+
 					// 組裝查詢參數（search 和 ordering）
 					const params = new URLSearchParams();
-					
+
 					// 如果有搜尋關鍵字，加入 search 參數
 					if (debouncedSearchTerm) {
-						params.append('search', debouncedSearchTerm);
+						params.append("search", debouncedSearchTerm);
 					}
-					
+
 					// 如果有選擇排序方式，加入 ordering 參數
 					if (debouncedSortBy) {
-						params.append('ordering', debouncedSortBy);
+						params.append("ordering", debouncedSortBy);
 					}
-					
+
 					// 如果有參數，加在 URL 後面
 					if (params.toString()) {
-						endpoint += '?' + params.toString();
+						endpoint += "?" + params.toString();
 					}
 				}
-				
+
 				const response = await api.get<PaginatedResponse<Customer>>(endpoint);
 
 				// 確保 response.data 符合 PaginatedResponse 類型，使用類型斷言避免 TypeScript 錯誤
@@ -107,7 +106,7 @@ const CustomerList: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[debouncedSearchTerm, debouncedSortBy] // 當搜尋關鍵字或排序方式改變時，重新獲取客戶資料
+		[debouncedSearchTerm, debouncedSortBy] // 當搜尋關鍵字或排序方式改變時，才重新產生 fetchCustomers 函數
 	);
 
 	useEffect(() => {
@@ -194,17 +193,34 @@ const CustomerList: React.FC = () => {
 
 	// Show form view
 	if (viewMode === "form") {
-		return <CustomerForm customer={selectedCustomer || undefined} onSave={handleSaveCustomer} onCancel={handleCancel} />;
+		return (
+			<CustomerForm
+				customer={selectedCustomer || undefined}
+				onSave={handleSaveCustomer}
+				onCancel={handleCancel}
+			/>
+		);
 	}
 
 	// Show detail view
 	if (viewMode === "detail" && selectedCustomerId) {
-		return <CustomerDetail customerId={selectedCustomerId} onEdit={handleEditCustomer} onBack={handleCancel} />;
+		return (
+			<CustomerDetail
+				customerId={selectedCustomerId}
+				onEdit={handleEditCustomer}
+				onBack={handleCancel}
+			/>
+		);
 	}
 
 	// Show import view
 	if (viewMode === "import") {
-		return <CustomerImport onImportComplete={handleImportComplete} onCancel={handleCancel} />;
+		return (
+			<CustomerImport
+				onImportComplete={handleImportComplete}
+				onCancel={handleCancel}
+			/>
+		);
 	}
 
 	if (loading && customers.length === 0) {
@@ -255,14 +271,24 @@ const CustomerList: React.FC = () => {
 						/>
 						{/* 搜尋中的轉圈動畫：當使用者輸入中且還未達到 debounce 時間時顯示 */}
 						{searchTerm !== debouncedSearchTerm && (
-							<div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+							<div className='absolute right-4 top-1/2 transform -translate-y-1/2'>
+								<div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500'></div>
 							</div>
 						)}
 						{/* 搜尋圖示 */}
 						<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400'>
-							<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' />
+							<svg
+								className='w-5 h-5'
+								fill='none'
+								stroke='currentColor'
+								viewBox='0 0 24 24'
+							>
+								<path
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									strokeWidth={2}
+									d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'
+								/>
 							</svg>
 						</div>
 					</div>
@@ -289,25 +315,45 @@ const CustomerList: React.FC = () => {
 							<option value='created_at'>加入時間：由舊到新</option>
 							<option value='-created_at'>加入時間：由新到舊</option>
 						</select>
-						
+
 						{/* 排序中的轉圈動畫：當選擇排序且還未達到 debounce 時間時顯示 */}
 						{sortBy !== debouncedSortBy && (
-							<div className="absolute right-12 top-1/2 transform -translate-y-1/2">
-								<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+							<div className='absolute right-12 top-1/2 transform -translate-y-1/2'>
+								<div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500'></div>
 							</div>
 						)}
-						
+
 						{/* 排序圖示 */}
 						<div className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none'>
-							<svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M3 4h13M3 8h9m-9 4h6m0 0l-3-3m3 3l3-3m-3 3v12' />
+							<svg
+								className='w-5 h-5'
+								fill='none'
+								stroke='currentColor'
+								viewBox='0 0 24 24'
+							>
+								<path
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									strokeWidth={2}
+									d='M3 4h13M3 8h9m-9 4h6m0 0l-3-3m3 3l3-3m-3 3v12'
+								/>
 							</svg>
 						</div>
-						
+
 						{/* 下拉箭頭 */}
 						<div className='absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none'>
-							<svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-								<path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M19 9l-7 7-7-7' />
+							<svg
+								className='w-4 h-4'
+								fill='none'
+								stroke='currentColor'
+								viewBox='0 0 24 24'
+							>
+								<path
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									strokeWidth={2}
+									d='M19 9l-7 7-7-7'
+								/>
 							</svg>
 						</div>
 					</div>
@@ -339,12 +385,18 @@ const CustomerList: React.FC = () => {
 					</thead>
 					<tbody className='bg-white divide-y divide-gray-200'>
 						{customers.map((customer) => (
-							<tr key={customer.id} className='hover:bg-gray-50'>
+							<tr
+								key={customer.id}
+								className='hover:bg-gray-50'
+							>
 								<td className='px-6 py-4 whitespace-nowrap'>
 									<div className='flex items-center'>
 										<div className='flex-1'>
 											<div className='text-sm font-medium text-gray-900'>
-												<button onClick={() => handleViewCustomer(customer)} className='text-blue-600 hover:text-blue-800'>
+												<button
+													onClick={() => handleViewCustomer(customer)}
+													className='text-blue-600 hover:text-blue-800'
+												>
 													{customer.full_name}
 												</button>
 												{customer.age && <span className='ml-2 text-xs text-gray-400'>({customer.age}歲)</span>}
@@ -395,10 +447,16 @@ const CustomerList: React.FC = () => {
 									<span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${customer.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>{customer.is_active ? "啟用" : "停用"}</span>
 								</td>
 								<td className='px-6 py-4 whitespace-nowrap text-right text-sm font-medium'>
-									<button onClick={() => handleEditCustomer(customer)} className='text-blue-600 hover:text-blue-900 mr-4'>
+									<button
+										onClick={() => handleEditCustomer(customer)}
+										className='text-blue-600 hover:text-blue-900 mr-4'
+									>
 										編輯
 									</button>
-									<button onClick={() => handleViewCustomer(customer)} className='text-gray-600 hover:text-gray-900'>
+									<button
+										onClick={() => handleViewCustomer(customer)}
+										className='text-gray-600 hover:text-gray-900'
+									>
 										查看
 									</button>
 								</td>
@@ -412,10 +470,18 @@ const CustomerList: React.FC = () => {
 			{(pagination.next || pagination.previous) && (
 				<div className='flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6'>
 					<div className='flex flex-1 justify-between sm:hidden'>
-						<button onClick={handlePreviousPage} disabled={!pagination.previous} className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'>
+						<button
+							onClick={handlePreviousPage}
+							disabled={!pagination.previous}
+							className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'
+						>
 							上一頁
 						</button>
-						<button onClick={handleNextPage} disabled={!pagination.next} className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'>
+						<button
+							onClick={handleNextPage}
+							disabled={!pagination.next}
+							className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50'
+						>
 							下一頁
 						</button>
 					</div>
@@ -427,10 +493,18 @@ const CustomerList: React.FC = () => {
 						</div>
 						<div>
 							<nav className='isolate inline-flex -space-x-px rounded-md shadow-sm'>
-								<button onClick={handlePreviousPage} disabled={!pagination.previous} className='relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50'>
+								<button
+									onClick={handlePreviousPage}
+									disabled={!pagination.previous}
+									className='relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50'
+								>
 									上一頁
 								</button>
-								<button onClick={handleNextPage} disabled={!pagination.next} className='relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50'>
+								<button
+									onClick={handleNextPage}
+									disabled={!pagination.next}
+									className='relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20 disabled:opacity-50'
+								>
 									下一頁
 								</button>
 							</nav>

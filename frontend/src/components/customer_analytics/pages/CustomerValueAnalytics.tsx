@@ -130,6 +130,7 @@ const CustomerValueAnalytics: React.FC = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">客戶價值分析</h1>
         <p className="text-gray-600">深度分析客戶生命週期價值 (CLV)、消費模式與商業價值</p>
+        <p className="text-sm text-gray-500 mt-2">💡 CLV = 每個客戶在整個生命週期內預期能為公司帶來的總價值</p>
       </div>
 
       {/* 篩選器 */}
@@ -223,7 +224,7 @@ const CustomerValueAnalytics: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl font-bold">{data.clv_overview.avg_purchase_frequency.toFixed(1)}</div>
-              <div className="text-orange-100 text-sm mt-1">月平均購買頻率</div>
+              <div className="text-orange-100 text-sm mt-1">平均每月購買次數</div>
             </div>
             <div className="text-4xl opacity-80">🔄</div>
           </div>

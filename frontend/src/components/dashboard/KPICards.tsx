@@ -108,6 +108,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
           <div>
             <p className="text-pink-100 text-sm">平均 CLV</p>
             <p className="text-3xl font-bold">{formatCurrency(customerStats.avg_clv)}</p>
+            <p className="text-pink-200 text-xs mt-1">每個客戶在整個生命週期內預期能為公司帶來的總價值</p>
             <p className="text-pink-200 text-sm mt-1">高價值客戶 {customerStats.high_value_customers} 人</p>
           </div>
           <div className="text-pink-200">
