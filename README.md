@@ -1,4 +1,4 @@
-# MiniCRM Pro - 輕量型、一站式 B2B CRM 系統
+# MiniCRM Pro - 輕量型、一站式 B2C CRM 系統
 
 <div align="center">
   <img src="./images/MiniCRM.png" style="margin-bottom: 12px;" />
