@@ -26,6 +26,7 @@
 - 客服紀錄
 -
 - AI 智慧商業分析助手
+
   - 對話式數據查詢：以自然語言查詢系統數據
     例：「幫我找出上個月購買最多的 25-35 歲女性客戶」
   - 自動報告生成：LLM 分析圖表與指標，生成可行的商業洞察與營運建議
@@ -41,6 +42,36 @@
 ### 修復問題
 
 - 修復產品管理，編輯、刪除 無效
+- **問題 1：編輯和刪除按鈕沒有功能**
+
+- 原因：按鈕只有樣式，沒有綁定事件處理器
+- 修復：添加 `onClick` 事件處理器
+  - 編輯按鈕：導向 `/products/${id}/edit` 路由
+  - 刪除按鈕：觸發確認對話框，確認後調用 DELETE API
+
+**問題 2：ProductForm 資料載入錯誤**
+
+- 原因：錯誤地使用 `product.category.id` 而不是 `product.category`
+- 修復：根據後端實際資料格式修正
+  ```javascript
+  // 修復前
+  category: product.category?.id?.toString() || "",
+  // 修復後
+  category: product.category?.toString() || "",
+  ```
+- **後端返回資料格式**：
+  ```json
+  {
+  	"id": 1,
+  	"name": "產品名稱",
+  	"category": 186, // 直接是 ID 數值
+  	"category_name": "3C 配件",
+  	"brand": 205, // 直接是 ID 數值
+  	"brand_name": "Adidas",
+  	"supplier": 146, // 直接是 ID 數值
+  	"supplier_name": "亞洲科技供應商"
+  }
+  ```
 
 ## [v1.12] - 2025-07-15
 
