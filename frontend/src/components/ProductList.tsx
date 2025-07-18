@@ -16,6 +16,7 @@ const ProductList: React.FC = () => {
     next: null as string | null,
     previous: null as string | null,
   });
+  const [deleteConfirm, setDeleteConfirm] = useState<{id: number, name: string} | null>(null);
 
   // Debouncing effect for search term
   useEffect(() => {
@@ -70,6 +71,28 @@ const ProductList: React.FC = () => {
     if (pagination.next) {
       fetchProducts(pagination.next);
     }
+  };
+
+  const handleDelete = (id: number, name: string) => {
+    setDeleteConfirm({ id, name });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+    
+    try {
+      await api.delete(`/products/products/${deleteConfirm.id}/`);
+      setDeleteConfirm(null);
+      // 重新載入產品列表
+      fetchProducts();
+    } catch (error) {
+      console.error('刪除產品失敗:', error);
+      alert('刪除產品失敗，請稍後再試');
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm(null);
   };
 
   if (loading) {
@@ -191,10 +214,16 @@ const ProductList: React.FC = () => {
                   >
                     檢視
                   </button>
-                  <button className="text-indigo-600 hover:text-indigo-900 mr-4">
+                  <button 
+                    onClick={() => navigate(`/products/${product.id}/edit`)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                  >
                     編輯
                   </button>
-                  <button className="text-red-600 hover:text-red-900">
+                  <button 
+                    onClick={() => handleDelete(product.id, product.name)}
+                    className="text-red-600 hover:text-red-900"
+                  >
                     刪除
                   </button>
                 </td>
@@ -226,6 +255,32 @@ const ProductList: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">確認刪除</h3>
+            <p className="text-gray-600 mb-6">
+              您確定要刪除產品「{deleteConfirm.name}」嗎？此操作無法復原。
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={cancelDelete}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                取消
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              >
+                確認刪除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
