@@ -321,12 +321,7 @@ const OrderList: React.FC = () => {
                   >
                     編輯
                   </button>
-                  <button
-                    onClick={() => handleViewOrder(order)}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    查看
-                  </button>
+
                 </td>
               </tr>
             ))}

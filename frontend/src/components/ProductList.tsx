@@ -178,7 +178,14 @@ const ProductList: React.FC = () => {
               <tr key={product.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      <button
+                        onClick={() => navigate(`/products/${product.id}`)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        {product.name}
+                      </button>
+                    </div>
                     <div className="text-sm text-gray-500">SKU: {product.sku}</div>
                   </div>
                 </td>
@@ -208,12 +215,6 @@ const ProductList: React.FC = () => {
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button 
-                    onClick={() => navigate(`/products/${product.id}`)}
-                    className="text-blue-600 hover:text-blue-900 mr-4"
-                  >
-                    檢視
-                  </button>
                   <button 
                     onClick={() => navigate(`/products/${product.id}/edit`)}
                     className="text-indigo-600 hover:text-indigo-900 mr-4"

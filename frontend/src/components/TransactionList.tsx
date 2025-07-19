@@ -376,12 +376,7 @@ const TransactionList: React.FC = () => {
                   >
                     編輯
                   </button>
-                  <button
-                    onClick={() => handleViewTransaction(transaction)}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    查看
-                  </button>
+
                 </td>
               </tr>
             ))}

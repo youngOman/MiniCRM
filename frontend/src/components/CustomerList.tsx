@@ -453,12 +453,7 @@ const CustomerList: React.FC = () => {
 									>
 										編輯
 									</button>
-									<button
-										onClick={() => handleViewCustomer(customer)}
-										className='text-gray-600 hover:text-gray-900'
-									>
-										查看
-									</button>
+
 								</td>
 							</tr>
 						))}
