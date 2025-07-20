@@ -99,6 +99,39 @@ _所有分析頁面皆支援篩選功能：日期範圍、客戶來源、年齡�
 - **付款方式**：多種付款方式統計(信用卡、PayPal、Stripe、銀行轉帳、現金、支票..等)
 - **交易報表**：財務流水與分析
 
+### 6. 客服記錄系統
+
+- **客服工單管理**：
+  - 工單建立、分配、追蹤、解決完整流程
+  - 自動工單號碼生成：CS + 年月日 + 4位序號
+  - 工單狀態：開啟中、處理中、等待回應、已解決、已關閉
+  - 優先級分類：低、中、高、緊急
+  - 問題分類：一般諮詢、技術問題、計費問題、產品問題、物流問題、退換貨、客訴、功能建議
+
+- **客服記錄追蹤**：
+  - 詳細的互動歷史記錄
+  - 內部備註、客戶回應、系統記錄、解決方案分類
+  - 回應時間統計：首次回應時間、解決時間計算
+  - 滿意度評分：1-5分客戶滿意度評價
+
+- **知識庫管理**：
+  - 知識文章管理：FAQ、操作指南、政策說明、故障排除、SOP
+  - 多層次分類結構：支援階層式分類管理
+  - 內容統計：瀏覽次數、有用評價、無用評價追蹤
+  - 精選文章：重要內容置頂顯示
+  - 全文搜尋：標題、內容、標籤快速檢索
+
+- **FAQ 常見問題**：
+  - 問答管理：問題與答案配對維護
+  - 分類整理：依業務類型分門別類
+  - 置頂功能：重要問題優先顯示
+  - 使用統計：追蹤查看次數分析
+
+- **客服統計分析**：
+  - 工單統計：按狀態、優先級、分類統計
+  - 績效分析：處理工單數量、回應速度統計
+  - 知識庫使用分析：熱門文章、搜尋關鍵字統計
+
 ## 核心功能
 
 ### 進階搜尋與即時篩選
@@ -424,6 +457,51 @@ GET    /api/reports/customer-clv/
 	]
 }
 ```
+
+### 客服記錄系統端點
+
+```
+GET    /api/customer-service/tickets/           # 列出客服工單 (含分頁)
+POST   /api/customer-service/tickets/           # 建立新工單
+GET    /api/customer-service/tickets/{id}/      # 取得工單詳情
+PUT    /api/customer-service/tickets/{id}/      # 更新工單
+DELETE /api/customer-service/tickets/{id}/      # 刪除工單
+POST   /api/customer-service/tickets/{id}/add_note/  # 新增客服記錄
+
+GET    /api/customer-service/notes/             # 列出客服記錄 (含分頁)
+POST   /api/customer-service/notes/             # 建立新記錄
+GET    /api/customer-service/notes/{id}/        # 取得記錄詳情
+PUT    /api/customer-service/notes/{id}/        # 更新記錄
+DELETE /api/customer-service/notes/{id}/        # 刪除記錄
+
+GET    /api/customer-service/knowledge-base/    # 列出知識庫文章 (含分頁)
+POST   /api/customer-service/knowledge-base/    # 建立新文章
+GET    /api/customer-service/knowledge-base/{id}/  # 取得文章詳情
+PUT    /api/customer-service/knowledge-base/{id}/  # 更新文章
+DELETE /api/customer-service/knowledge-base/{id}/  # 刪除文章
+
+GET    /api/customer-service/knowledge-categories/  # 列出知識庫分類
+POST   /api/customer-service/knowledge-categories/  # 建立新分類
+GET    /api/customer-service/knowledge-categories/{id}/  # 取得分類詳情
+PUT    /api/customer-service/knowledge-categories/{id}/  # 更新分類
+DELETE /api/customer-service/knowledge-categories/{id}/  # 刪除分類
+
+GET    /api/customer-service/faq/               # 列出常見問題 (含分頁)
+POST   /api/customer-service/faq/               # 建立新問題
+GET    /api/customer-service/faq/{id}/          # 取得問題詳情
+PUT    /api/customer-service/faq/{id}/          # 更新問題
+DELETE /api/customer-service/faq/{id}/          # 刪除問題
+```
+
+**客服工單查詢參數：**
+
+- `status`: 工單狀態篩選 (open, in_progress, waiting_response, resolved, closed)
+- `priority`: 優先級篩選 (low, medium, high, urgent)
+- `category`: 問題分類篩選
+- `customer`: 客戶篩選
+- `assigned_to`: 負責人篩選
+- `date_from`: 開始日期
+- `date_to`: 結束日期
 
 ### 查詢參數
 
