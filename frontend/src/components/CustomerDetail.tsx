@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Customer } from '../types/customer';
 import { Order } from '../types/order';
 import { Transaction } from '../types/transaction';
+import { ApiError } from '../types/error';
 import api from '../services/api';
 
 interface CustomerDetailProps {
@@ -18,11 +19,7 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
   const [activeTab, setActiveTab] = useState('details');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    fetchCustomerData();
-  }, [customerId]);
-
-  const fetchCustomerData = async () => {
+  const fetchCustomerData = useCallback(async () => {
     try {
       setLoading(true);
       const [customerResponse, ordersResponse, transactionsResponse] = await Promise.all([
@@ -34,13 +31,18 @@ const CustomerDetail: React.FC<CustomerDetailProps> = ({ customerId, onEdit, onB
       setCustomer(customerResponse.data);
       setOrders(ordersResponse.data);
       setTransactions(transactionsResponse.data);
-    } catch (err: unknown) {
-      setError('無法取得客戶資料');
+    } catch (err) {
+      const error = err as ApiError;
+      setError(error.response?.data?.detail || error.message || '無法取得客戶資料');
       console.error('Error fetching customer:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [customerId]); // 只有當 customerId 改變時才重新建立函數
+
+  useEffect(() => {
+    fetchCustomerData();
+  }, [customerId, fetchCustomerData]);
 
   const handleDelete = async () => {
     if (!customer) return;
