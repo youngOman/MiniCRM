@@ -34,7 +34,7 @@ const ServiceTicketForm: React.FC = () => {
 		customer: "",
 		title: "",
 		description: "",
-		category: "general_inquiry",
+		category: "general",
 		priority: "medium",
 		status: "open",
 		tags: [],

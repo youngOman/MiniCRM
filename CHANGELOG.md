@@ -34,6 +34,28 @@
     - AI 自動分析圖表與指標，生成營運跟銷售建議
     - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
+## [v2.0.1] - 2025-07-22
+
+- 修復客服工單編輯開發
+
+  - 前端和後端的分類值不匹配問題，改成與後端一致
+  - 工單分類 (TICKET_CATEGORIES)：
+    - 前端：general_inquiry → 後端：general
+    - 前端：technical_issue → 後端：technical
+    - 前端：return_exchange → 後端：return
+  - 工單狀態 (TICKET_STATUSES)：
+    - 前端：waiting_response → 後端：pending
+  - 記錄類型 (NOTE_TYPES)：
+    - 前端：internal_note → 後端：internal
+    - 前端：customer_response → 後端：customer
+    - 前端：system_note → 後端：system
+    - 前端：solution → 後端：resolution
+
+- 生成 客服工單、知識庫文章、常見問題 測試資料腳本開發
+  - 生成 50 條客服工單，包含各種狀態、優先級、分類
+  - 生成 50 篇知識庫文章，包含多層次分類
+  - 生成 50 條常見問題，涵蓋各業務類型
+
 ## [v2.0.1] - 2025-07-21
 
 ### 🎯 客服記錄系統 - 前端介面開發

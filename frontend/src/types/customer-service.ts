@@ -174,12 +174,12 @@ export interface FAQFormData {
 
 // 常數定義
 export const TICKET_CATEGORIES = [
-  { value: 'general_inquiry', label: '一般諮詢' },
-  { value: 'technical_issue', label: '技術問題' },
-  { value: 'billing_issue', label: '計費問題' },
-  { value: 'product_issue', label: '產品問題' },
-  { value: 'shipping_issue', label: '物流問題' },
-  { value: 'return_exchange', label: '退換貨' },
+  { value: 'general', label: '一般諮詢' },
+  { value: 'technical', label: '技術問題' },
+  { value: 'billing', label: '計費問題' },
+  { value: 'product', label: '產品問題' },
+  { value: 'shipping', label: '物流問題' },
+  { value: 'return', label: '退換貨' },
   { value: 'complaint', label: '客訴' },
   { value: 'feature_request', label: '功能建議' },
 ];
@@ -194,16 +194,16 @@ export const TICKET_PRIORITIES = [
 export const TICKET_STATUSES = [
   { value: 'open', label: '開啟中' },
   { value: 'in_progress', label: '處理中' },
-  { value: 'waiting_response', label: '等待回應' },
+  { value: 'pending', label: '等待回應' },
   { value: 'resolved', label: '已解決' },
   { value: 'closed', label: '已關閉' },
 ];
 
 export const NOTE_TYPES = [
-  { value: 'internal_note', label: '內部備註' },
-  { value: 'customer_response', label: '客戶回應' },
-  { value: 'system_note', label: '系統記錄' },
-  { value: 'solution', label: '解決方案' },
+  { value: 'internal', label: '內部備註' },
+  { value: 'customer', label: '客戶回應' },
+  { value: 'system', label: '系統記錄' },
+  { value: 'resolution', label: '解決方案' },
 ];
 
 export const KNOWLEDGE_CONTENT_TYPES = [

@@ -23,7 +23,7 @@ const ServiceTicketDetail: React.FC = () => {
   
   // 新增記錄表單
   const [newNote, setNewNote] = useState({
-    note_type: 'internal_note',
+    note_type: 'internal',
     content: '',
     is_visible_to_customer: false,
   });
@@ -72,7 +72,7 @@ const ServiceTicketDetail: React.FC = () => {
       
       // 清空表單
       setNewNote({
-        note_type: 'internal_note',
+        note_type: 'internal',
         content: '',
         is_visible_to_customer: false,
       });
@@ -99,7 +99,7 @@ const ServiceTicketDetail: React.FC = () => {
     switch (status) {
       case 'open': return 'bg-blue-100 text-blue-800';
       case 'in_progress': return 'bg-yellow-100 text-yellow-800';
-      case 'waiting_response': return 'bg-purple-100 text-purple-800';
+      case 'pending': return 'bg-purple-100 text-purple-800';
       case 'resolved': return 'bg-green-100 text-green-800';
       case 'closed': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
@@ -108,10 +108,10 @@ const ServiceTicketDetail: React.FC = () => {
 
   const getNoteTypeColor = (noteType: string) => {
     switch (noteType) {
-      case 'internal_note': return 'bg-gray-100 text-gray-800';
-      case 'customer_response': return 'bg-blue-100 text-blue-800';
-      case 'system_note': return 'bg-green-100 text-green-800';
-      case 'solution': return 'bg-purple-100 text-purple-800';
+      case 'internal': return 'bg-gray-100 text-gray-800';
+      case 'customer': return 'bg-blue-100 text-blue-800';
+      case 'system': return 'bg-green-100 text-green-800';
+      case 'resolution': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
