@@ -9,6 +9,7 @@ import {
 	TICKET_STATUSES,
 } from "../types/customer-service";
 import { Customer } from "../types/customer";
+import { ApiError } from "../types/error";
 
 interface CustomerOption {
 	id: number;
@@ -164,8 +165,9 @@ const ServiceTicketForm: React.FC = () => {
 			}
 
 			navigate("/service-tickets");
-		} catch (err: unknown) {
-			setError(err.response?.data?.detail || "儲存工單失敗");
+		} catch (err) {
+			const error = err as ApiError;
+			setError(error.response?.data?.detail || error.message || "儲存工單失敗");
 			console.error("Error saving ticket:", err);
 		} finally {
 			setLoading(false);

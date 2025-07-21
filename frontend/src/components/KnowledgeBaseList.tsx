@@ -8,6 +8,7 @@ import {
   KnowledgeBaseCategoryResponse,
   KNOWLEDGE_CONTENT_TYPES 
 } from '../types/customer-service';
+import { ApiError } from '../types/error';
 
 const KnowledgeBaseList: React.FC = () => {
   const navigate = useNavigate();
@@ -63,7 +64,8 @@ const KnowledgeBaseList: React.FC = () => {
       setTotalPages(Math.ceil(response.data.count / 20));
       setCurrentPage(page);
     } catch (err) {
-      setError('載入知識庫文章失敗');
+      const error = err as ApiError;
+      setError(error.response?.data?.detail || error.message || '載入知識庫文章失敗');
       console.error('Error fetching articles:', err);
     } finally {
       setLoading(false);

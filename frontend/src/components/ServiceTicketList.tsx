@@ -8,6 +8,7 @@ import {
   TICKET_PRIORITIES,
   TICKET_STATUSES 
 } from '../types/customer-service';
+import { ApiError } from '../types/error';
 
 const ServiceTicketList: React.FC = () => {
   const navigate = useNavigate();
@@ -45,7 +46,8 @@ const ServiceTicketList: React.FC = () => {
       setTotalPages(Math.ceil(response.data.count / 20));
       setCurrentPage(page);
     } catch (err) {
-      setError('載入客服工單失敗');
+      const error = err as ApiError;
+      setError(error.response?.data?.detail || error.message || '載入客服工單失敗');
       console.error('Error fetching tickets:', err);
     } finally {
       setLoading(false);

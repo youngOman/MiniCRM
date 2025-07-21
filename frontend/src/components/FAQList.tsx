@@ -6,6 +6,7 @@ import {
   FAQResponse,
   FAQ_CATEGORIES 
 } from '../types/customer-service';
+import { ApiError } from '../types/error';
 
 const FAQList: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +47,8 @@ const FAQList: React.FC = () => {
       setTotalPages(Math.ceil(response.data.count / 20));
       setCurrentPage(page);
     } catch (err) {
-      setError('載入FAQ失敗');
+      const error = err as ApiError;
+      setError(error.response?.data?.detail || error.message || '載入FAQ失敗');
       console.error('Error fetching FAQs:', err);
     } finally {
       setLoading(false);
@@ -62,8 +64,10 @@ const FAQList: React.FC = () => {
       await api.delete(`/customer-service/faq/${faqId}/`);
       fetchFAQs(currentPage);
     } catch (err) {
+      const error = err as ApiError;
+      const errorMessage = error.response?.data?.detail || error.message || '刪除失敗';
       console.error('Error deleting FAQ:', err);
-      alert('刪除失敗');
+      alert(errorMessage);
     }
   };
 

@@ -10,6 +10,7 @@ import {
   TICKET_STATUSES,
   NOTE_TYPES 
 } from '../types/customer-service';
+import { ApiError } from '../types/error';
 
 const ServiceTicketDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -39,7 +40,8 @@ const ServiceTicketDetail: React.FC = () => {
       const response = await api.get<ServiceTicket>(`/customer-service/tickets/${ticketId}/`);
       setTicket(response.data);
     } catch (err) {
-      setError('載入工單詳情失敗');
+      const error = err as ApiError;
+      setError(error.response?.data?.detail || error.message || '載入工單詳情失敗');
       console.error('Error fetching ticket detail:', err);
     }
   };
@@ -76,8 +78,10 @@ const ServiceTicketDetail: React.FC = () => {
       });
       setAddingNote(false);
     } catch (err) {
+      const error = err as ApiError;
+      const errorMessage = error.response?.data?.detail || error.message || '新增記錄失敗';
       console.error('Error adding note:', err);
-      alert('新增記錄失敗');
+      alert(errorMessage);
     }
   };
 
