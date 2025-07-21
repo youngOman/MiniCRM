@@ -59,7 +59,7 @@ const ServiceTicketDetail: React.FC = () => {
     if (!ticket || !newNote.content.trim()) return;
 
     try {
-      const response = await api.post(`/customer-service/tickets/${ticket.id}/add_note/`, {
+      await api.post(`/customer-service/tickets/${ticket.id}/add_note/`, {
         note_type: newNote.note_type,
         content: newNote.content,
         is_visible_to_customer: newNote.is_visible_to_customer,
