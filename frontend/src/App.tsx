@@ -15,6 +15,11 @@ import TransactionList from './components/TransactionList';
 import ProductList from './components/ProductList';
 import ProductDetail from './components/ProductDetail';
 import ProductForm from './components/ProductForm';
+import ServiceTicketList from './components/ServiceTicketList';
+import ServiceTicketDetail from './components/ServiceTicketDetail';
+import ServiceTicketForm from './components/ServiceTicketForm';
+import KnowledgeBaseList from './components/KnowledgeBaseList';
+import FAQList from './components/FAQList';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/auth';
 
@@ -46,6 +51,14 @@ function App() {
             <Route path="products/new" element={<ProductForm mode="create" />} />
             <Route path="products/:id" element={<ProductDetail />} />
             <Route path="products/:id/edit" element={<ProductForm mode="edit" />} />
+            
+            {/* 客服系統路由 */}
+            <Route path="service-tickets" element={<ServiceTicketList />} />
+            <Route path="service-tickets/new" element={<ServiceTicketForm />} />
+            <Route path="service-tickets/:id" element={<ServiceTicketDetail />} />
+            <Route path="service-tickets/:id/edit" element={<ServiceTicketForm />} />
+            <Route path="knowledge-base" element={<KnowledgeBaseList />} />
+            <Route path="faq" element={<FAQList />} />
             
           </Route>
           <Route

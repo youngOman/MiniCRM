@@ -369,20 +369,47 @@ DELETE /api/transactions/{id}/ # 刪除交易記錄
 ```
 GET    /api/products/categories/        # 列出產品分類
 POST   /api/products/categories/        # 建立新分類
+GET    /api/products/categories/{id}/   # 取得分類詳情
+PUT    /api/products/categories/{id}/   # 更新分類
+DELETE /api/products/categories/{id}/   # 刪除分類
+
 GET    /api/products/brands/            # 列出品牌
 POST   /api/products/brands/            # 建立新品牌
+GET    /api/products/brands/{id}/       # 取得品牌詳情
+PUT    /api/products/brands/{id}/       # 更新品牌
+DELETE /api/products/brands/{id}/       # 刪除品牌
+
 GET    /api/products/suppliers/         # 列出供應商
 POST   /api/products/suppliers/         # 建立新供應商
+GET    /api/products/suppliers/{id}/    # 取得供應商詳情
+PUT    /api/products/suppliers/{id}/    # 更新供應商
+DELETE /api/products/suppliers/{id}/    # 刪除供應商
+
 GET    /api/products/                   # 列出產品 (含分頁)
 POST   /api/products/                   # 建立新產品
 GET    /api/products/{id}/              # 取得產品詳情
 PUT    /api/products/{id}/              # 更新產品
 DELETE /api/products/{id}/              # 刪除產品
-GET    /api/products/{id}/variants/     # 取得產品款式變體
-POST   /api/products/{id}/variants/     # 建立產品款式變體
-GET    /api/products/{id}/inventory/    # 取得庫存資訊
-PUT    /api/products/{id}/inventory/    # 更新庫存
-GET    /api/products/{id}/stock-movements/ # 取得庫存異動記錄
+
+GET    /api/products/variants/          # 列出產品款式變體
+POST   /api/products/variants/          # 建立產品款式變體
+GET    /api/products/variants/{id}/     # 取得變體詳情
+PUT    /api/products/variants/{id}/     # 更新變體
+DELETE /api/products/variants/{id}/     # 刪除變體
+
+GET    /api/products/inventory/         # 列出庫存資訊
+POST   /api/products/inventory/         # 建立庫存記錄
+GET    /api/products/inventory/{id}/    # 取得庫存詳情
+PUT    /api/products/inventory/{id}/    # 更新庫存
+DELETE /api/products/inventory/{id}/    # 刪除庫存記錄
+
+GET    /api/products/stock-movements/   # 列出庫存異動記錄
+POST   /api/products/stock-movements/   # 建立庫存異動記錄
+GET    /api/products/stock-movements/{id}/ # 取得異動記錄詳情
+
+GET    /api/products/price-history/     # 列出價格變動歷史
+POST   /api/products/price-history/     # 建立價格歷史記錄
+GET    /api/products/price-history/{id}/ # 取得價格歷史詳情
 ```
 
 ### 分析報表端點
@@ -390,10 +417,10 @@ GET    /api/products/{id}/stock-movements/ # 取得庫存異動記錄
 ```
 GET    /api/reports/dashboard/              # 營銷分析儀表板數據
 GET    /api/reports/trends/                 # 趨勢分析數據
-GET    /api/reports/customer-analytics/     # 客戶分析數據
+GET    /api/reports/customers/              # 客戶分析數據
 GET    /api/reports/customer-demographics/  # 客戶人口統計分析
 GET    /api/reports/customer-clv/           # 客戶生命週期價值 (CLV) 分析
-GET    /api/reports/revenue-analytics/      # 營收分析數據
+GET    /api/reports/revenue/                # 營收分析數據
 ```
 
 ### 客戶價值分析 (CLV) 端點詳細說明

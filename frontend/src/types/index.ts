@@ -3,3 +3,4 @@ export * from './customer';
 export * from './order';
 export * from './transaction';
 export * from './common';
+export * from './customer-service';
