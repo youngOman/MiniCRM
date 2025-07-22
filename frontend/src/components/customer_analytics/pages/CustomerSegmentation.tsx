@@ -201,21 +201,21 @@ const CustomerSegmentation: React.FC = () => {
 
       {/* 概覽卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.total_customers}</div>
-          <div className="text-blue-100 text-sm">總客戶數</div>
+          <div className="text-gray-300 text-sm">總客戶數</div>
         </div>
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-lg font-bold">{data.overview.most_common_source || '無資料'}</div>
-          <div className="text-green-100 text-sm">主要來源</div>
+          <div className="text-gray-300 text-sm">主要來源</div>
         </div>
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-lg font-bold">{data.overview.most_common_tier || '無資料'}</div>
-          <div className="text-purple-100 text-sm">主要等級</div>
+          <div className="text-gray-300 text-sm">主要等級</div>
         </div>
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.segment_diversity?.toFixed(1) || '0.0'}</div>
-          <div className="text-orange-100 text-sm">分群多樣性</div>
+          <div className="text-gray-300 text-sm">分群多樣性</div>
         </div>
       </div>
 

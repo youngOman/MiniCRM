@@ -38,7 +38,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-8">
       {/* 總客戶數 */}
-      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-blue-100 text-sm">總客戶數</p>
@@ -54,7 +54,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
       </div>
 
       {/* 總營收 */}
-      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-green-100 text-sm">總營收</p>
@@ -70,7 +70,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
       </div>
 
       {/* 總訂單數 */}
-      <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-purple-100 text-sm">總訂單數</p>
@@ -86,7 +86,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
       </div>
 
       {/* 總交易數 */}
-      <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-orange-100 text-sm">總交易數</p>
@@ -103,7 +103,7 @@ const KPICards: React.FC<KPICardsProps> = ({ overview, transactionStats, custome
       </div>
 
       {/* 平均客戶價值 (CLV) */}
-      <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-6 text-white">
+      <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-pink-100 text-sm">平均 CLV</p>

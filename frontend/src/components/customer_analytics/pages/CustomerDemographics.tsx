@@ -196,21 +196,21 @@ const CustomerDemographics: React.FC = () => {
 
       {/* 概覽卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.total_customers}</div>
-          <div className="text-blue-100 text-sm">總客戶數</div>
+          <div className="text-gray-300 text-sm">總客戶數</div>
         </div>
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.customers_with_age}</div>
-          <div className="text-green-100 text-sm">有年齡資料</div>
+          <div className="text-gray-300 text-sm">有年齡資料</div>
         </div>
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.customers_with_gender}</div>
-          <div className="text-purple-100 text-sm">有性別資料</div>
+          <div className="text-gray-300 text-sm">有性別資料</div>
         </div>
-        <div className="bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.avg_age.toFixed(1)}</div>
-          <div className="text-pink-100 text-sm">平均年齡</div>
+          <div className="text-gray-300 text-sm">平均年齡</div>
         </div>
       </div>
 

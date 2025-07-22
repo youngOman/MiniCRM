@@ -197,21 +197,21 @@ const CustomerBehavior: React.FC = () => {
 
       {/* 概覽卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.customers_with_preferences}</div>
-          <div className="text-orange-100 text-sm">有產品偏好客戶</div>
+          <div className="text-gray-300 text-sm">有產品偏好客戶</div>
         </div>
-        <div className="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-2xl font-bold">{data.overview.customers_with_seasonal}</div>
-          <div className="text-teal-100 text-sm">有季節偏好客戶</div>
+          <div className="text-gray-300 text-sm">有季節偏好客戶</div>
         </div>
-        <div className="bg-gradient-to-r from-rose-500 to-rose-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-lg font-bold">{data.overview.most_popular_category || '無資料'}</div>
-          <div className="text-rose-100 text-sm">最受歡迎類別</div>
+          <div className="text-gray-300 text-sm">最受歡迎類別</div>
         </div>
-        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-4 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="text-lg font-bold">{data.overview.most_active_season || '無資料'}</div>
-          <div className="text-emerald-100 text-sm">最活躍季節</div>
+          <div className="text-gray-300 text-sm">最活躍季節</div>
         </div>
       </div>
 

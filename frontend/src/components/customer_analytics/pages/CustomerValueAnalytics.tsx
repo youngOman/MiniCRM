@@ -183,27 +183,27 @@ const CustomerValueAnalytics: React.FC = () => {
 
       {/* CLV 概覽統計卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl font-bold">{formatCurrency(data.clv_overview.avg_clv)}</div>
-              <div className="text-emerald-100 text-sm mt-1">平均 CLV</div>
+              <div className="text-gray-300 text-sm mt-1">平均 CLV</div>
             </div>
             <div className="text-4xl opacity-80">💰</div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl font-bold">{data.clv_overview.customers_with_orders}</div>
-              <div className="text-blue-100 text-sm mt-1">有消費客戶</div>
+              <div className="text-gray-300 text-sm mt-1">有消費客戶</div>
             </div>
             <div className="text-4xl opacity-80">👥</div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl font-bold">
@@ -214,17 +214,17 @@ const CustomerValueAnalytics: React.FC = () => {
                   minimumFractionDigits: 0
                 }).format(data.clv_overview.total_clv)}
               </div>
-              <div className="text-purple-100 text-sm mt-1">總客戶價值</div>
+              <div className="text-gray-300 text-sm mt-1">總客戶價值</div>
             </div>
             <div className="text-4xl opacity-80">📈</div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+        <div className="bg-gradient-to-br from-black/80 via-slate-900/70 to-black/80 rounded-lg text-white p-6 shadow-xl">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl font-bold">{data.clv_overview.avg_purchase_frequency.toFixed(1)}</div>
-              <div className="text-orange-100 text-sm mt-1">平均每月購買次數</div>
+              <div className="text-gray-300 text-sm mt-1">平均每月購買次數</div>
             </div>
             <div className="text-4xl opacity-80">🔄</div>
           </div>
