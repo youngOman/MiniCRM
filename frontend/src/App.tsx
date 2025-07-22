@@ -19,6 +19,7 @@ import ServiceTicketList from './components/ServiceTicketList';
 import ServiceTicketDetail from './components/ServiceTicketDetail';
 import ServiceTicketForm from './components/ServiceTicketForm';
 import KnowledgeBaseList from './components/KnowledgeBaseList';
+import KnowledgeBaseDetail from './components/KnowledgeBaseDetail';
 import FAQList from './components/FAQList';
 import ProtectedRoute from './components/ProtectedRoute';
 import authService from './services/auth';
@@ -58,6 +59,7 @@ function App() {
             <Route path="service-tickets/:id" element={<ServiceTicketDetail />} />
             <Route path="service-tickets/:id/edit" element={<ServiceTicketForm />} />
             <Route path="knowledge-base" element={<KnowledgeBaseList />} />
+            <Route path="knowledge-base/:id" element={<KnowledgeBaseDetail />} />
             <Route path="faq" element={<FAQList />} />
             
           </Route>
