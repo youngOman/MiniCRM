@@ -36,7 +36,11 @@
 
 ## [v2.0.2] - 2025-07-23
 
-- 
+- 確認能夠在 LINE Bot 中接收訊息，並回覆訊息
+  - 先安裝 LINE Bot SDK
+  - 創建 LINE Bot Django App
+  - 設置基本 Webhook 接收功能
+  - 測試接收 LINE 訊息
 
 ## [v2.0.1] - 2025-07-22
 

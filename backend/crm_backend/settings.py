@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'reports',
     'products',
     'customer_service',
+    'line_bot',
 ]
 
 MIDDLEWARE = [
