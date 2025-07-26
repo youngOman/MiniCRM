@@ -15,8 +15,8 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 logger = logging.getLogger(__name__)
 
 # LINE Bot 設定 (暫時用假的值，稍後會從環境變數讀取)
-LINE_CHANNEL_SECRET = 'your_line_channel_secret'
-LINE_CHANNEL_ACCESS_TOKEN = 'your_line_channel_access_token'
+LINE_CHANNEL_SECRET = '78379badfa77ed3c62d79cfe9015496c'
+LINE_CHANNEL_ACCESS_TOKEN = ''
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
