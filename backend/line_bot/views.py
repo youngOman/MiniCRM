@@ -22,11 +22,8 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 logger = logging.getLogger(__name__)
 
 # LINE Bot 設定 - 從環境變數讀取
-# LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
-# LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
-
-LINE_CHANNEL_SECRET = '78379badfa77ed3c62d79cfe9015496c'
-LINE_CHANNEL_ACCESS_TOKEN ='5Eb3R+rxm7mtbyJKwvk3pdRHDx/3nOwVCpNNHIHdntsDZVVWTyGn+24VjTnl9lkbvKD3zcYtVb2sycdwoQrp4p/kTdRLo7NpUweaL8tKkx6vH09Zzhn9TR3Tm2wphhaFKvVAkobIlAZ3OyN0pIwYjAdB04t89/1O/w1cDnyilFU='
+LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
 
 # 驗證環境變數是否存在
 if not LINE_CHANNEL_SECRET or not LINE_CHANNEL_ACCESS_TOKEN:
@@ -63,7 +60,7 @@ def webhook(request):
     return HttpResponse("OK")
 
 
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=TextMessage) # 
 def handle_text_message(event):
     """處理文字訊息"""
     user_id = event.source.user_id
@@ -91,13 +88,3 @@ def test_connection(request):
     """測試連接的簡單端點"""
     return HttpResponse("LINE Bot 服務運行中！")
 
-
-@csrf_exempt
-def test_webhook(request):
-    """測試 Webhook 的簡單端點（跳過簽名驗證）"""
-    if request.method == 'POST':
-        body = request.body.decode('utf-8')
-        logger.info(f"測試 Webhook 收到請求: {body}")
-        return HttpResponse("Webhook 測試成功！")
-    else:
-        return HttpResponse("請使用 POST 方法測試 Webhook")

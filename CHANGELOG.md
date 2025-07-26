@@ -37,6 +37,7 @@
 ## [v2.0.2] - 2025-07-26
 
 - LINE 基本 ID：@979oqblz
+- 確定可以 接收到 LINE Bot 的訊息，並回覆訊息了 [流程](https://akebee.com/django-linebot-2025/)
 
 ### 修復問題
 
