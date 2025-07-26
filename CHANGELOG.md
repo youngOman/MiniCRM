@@ -34,19 +34,23 @@
     - AI 自動分析圖表與指標，生成營運跟銷售建議
     - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
-
 ## [v2.0.2] - 2025-07-26
 
-LINE 基本ID：@979oqblz
+- LINE 基本 ID：@979oqblz
 
+### 修復問題
+
+- 修復客服工單搜尋功能回傳 500 Error
+  - 問題原因：在 `customer_service/views.py` 和 `admin.py` 中使用了 `customer__full_name` 進行搜尋，但 `full_name` 是 Customer 模型的 `@property` 屬性，不是資料庫欄位，Django ORM 無法對其進行查詢
+  - 搜尋欄位從 `customer__full_name` 改為 `customer__first_name` 和 `customer__last_name`
 
 ## [v2.0.2] - 2025-07-23
 
 - 確認能夠在 LINE Bot 中接收訊息，並回覆訊息
-  - 先安裝 LINE Bot SDK
-  - 創建 LINE Bot Django App
-  - 設置基本 Webhook 接收功能
-  - 測試接收 LINE 訊息
+  - LINE Bot SDK 安裝
+  - Django App 創建 (line_bot)
+  - 基本 Webhook 處理器 (/api/line-bot/webhook/)
+  - urls.py 路由配置
 
 ## [v2.0.1] - 2025-07-22
 

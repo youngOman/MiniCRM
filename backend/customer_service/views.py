@@ -21,7 +21,7 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'priority', 'category', 'assigned_to', 'customer']
-    search_fields = ['ticket_number', 'title', 'description', 'customer__full_name', 'customer__email']
+    search_fields = ['ticket_number', 'title', 'description', 'customer__first_name', 'customer__last_name', 'customer__email']
     ordering_fields = ['created_at', 'updated_at', 'priority', 'status']
     ordering = ['-created_at']
 

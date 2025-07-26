@@ -23,7 +23,7 @@ class ServiceTicketAdmin(admin.ModelAdmin):
         'priority', 'status', 'assigned_to', 'created_at'
     ]
     list_filter = ['status', 'priority', 'category', 'assigned_to', 'created_at']
-    search_fields = ['ticket_number', 'title', 'customer__full_name', 'customer__email']
+    search_fields = ['ticket_number', 'title', 'customer__first_name', 'customer__last_name', 'customer__email']
     readonly_fields = ['ticket_number', 'created_at', 'updated_at']
     ordering = ['-created_at']
     inlines = [ServiceNoteInline]
