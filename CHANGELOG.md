@@ -36,15 +36,43 @@
 
 ## [v2.0.2] - 2025-07-27
 
-下載本地 LLM llama3 模型：https://ollama.com/
+實作 RAG 的 'R'，RAG 大致工作流程：
 
-- 設計 RAG 知識庫架構 - 分析現有資料表結構
-  - RAG 系統的核心模組，先創建知識庫管理器
-- 實現文本向量化和相似度搜尋功能
-- 設置 Ollama3 本地 LLM 服務
-- 建立 LLM 意圖理解模組
-- 實現 SQL 生成器
-- 整合 LINE Bot + RAG + LLM 完整流程
+RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
+
+1. Retrieval: search_similar_examples() 找相似範例
+2. Augmented: 將範例+schema 作為上下文
+3. Generation: LLM 根據上下文生成 SQL
+
+4. 知識收集: 將 CRM 系統的資料庫 schema 和查詢範例向量化儲存
+5. 查詢理解: 當用戶輸入自然語言查詢時，搜尋相關的範例和 schema
+6. 上下文增強: 提供相關背景資訊給 LLM，提升 SQL 生成準確度
+7. **Ex：**
+
+   - "幫我找出上個月購買最多的 25-35 歲女性客戶"
+   - 系統會搜尋相關的客戶表 schema 和類似查詢範例
+   - 協助 LLM 生成正確的 SQL 查詢
+
+8. 知識庫儲存階段（預先建立）
+
+[知識庫儲存階段（預先建立）](./images/rag/knowledge_store.png)
+
+2. 查詢階段（用戶提問時）
+
+[查詢階段（用戶提問時）](./images/rag/query.png)
+
+- 下載本地 LLM llama3 模型：https://ollama.com/
+- 下載相關套件
+  - chromadb==0.4.22
+  - sentence-transformers==2.7.0
+  - ollama==0.1.7
+  - numpy==1.24.3
+  - scikit-learn==1.3.0
+- 開發 knowledge_base.py 負責 RAG 的 "R" 檢索功能
+  - add_schema_info：將資料表結構轉換為可搜尋的向量
+  - add_query_example：儲存自然語言查詢與對應的 SQL 範例(包含意圖、描述等元資料)
+  - search_similar_examples：根據用戶查詢找出相似的範例
+  - search_relevant_schemas：找出相關的資料表結構
 
 ## [v2.0.2] - 2025-07-26
 
