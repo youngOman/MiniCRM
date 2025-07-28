@@ -62,7 +62,7 @@ RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
 
 用戶輸入 → 意圖分類（同時向量搜尋相似範例作為上下文）→ SQL 生成（同時向量搜尋相關 Schema + 相似範例作為上下文）→ 執行 SQL → SQL 結果 → 格式化限制(限制結果筆數、避免傳給 LLM 的資料過長，影響回應品質)→ LLM 生成自然語言 → 返回用戶
 
-[RAG 工作流程](./images/rag/rag-flowchart.png)
+![RAG 工作流程](./images/rag/rag-flowchart.png)
 
 | 階段 | 步驟          | 函數                      | 檔案              |
 | ---- | ------------- | ------------------------- | ----------------- |

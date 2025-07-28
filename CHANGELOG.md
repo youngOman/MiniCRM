@@ -38,7 +38,7 @@
 2. **SQL 生成** (generate_sql) - 調用 knowledge_base 搜尋相關資料表 + 相似範例作為上下文，生成對應的 SQL 查詢語句
 3. **自然語言回應** (generate_response) - 將 SQL 結果轉為自然語言中文回答，限制結果筆數避免回應過長
 
-支援 6 種意圖分類：customer_query、order_query、product_query、transaction_query、service_query、analytics_query
+支援 9 種意圖分類：customer_query、order_query、product_query、transaction_query、service_query、analytics_query、faq_query、knowledge_base_query、ticket_management_query
 
 **RAG 工作流程完整實現：**
 

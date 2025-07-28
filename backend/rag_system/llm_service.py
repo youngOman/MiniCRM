@@ -43,6 +43,9 @@ class OllamaLLMService:
 - transaction_query: 交易資料查詢
 - service_query: 客服工單查詢
 - analytics_query: 統計分析查詢
+- faq_query: FAQ 常見問題查詢
+- knowledge_base_query: 知識庫文章查詢
+- ticket_management_query: 客服工單管理查詢
 
 {context}
 
@@ -183,6 +186,12 @@ class OllamaLLMService:
             intent = 'order_query'
         elif any(word in query_lower for word in ['產品', '商品', 'product']):
             intent = 'product_query'
+        elif any(word in query_lower for word in ['faq', '常見問題', '問答']):
+            intent = 'faq_query'
+        elif any(word in query_lower for word in ['知識庫', '知識', '文章', 'knowledge']):
+            intent = 'knowledge_base_query'
+        elif any(word in query_lower for word in ['工單', '客服', '服務', 'ticket', 'service']):
+            intent = 'ticket_management_query'
         else:
             intent = 'general_info'
         
