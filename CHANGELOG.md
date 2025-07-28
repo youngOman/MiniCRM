@@ -28,6 +28,158 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
+## [v2.0.5] - 2025-07-30
+
+### 開發 test_rag.py - RAG 系統綜合測試腳本
+
+建立完整的 RAG 系統測試框架，確保所有組件正常運作並為 LINE Bot 整合做準備。
+
+**測試架構設計：**
+
+1. **環境檢查測試**
+
+   - 驗證必要套件安裝：ollama, chromadb, sentence-transformers
+   - 確保測試環境完整性
+   - 提供清楚的錯誤指引
+
+2. **組件獨立測試** (`test_individual_components`)
+
+   - **knowledge_base 組件測試**：
+     - ChromaDB 向量資料庫連接
+     - SentenceTransformer 模型載入
+     - 添加範例資料功能 (`add_query_example`)
+     - 向量搜尋功能 (`search_similar_examples`)
+   - **llm_service 組件測試**：
+     - Ollama 服務連接
+     - llama3 模型可用性
+     - 意圖分類功能 (`classify_intent`)
+     - 與 knowledge_base 整合
+
+3. **簡化功能測試** (`test_simplified_functionality`)
+
+   - 測試不支援功能的友善引導機制
+   - 驗證用戶體驗設計（引導至支援功能）
+   - 確保系統穩定性（不會因不支援功能而崩潰）
+
+4. **完整系統測試** (`test_rag_system`)
+   - **支援功能測試**：
+     - FAQ 常見問題查詢 (`faq_query`)
+     - 知識庫文章搜尋 (`knowledge_base_query`)
+     - 客服工單管理 (`ticket_management_query`)
+   - **端到端流程驗證**：
+     - 查詢引擎初始化
+     - 範例資料添加
+     - 完整 RAG 工作流程測試
+     - 意圖識別準確性驗證
+
+**測試驗證項目：**
+
+✅ **技術棧完整性** - ChromaDB + Ollama + SentenceTransformer 整合
+✅ **RAG 架構正確性** - 檢索、生成、整合流程驗證  
+✅ **組件間協作** - knowledge_base ↔ llm_service ↔ query_engine
+✅ **意圖分類準確性** - 9 種意圖類別識別測試
+✅ **回應品質** - 自然語言生成品質驗證
+✅ **錯誤處理機制** - 異常情況處理和系統穩定性
+✅ **LINE Bot 整合準備** - 標準化輸出格式驗證
+
+**成功指標：**
+
+- 所有組件初始化成功
+- 意圖分類結果正確
+- FAQ/知識庫/工單搜尋功能正常
+- 不支援功能正確引導用戶
+- 無錯誤訊息或異常
+
+**測試意義：**
+當 `test_rag.py` 全部通過時，代表 RAG 系統已準備好接收 LINE 訊息並正確處理回應，為下一階段的 LINE Bot 整合奠定穩固基礎。
+
+## [v2.0.2] - 2025-07-29
+
+### 開發 query_engine.py，負責 RAG 系統的查詢處理和 SQL 執行，作為整個 RAG 系統的「大腦中樞」
+
+**query_engine 作為 RAG 系統協調器的角色**
+
+- 整合 knowledge_base (檢索) 和 llm_service (生成) 兩大組件
+- 提供統一的查詢入口點給 LINE Bot 使用
+- 實現智能路由系統，根據意圖自動選擇處理方式
+- 確保系統安全性和穩定性
+
+### **主要功能模組**
+
+1. **process_query()** - 主要對外接口
+
+   - 完整的 RAG 工作流程：意圖分類 → 路由選擇 → 查詢處理 → 回應生成
+   - 返回標準化結果供 LINE Bot 使用
+   - 統一的錯誤處理和日誌記錄
+
+2. **智慧路由系統**
+
+   - SQL 查詢路徑：customer_query, order_query, product_query, transaction_query, analytics_query
+   - 非 SQL 查詢路徑：faq_query, knowledge_base_query, ticket_management_query
+   - 根據意圖自動選擇最適合的處理方式
+
+3. **\_handle_sql_query()** - SQL 查詢處理流程
+
+   - 調用 LLM 生成 SQL (含向量搜尋增強)
+   - 安全執行 SQL 查詢
+   - 將結果轉為自然語言回應
+
+4. **\_handle_non_sql_query()** - 非 SQL 查詢處理
+
+   - \_search_faq() - FAQ 常見問題搜尋
+   - \_search_knowledge_base() - 知識庫文章搜尋
+   - \_handle_ticket_management() - 客服工單操作指引
+
+5. **\_execute_sql()** - 多層安全 SQL 執行機制
+
+   - 語句類型檢查：只允許 SELECT 語句
+   - 關鍵字黑名單：禁止 DROP、DELETE、UPDATE、INSERT、ALTER 等危險操作
+   - Django ORM 防護：自動防止 SQL 注入攻擊
+   - 錯誤隔離：失敗時不影響系統穩定性
+
+6. **add_sample_data()** - 知識庫初始化
+   - 添加 CRM 資料表 schema 資訊
+   - 提供查詢範例和 FAQ 內容
+   - 為系統提供基礎訓練資料
+
+### **安全機制設計**
+
+**多層防護架構：**
+
+- **第一層**：語句類型限制 (只允許 SELECT)
+- **第二層**：危險關鍵字過濾 (DDL/DML 阻擋)
+- **第三層**：Django 連接防護 (SQL 注入防護)
+- **第四層**：錯誤處理隔離 (系統穩定性保證)
+
+### **LINE Bot 集成準備**
+
+**標準化輸出格式：**
+
+```json
+{
+    "success": boolean,      // 查詢是否成功
+    "response": string,      // 給用戶的自然語言回應
+    "intent": string,        // 識別的查詢意圖
+    "sql_query": string,     // 執行的 SQL (如果有)
+    "result_count": integer, // 查詢結果筆數
+    "confidence": float      // 意圖識別信心度
+}
+```
+
+### **完整 RAG 工作流程**
+
+```
+用戶 LINE 訊息 → process_query()
+    ↓
+意圖分類 (LLM + 向量搜尋)
+    ↓
+智能路由選擇
+    ├── SQL 查詢：生成 SQL → 安全執行 → 自然語言回應
+    └── 非 SQL：直接搜尋 FAQ/知識庫/工單指引
+    ↓
+回傳 LINE Bot → 用戶收到回應
+```
+
 ## [v2.0.2] - 2025-07-28
 
 開發 llm_service.py，負責 RAG 的「Generation」部分
@@ -52,16 +204,14 @@
 
 **CRMKnowledgeBase 類別功能：**
 
-- 使用 ChromaDB 進行向量儲存和相似度搜尋
-- 使用 SentenceTransformer ('all-MiniLM-L6-v2') 將文本轉換為向量
-- 管理兩個集合：schema_collection (資料庫結構) 和 examples_collection (查詢範例)
-
-**核心方法：**
-
 1. **add_schema_info** - 將資料表結構轉換為可搜尋的向量，格式化為包含欄位、類型、描述、關聯的結構化文本
 2. **add_query_example** - 儲存自然語言查詢與對應的 SQL 範例，包含意圖、描述等元資料
 3. **search_similar_examples** - 根據用戶查詢找出相似的範例，返回相似度分數
 4. **search_relevant_schemas** - 找出相關的資料表結構，支援多表關聯查詢
+
+- 使用 ChromaDB 進行向量儲存和相似度搜尋
+- 使用 SentenceTransformer ('all-MiniLM-L6-v2') 將文本轉換為向量
+- 管理兩個集合：schema_collection (資料庫結構) 和 examples_collection (查詢範例)
 
 **下載套件：**
 
@@ -711,7 +861,6 @@ frontend/src/components/
 - `frontend/package.json` - 導入 Recharts、date-fns 套件
 - `frontend/src/components/CustomerList.tsx` - 匯入功能整合
 - `frontend/src/components/CustomerImport.tsx` - 客戶資料匯入組件
-- `frontend/test_customers.csv` - 匯入功能測試檔案
 
 ---
 
