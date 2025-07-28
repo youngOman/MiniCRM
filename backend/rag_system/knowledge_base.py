@@ -22,12 +22,12 @@ class CRMKnowledgeBase:
 
         logger.info("CRM 知識庫初始化完成")
 
-    def _get_or_create_collection(self, name: str):
+    def _get_or_create_collection(self, name: str): # 冪等性
         """獲取或創建集合"""
         try:
-            return self.client.get_collection(name)
+            return self.client.get_collection(name) # 如果集合已存在則返回
         except:
-            return self.client.create_collection(name)
+            return self.client.create_collection(name) # 如果不存在則創建新的集合
 
     def add_schema_info(self, table_name: str, schema_info: Dict[str, Any]):
         """
@@ -35,8 +35,8 @@ class CRMKnowledgeBase:
         將資料表結構轉換為可搜尋的向量
 
         """
-        schema_text = self._format_schema_text(table_name, schema_info)
-        embedding = self.model.encode([schema_text])[0].tolist()
+        schema_text = self._format_schema_text(table_name, schema_info) # 格式化 schema 資訊為文本
+        embedding = self.model.encode([schema_text])[0].tolist() # 向量化文本
 
         self.schema_collection.add(
             embeddings=[embedding],
@@ -47,7 +47,7 @@ class CRMKnowledgeBase:
                 "fields": json.dumps(schema_info)
             }],
             ids=[f"schema_{table_name}"]
-        )
+        ) # 存入 ChromaDB
         logger.info(f"已添加 {table_name} 的 schema 資訊")
 
     def add_query_example(self, intent: str, natural_query: str, sql_query: str, description: str = ""):
@@ -55,12 +55,11 @@ class CRMKnowledgeBase:
         添加查詢範例
         儲存自然語言查詢與對應的 SQL 範例(包含意圖、描述等元資料)
         """
-        example_text = f"意圖: {intent}\n自然語言查詢: {natural_query}\n描述: {description}"
-        embedding = self.model.encode([example_text])[0].tolist()
+        example_text = f"意圖: {intent}\n自然語言查詢: {natural_query}\n描述: {description}" # 格式化查詢範例文本
+        embedding = self.model.encode([example_text])[0].tolist() # 向量化文本
+        example_id = f"example_{len(self.examples_collection.get()['ids'])}" # 生成唯一 ID
 
-        example_id = f"example_{len(self.examples_collection.get()['ids'])}"
-
-        self.examples_collection.add(
+        self.examples_collection.add( 
             embeddings=[embedding],
             documents=[example_text],
             metadatas=[{
@@ -71,7 +70,7 @@ class CRMKnowledgeBase:
                 "type": "example"
             }],
             ids=[example_id]
-        )
+        ) # 存入 ChromaDB
         logger.info(f"已添加查詢範例: {intent}")
 
     def search_similar_examples(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:

@@ -24,55 +24,55 @@
 - 多平台整合：與 Notion、Google Workspace 等業務工具整合
 - 行銷自動化：建立 EDM 模板或與 LINE 串接，自動化內容推播
 
-- AI 智慧商業分析先驅
+- AI 智慧分析、生成
+  - AI 自動分析圖表與指標，生成營運跟銷售建議
+  - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
-  - 導入（RAG）Retrieval-Augmented Generation，結合公司內部文件（如產品知識庫、客服紀錄、SOP、FAQ），
-    - AI 助理能根據系統資料回答精準且具上下文的業務與客戶問題
-    - 例：「告訴我 VIP 客戶常見的售後問題，以及該如何處理」
-    - 例：「幫我找出上個月購買最多的 25-35 歲女性客戶」
-    -
-    - AI 自動分析圖表與指標，生成營運跟銷售建議
-    - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
+## [v2.0.2] - 2025-07-28
+
+開發 llm_service.py，負責 RAG 的「Generation」部分
+
+**OllamaLLMService Class 功能：**
+
+1. **意圖分類** (classify_intent) - 調用 knowledge_base 搜尋相似範例作為上下文，使用 LLM 分析用戶查詢意圖
+2. **SQL 生成** (generate_sql) - 調用 knowledge_base 搜尋相關資料表 + 相似範例作為上下文，生成對應的 SQL 查詢語句
+3. **自然語言回應** (generate_response) - 將 SQL 結果轉為自然語言中文回答，限制結果筆數避免回應過長
+
+支援 6 種意圖分類：customer_query、order_query、product_query、transaction_query、service_query、analytics_query
+
+**RAG 工作流程完整實現：**
+
+- 階段一：知識庫儲存 (knowledge_base.py)
+- 階段二：查詢處理並回覆 (llm_service.py)
+  - 用戶輸入 → 意圖分類（同時向量搜尋相似範例）→ SQL 生成（同時搜尋 Schema+範例）→ 執行 SQL → 限制結果筆數 → LLM 生成自然語言 → 返回用戶
 
 ## [v2.0.2] - 2025-07-27
 
-實作 RAG 的 'R'，RAG 大致工作流程：
+開發 knowledge_base.py，負責 RAG 的「Retrieval」部分，將 CRM 系統的資料庫 schema 和查詢範例向量化儲存
 
-RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
+**CRMKnowledgeBase 類別功能：**
 
-1. Retrieval: search_similar_examples() 找相似範例
-2. Augmented: 將範例+schema 作為上下文
-3. Generation: LLM 根據上下文生成 SQL
+- 使用 ChromaDB 進行向量儲存和相似度搜尋
+- 使用 SentenceTransformer ('all-MiniLM-L6-v2') 將文本轉換為向量
+- 管理兩個集合：schema_collection (資料庫結構) 和 examples_collection (查詢範例)
 
-4. 知識收集: 將 CRM 系統的資料庫 schema 和查詢範例向量化儲存
-5. 查詢理解: 當用戶輸入自然語言查詢時，搜尋相關的範例和 schema
-6. 上下文增強: 提供相關背景資訊給 LLM，提升 SQL 生成準確度
-7. **Ex：**
+**核心方法：**
 
-   - "幫我找出上個月購買最多的 25-35 歲女性客戶"
-   - 系統會搜尋相關的客戶表 schema 和類似查詢範例
-   - 協助 LLM 生成正確的 SQL 查詢
+1. **add_schema_info** - 將資料表結構轉換為可搜尋的向量，格式化為包含欄位、類型、描述、關聯的結構化文本
+2. **add_query_example** - 儲存自然語言查詢與對應的 SQL 範例，包含意圖、描述等元資料
+3. **search_similar_examples** - 根據用戶查詢找出相似的範例，返回相似度分數
+4. **search_relevant_schemas** - 找出相關的資料表結構，支援多表關聯查詢
 
-8. 知識庫儲存階段（預先建立）
+**下載套件：**
 
-[知識庫儲存階段（預先建立）](./images/rag/knowledge_store.png)
+- chromadb==0.4.22 (向量資料庫)
+- sentence-transformers==2.7.0 (文本向量化)
+- ollama==0.1.7 (LLM 服務)
+- numpy==1.24.3, scikit-learn==1.3.0 (數值計算)
 
-2. 查詢階段（用戶提問時）
+**下載本地 LLM：**
 
-[查詢階段（用戶提問時）](./images/rag/query.png)
-
-- 下載本地 LLM llama3 模型：https://ollama.com/
-- 下載相關套件
-  - chromadb==0.4.22
-  - sentence-transformers==2.7.0
-  - ollama==0.1.7
-  - numpy==1.24.3
-  - scikit-learn==1.3.0
-- 開發 knowledge_base.py 負責 RAG 的 "R" 檢索功能
-  - add_schema_info：將資料表結構轉換為可搜尋的向量
-  - add_query_example：儲存自然語言查詢與對應的 SQL 範例(包含意圖、描述等元資料)
-  - search_similar_examples：根據用戶查詢找出相似的範例
-  - search_relevant_schemas：找出相關的資料表結構
+- Ollama llama3 模型：https://ollama.com/
 
 ## [v2.0.2] - 2025-07-26
 
