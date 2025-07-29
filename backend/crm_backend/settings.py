@@ -34,7 +34,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['minicrm.akebee.com','localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -225,6 +225,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
 ]
+
+# 允許所有來源 (開發環境用)
+# CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 

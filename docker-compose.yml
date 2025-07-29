@@ -1,0 +1,68 @@
+version: "3.8"
+
+services:
+  # Django 後端
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: minicrm_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_NAME=${DB_NAME:-minicrm}
+      - DB_USER=${DB_USER:-minicrm_user}
+      - DB_PASSWORD=${DB_PASSWORD:-minicrm_pass}
+      - DB_HOST=${DB_HOST:-127.0.0.1}
+      - DB_PORT=${DB_PORT:-3306}
+      # - CHROMA_HOST=chromadb
+      # - CHROMA_PORT=8000
+      # - OLLAMA_HOST=ollama
+      # - OLLAMA_PORT=11434
+      - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
+      - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
+    volumes:
+      - ./backend:/app
+      - backend_static:/app/staticfiles
+      - backend_media:/app/media
+    # depends_on:
+    #   chromadb:
+    #     condition: service_healthy
+    #   ollama:
+    #     condition: service_healthy
+    networks:
+      - minicrm_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # React 前端
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: minicrm_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - minicrm_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  backend_static:
+  backend_media:
+
+networks:
+  minicrm_network:
+    driver: bridge
