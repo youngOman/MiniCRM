@@ -10,7 +10,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=False
+      - DEBUG=True
       - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
       - DB_ENGINE=django.db.backends.mysql
       - DB_NAME=${DB_NAME:-minicrm}
@@ -49,6 +49,9 @@ services:
     container_name: minicrm_frontend
     ports:
       - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
     networks:
