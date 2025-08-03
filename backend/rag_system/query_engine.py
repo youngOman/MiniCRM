@@ -56,15 +56,15 @@ class CRMQueryEngine:
             intent_info = self.llm_service.classify_intent(user_query)
             logger.info(f"意圖分類結果: {intent_info['intent']}")
             
-            # 步驟 2: 根據意圖選擇處理方式 (目前只支援非 SQL 查詢)
+            # 步驟 2: 根據意圖選擇處理方式
             if intent_info['intent'] in ['faq_query', 'knowledge_base_query', 'ticket_management_query']:
-                # 非 SQL 查詢：FAQ、知識庫、工單管理等不需要查詢資料庫的請求
-                return self._handle_non_sql_query(user_query, intent_info)
+                # SQL 查詢：查詢真實的 FAQ、知識庫、工單資料
+                return self._handle_sql_query(user_query, intent_info)
             else:
-                # 暫時不支援 SQL 查詢，引導用戶使用支援的功能
+                # 不支援的查詢類型，引導用戶
                 return {
                     "success": True,
-                    "response": "目前我只能協助您：\n1. FAQ 常見問題解答\n2. 知識庫文章搜尋\n3. 客服工單相關問題\n\n請問您需要哪種協助？",
+                    "response": "目前我只能協助您：\n1. FAQ 常見問題查詢\n2. 知識庫文章搜尋\n3. 客服工單查詢\n\n請問您需要哪種協助？",
                     "intent": intent_info['intent'],
                     "confidence": intent_info.get('confidence', 0)
                 }
@@ -320,62 +320,81 @@ class CRMQueryEngine:
         """
         添加範例資料到知識庫
         
-        這個方法用於初始化系統時添加基本的非 SQL 查詢範例
-        包括：
-        1. FAQ 常見問題
-        2. 知識庫文章內容  
-        3. 客服工單相關資訊
+        這個方法用於初始化系統時添加：
+        1. 真實客服資料表 schema 資訊  
+        2. SQL 查詢範例
         """
         logger.info("開始添加範例資料到知識庫...")
         
-        # 添加 FAQ 和知識庫範例
+        # 添加真實客服資料表 schema
+        self._add_customer_service_schemas()
+        
+        # 添加查詢範例（包含 SQL 查詢和靜態回應）
         examples = [
-            # FAQ 範例
+            # FAQ 靜態範例（保留用於理解）
             {
                 "intent": "faq_query",
                 "natural_query": "如何修改密碼",
                 "sql_query": "",
                 "description": "請到個人設定頁面，點選「修改密碼」，輸入舊密碼和新密碼即可完成修改。"
             },
+            
+            # FAQ SQL 查詢範例
             {
                 "intent": "faq_query",
-                "natural_query": "忘記密碼怎麼辦",
-                "sql_query": "",
-                "description": "請點選登入頁面的「忘記密碼」連結，輸入您的電子郵件，系統會發送重設密碼的連結給您。"
+                "natural_query": "搜尋密碼相關的常見問題",
+                "sql_query": "SELECT question, answer FROM customer_service_faq WHERE question LIKE '%密碼%' AND is_active = true",
+                "description": "從資料庫搜尋包含密碼關鍵字的常見問題"
             },
             {
                 "intent": "faq_query",
-                "natural_query": "如何聯絡客服",
-                "sql_query": "",
-                "description": "您可以透過以下方式聯絡客服：1. LINE 官方帳號 2. 客服電話：02-1234-5678 3. 電子郵件：support@minicrm.com"
+                "natural_query": "顯示所有常見問題",
+                "sql_query": "SELECT question, answer FROM customer_service_faq WHERE is_active = true ORDER BY is_featured DESC, sort_order ASC LIMIT 10",
+                "description": "顯示前10個常見問題"
             },
             
-            # 知識庫範例
+            # 知識庫靜態範例（保留用於理解）
             {
                 "intent": "knowledge_base_query",
                 "natural_query": "系統操作指南",
                 "sql_query": "",
                 "description": "CRM 系統操作指南：1. 登入後可在儀表板查看總覽 2. 左側選單可管理客戶、訂單等 3. 詳細操作請參考各功能頁面的說明"
             },
+            
+            # 知識庫 SQL 查詢範例
+            {
+                "intent": "knowledge_base_query",
+                "natural_query": "搜尋操作相關文章",
+                "sql_query": "SELECT title, summary FROM customer_service_knowledgebase WHERE (title LIKE '%操作%' OR content LIKE '%操作%') AND is_active = true LIMIT 5",
+                "description": "搜尋標題或內容包含操作關鍵字的知識庫文章"
+            },
             {
                 "intent": "knowledge_base_query", 
-                "natural_query": "資料匯入說明",
-                "sql_query": "",
-                "description": "資料匯入功能：支援 CSV 和 Excel 格式，可匯入客戶資料。匯入前請確認欄位格式正確，系統會提供預覽功能。"
+                "natural_query": "精選知識庫文章",
+                "sql_query": "SELECT title, summary FROM customer_service_knowledgebase WHERE is_featured = true AND is_active = true ORDER BY updated_at DESC",
+                "description": "顯示所有精選的知識庫文章"
             },
             
-            # 客服工單範例
+            # 客服工單靜態範例（保留用於理解）
             {
                 "intent": "ticket_management_query",
                 "natural_query": "如何建立客服工單",
                 "sql_query": "",
                 "description": "建立客服工單：1. 點選「新增工單」2. 填寫問題描述 3. 選擇問題分類 4. 提交後會自動分配工單號碼"
             },
+            
+            # 客服工單 SQL 查詢範例
             {
                 "intent": "ticket_management_query",
-                "natural_query": "工單狀態說明",
-                "sql_query": "",
-                "description": "工單狀態：開啟中(已收到)、處理中(客服處理)、等待回應(需要更多資訊)、已解決(問題完成)"
+                "natural_query": "顯示開啟中的工單",
+                "sql_query": "SELECT ticket_number, title, status, priority, created_at FROM customer_service_serviceticket WHERE status = 'open' ORDER BY priority DESC, created_at ASC LIMIT 10",
+                "description": "顯示前10個開啟中的工單"
+            },
+            {
+                "intent": "ticket_management_query",
+                "natural_query": "本週新建立的工單數量",
+                "sql_query": "SELECT COUNT(*) as ticket_count FROM customer_service_serviceticket WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
+                "description": "統計最近7天建立的工單數量"
             }
         ]
         
@@ -389,3 +408,90 @@ class CRMQueryEngine:
             )
         
         logger.info("範例資料添加完成")
+    
+    def _add_customer_service_schemas(self):
+        """添加真實的客服資料表 schema 資訊"""
+        
+        # FAQ 表
+        faq_schema = {
+            "description": "常見問題表",
+            "fields": {
+                "id": {"type": "int", "description": "FAQ ID，主鍵"},
+                "question": {"type": "varchar", "description": "問題內容，最大300字"},
+                "answer": {"type": "text", "description": "答案內容"},
+                "category_id": {"type": "int", "description": "分類 ID，外鍵關聯 customer_service_knowledgebasecategory"},
+                "is_active": {"type": "boolean", "description": "是否啟用"},
+                "is_featured": {"type": "boolean", "description": "是否置頂"},
+                "sort_order": {"type": "int", "description": "排序順序"},
+                "view_count": {"type": "int", "description": "查看次數"},
+                "created_by_id": {"type": "int", "description": "建立人員 ID"},
+                "created_at": {"type": "datetime", "description": "建立時間"},
+                "updated_at": {"type": "datetime", "description": "更新時間"}
+            },
+            "relationships": [
+                "與 customer_service_knowledgebasecategory 表通過 category_id 關聯 (多對一)"
+            ]
+        }
+        
+        # 知識庫表
+        knowledgebase_schema = {
+            "description": "知識庫文章表",
+            "fields": {
+                "id": {"type": "int", "description": "文章 ID，主鍵"},
+                "title": {"type": "varchar", "description": "文章標題，最大200字"},
+                "content": {"type": "text", "description": "文章內容"},
+                "summary": {"type": "varchar", "description": "文章摘要，最大500字"},
+                "category_id": {"type": "int", "description": "分類 ID，外鍵"},
+                "content_type": {"type": "varchar", "description": "內容類型：faq, guide, policy, troubleshooting, sop"},
+                "tags": {"type": "json", "description": "標籤列表"},
+                "is_public": {"type": "boolean", "description": "是否公開可見"},
+                "is_featured": {"type": "boolean", "description": "是否精選文章"},
+                "is_active": {"type": "boolean", "description": "是否啟用"},
+                "view_count": {"type": "int", "description": "查看次數"},
+                "helpful_count": {"type": "int", "description": "有用次數"},
+                "not_helpful_count": {"type": "int", "description": "無用次數"},
+                "created_by_id": {"type": "int", "description": "建立人員 ID"},
+                "updated_by_id": {"type": "int", "description": "更新人員 ID"},
+                "created_at": {"type": "datetime", "description": "建立時間"},
+                "updated_at": {"type": "datetime", "description": "更新時間"}
+            },
+            "relationships": [
+                "與 customer_service_knowledgebasecategory 表通過 category_id 關聯 (多對一)"
+            ]
+        }
+        
+        # 客服工單表
+        serviceticket_schema = {
+            "description": "客服工單表",
+            "fields": {
+                "id": {"type": "int", "description": "工單 ID，主鍵"},
+                "ticket_number": {"type": "varchar", "description": "工單號碼，唯一，格式：CS+年月日+4位序號"},
+                "customer_id": {"type": "int", "description": "客戶 ID，外鍵關聯 customers_customer"},
+                "title": {"type": "varchar", "description": "工單標題，最大200字"},
+                "description": {"type": "text", "description": "問題描述"},
+                "category": {"type": "varchar", "description": "問題分類：general, technical, billing, product, shipping, return, complaint, feature_request"},
+                "priority": {"type": "varchar", "description": "優先級：low, medium, high, urgent"},
+                "status": {"type": "varchar", "description": "工單狀態：open, in_progress, pending, resolved, closed"},
+                "assigned_to_id": {"type": "int", "description": "負責人員 ID"},
+                "created_by_id": {"type": "int", "description": "建立人員 ID"},
+                "tags": {"type": "json", "description": "標籤列表"},
+                "satisfaction_rating": {"type": "int", "description": "滿意度評分 1-5分"},
+                "satisfaction_comment": {"type": "text", "description": "滿意度評語"},
+                "created_at": {"type": "datetime", "description": "建立時間"},
+                "updated_at": {"type": "datetime", "description": "更新時間"},
+                "first_response_at": {"type": "datetime", "description": "首次回應時間"},
+                "resolved_at": {"type": "datetime", "description": "解決時間"},
+                "closed_at": {"type": "datetime", "description": "關閉時間"}
+            },
+            "relationships": [
+                "與 customers_customer 表通過 customer_id 關聯 (多對一)",
+                "與 customer_service_servicenote 表通過 ticket_id 關聯 (一對多)"
+            ]
+        }
+        
+        # 將 schema 資訊存入知識庫
+        self.knowledge_base.add_schema_info("customer_service_faq", faq_schema)
+        self.knowledge_base.add_schema_info("customer_service_knowledgebase", knowledgebase_schema)
+        self.knowledge_base.add_schema_info("customer_service_serviceticket", serviceticket_schema)
+        
+        logger.info("客服資料表 schema 添加完成")

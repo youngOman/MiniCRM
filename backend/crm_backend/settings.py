@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'products',
     'customer_service',
     'line_bot',
+    'rag_system',
 ]
 
 MIDDLEWARE = [

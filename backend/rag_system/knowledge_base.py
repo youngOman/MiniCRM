@@ -74,7 +74,7 @@ class CRMKnowledgeBase:
         logger.info(f"已添加查詢範例: {intent}")
 
     def search_similar_examples(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:
-        """搜尋相似的查詢範例"""
+        """去向量空間內搜尋相似的查詢範例"""
         query_embedding = self.model.encode([query])[0].tolist()
         """
         範例：

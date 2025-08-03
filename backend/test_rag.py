@@ -41,38 +41,48 @@ def test_rag_system():
         engine.add_sample_data()
         print("✅ 範例資料添加完成")
         
-        # 測試查詢 (只測試支援的功能)
+        # 測試查詢 (支援 SQL 功能)
         test_queries = [
+            # 靜態回應測試
             {
                 "query": "如何修改密碼",
                 "expected_intent": "faq_query", 
-                "description": "FAQ 常見問題"
+                "description": "FAQ 靜態回應"
             },
+            
+            # SQL 查詢測試
             {
-                "query": "忘記密碼怎麼辦",
+                "query": "搜尋密碼相關的常見問題",
                 "expected_intent": "faq_query", 
-                "description": "FAQ 常見問題"
+                "description": "FAQ SQL 查詢"
             },
             {
-                "query": "知識庫文章搜尋",
+                "query": "顯示所有常見問題",
+                "expected_intent": "faq_query", 
+                "description": "FAQ SQL 查詢"
+            },
+            {
+                "query": "搜尋操作相關文章",
                 "expected_intent": "knowledge_base_query",
-                "description": "知識庫搜尋"
+                "description": "知識庫 SQL 查詢"
             },
             {
-                "query": "系統操作指南",
+                "query": "精選知識庫文章",
                 "expected_intent": "knowledge_base_query",
-                "description": "知識庫搜尋"
+                "description": "知識庫 SQL 查詢"
             },
             {
-                "query": "如何建立客服工單",
+                "query": "顯示開啟中的工單",
                 "expected_intent": "ticket_management_query",
-                "description": "工單管理查詢"
+                "description": "工單 SQL 查詢"
             },
             {
-                "query": "工單狀態查詢",
+                "query": "本週新建立的工單數量",
                 "expected_intent": "ticket_management_query",
-                "description": "工單管理查詢"
+                "description": "工單統計 SQL 查詢"
             },
+            
+            # 不支援功能測試
             {
                 "query": "查詢客戶資料",
                 "expected_intent": "customer_query",
