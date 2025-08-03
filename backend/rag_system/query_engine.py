@@ -410,8 +410,8 @@ class CRMQueryEngine:
         logger.info("範例資料添加完成")
     
     def _add_customer_service_schemas(self):
-        """添加真實的客服資料表 schema 資訊"""
-        
+        """添加真實的FAQ、知識庫、客服工單資料表 schema 資訊"""
+
         # FAQ 表
         faq_schema = {
             "description": "常見問題表",

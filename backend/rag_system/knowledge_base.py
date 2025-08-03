@@ -1,5 +1,9 @@
 import os
 import json
+
+# 必須在 import chromadb 之前設定
+os.environ['ANONYMIZED_TELEMETRY'] = 'False'
+
 import chromadb
 from sentence_transformers import SentenceTransformer
 from typing import List, Dict, Any
@@ -33,7 +37,6 @@ class CRMKnowledgeBase:
         """
         添加資料表 schema 資訊
         將資料表結構轉換為可搜尋的向量
-
         """
         schema_text = self._format_schema_text(table_name, schema_info)  # 格式化 schema 資訊為文本
         embedding = self.model.encode([schema_text])[0].tolist()  # 向量化文本
@@ -74,7 +77,16 @@ class CRMKnowledgeBase:
         logger.info(f"已添加查詢範例: {intent}")
 
     def search_similar_examples(self, query: str, n_results: int = 3) -> List[Dict[str, Any]]:
-        """去向量空間內搜尋相似的查詢範例"""
+        """
+        搜尋相似的查詢範例
+        
+        這個函數專門搜尋「查詢範例」(query examples)，包含：
+        - 自然語言查詢模式 (如："如何修改密碼")
+        - 對應的 SQL 語句或回應
+        - 使用意圖和描述
+        
+        用途：教系統如何回應類似的用戶查詢
+        """
         query_embedding = self.model.encode([query])[0].tolist()
         """
         範例：
@@ -82,7 +94,7 @@ class CRMKnowledgeBase:
         # 轉換後變成：
         query_embedding = [0.123, -0.456, 0.789, ..., 0.321]  # 384 個數字
         """
-        results = self.examples_collection.query(  # examples_collection = ChromaDB 中儲存範例的集合
+        results = self.examples_collection.query(  # examples_collection = ChromaDB 中儲存「查詢範例」的集合
             query_embeddings=[query_embedding],
             n_results=n_results
         )
@@ -113,11 +125,17 @@ class CRMKnowledgeBase:
     def search_relevant_schemas(self, query: str, n_results: int = 5) -> List[Dict[str, Any]]:
         """
         搜尋相關的資料表 schema
-        根據用戶查詢找出相似的範例
+        
+        這個函數專門搜尋「資料表結構」(database schemas)，包含：
+        - 資料表名稱 (如：customer_service_faq)
+        - 欄位定義 (欄位名稱、類型、描述)
+        - 表之間的關聯關係
+        
+        用途：幫助 LLM 生成正確的 SQL 查詢語句
         """
         query_embedding = self.model.encode([query])[0].tolist()
 
-        results = self.schema_collection.query(
+        results = self.schema_collection.query(  # schema_collection = ChromaDB 中儲存「資料表結構」的集合
             query_embeddings=[query_embedding],
             n_results=n_results
         )
@@ -136,7 +154,9 @@ class CRMKnowledgeBase:
     def _format_schema_text(self, table_name: str, schema_info: Dict[str, Any]) -> str:
         """
         格式化 schema 資訊為文本
-        找出相關的資料表結構
+        
+        將資料表結構轉換為可搜尋的文本格式，
+        讓向量搜尋能理解資料表的用途和欄位含義
         """
         text = f"資料表: {table_name}\n"
 

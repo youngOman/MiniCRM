@@ -6,6 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    # 禁用 ChromaDB 遙測避免錯誤
+    os.environ.setdefault('ANONYMIZED_TELEMETRY', 'False')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'crm_backend.settings')
     try:
         from django.core.management import execute_from_command_line

@@ -62,20 +62,36 @@ RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
 
 用戶輸入 → 意圖分類（同時向量搜尋相似範例作為上下文）→ SQL 生成（同時向量搜尋相關 Schema + 相似範例作為上下文）→ 執行 SQL → SQL 結果 → 格式化限制(限制結果筆數、避免傳給 LLM 的資料過長，影響回應品質)→ LLM 生成自然語言 → 返回用戶
 
-![RAG 工作流程](./images/rag/rag-flowchart.png)
+![RAG 工作流程](./images/rag/rag-.png)
 
-| 階段 | 步驟          | 函數                      | 檔案              |
-| ---- | ------------- | ------------------------- | ----------------- |
-| 儲存 | Schema 向量化 | add_schema_info()         | knowledge_base.py |
-| 儲存 | 範例向量化    | add_query_example()       | knowledge_base.py |
-| 查詢 | 意圖分類      | classify_intent()         | llm_service.py    |
-| 查詢 | 範例搜尋      | search_similar_examples() | knowledge_base.py |
-| 查詢 | Schema 搜尋   | search_relevant_schemas() | knowledge_base.py |
-| 生成 | SQL 生成      | generate_sql()            | llm_service.py    |
-| 執行 | SQL 執行      | \_execute_sql()           | query_engine.py   |
-| 回應 | 自然語言生成  | generate_response()       | llm_service.py    |
+### 階段一：系統初始化（知識庫建立）
 
-## 核心功能模組
+| 步驟  | 函數                              | 檔案                  | 說明                     | Ollama LLM |
+| ----- | --------------------------------- | --------------------- | ------------------------ | ---------- |
+| 1     | `add_sample_data()`               | query_engine.py:319   | 主控初始化函數           |            |
+| 2     | `_add_customer_service_schemas()` | query_engine.py:412   | 準備 3 個資料表的 schema |            |
+| 3.1   | `add_schema_info()`               | knowledge_base.py:32  | 添加 FAQ 表 schema       |            |
+| 3.1.1 | `_format_schema_text()`           | knowledge_base.py:151 | 格式化 schema 為文本     |            |
+| 3.1.2 | SentenceTransformer               | knowledge_base.py:38  | 向量化並存入 ChromaDB    |            |
+| 3.2   | `add_schema_info()`               | knowledge_base.py:32  | 添加知識庫表 schema      |            |
+| 3.3   | `add_schema_info()`               | knowledge_base.py:32  | 添加工單表 schema        |            |
+| 4     | `add_query_example()` × N 次      | knowledge_base.py:53  | 添加查詢範例並向量化     |            |
+
+### 階段二：用戶查詢處理
+
+| 順序 | 函數                        | 檔案:行號             | 說明                                  | Ollama LLM     |
+| ---- | --------------------------- | --------------------- | ------------------------------------- | -------------- |
+| 1    | `process_query()`           | query_engine.py:28    | 主查詢處理入口                        |                |
+| 2    | `classify_intent()`         | llm_service.py:25     | 開始意圖分類                          |                |
+| 2.1  | `search_similar_examples()` | knowledge_base.py:75  | **第 1 次搜尋**：為意圖分類提供上下文 |                |
+| 2.2  | Ollama LLM 調用             | llm_service.py:63     | 意圖分類                              | ✅ **第 1 次** |
+| 3    | `_handle_sql_query()`       | query_engine.py:82    | SQL 查詢處理流程                      |                |
+| 4    | `generate_sql()`            | llm_service.py:84     | 開始 SQL 生成                         |                |
+| 4.1  | `search_relevant_schemas()` | knowledge_base.py:121 | 搜尋相關資料表結構                    |                |
+| 4.2  | `search_similar_examples()` | knowledge_base.py:75  | **第 2 次搜尋**：為 SQL 生成提供範例  |                |
+| 4.3  | Ollama LLM 調用             | llm_service.py:127    | 結合 RAG 檢索結果生成 SQL             | ✅ **第 2 次** |
+| 5    | `_execute_sql()`            | query_engine.py:167   | 安全執行 SQL                          |                |
+| 6    | `generate_response()`       | llm_service.py:147    | 轉為自然語言回應                      | ✅ **第 3 次** |
 
 ### 1. 營銷分析儀表板
 

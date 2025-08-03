@@ -18,6 +18,9 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
+# 引入 RAG 系統
+from rag_system.query_engine import CRMQueryEngine
+
 # 設置日誌
 logger = logging.getLogger(__name__)
 
@@ -32,6 +35,14 @@ if not LINE_CHANNEL_SECRET or not LINE_CHANNEL_ACCESS_TOKEN:
 
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
+
+# 初始化 RAG 系統
+try:
+    query_engine = CRMQueryEngine()
+    logger.info("RAG 系統初始化成功")
+except Exception as e:
+    logger.error(f"RAG 系統初始化失敗: {str(e)}")
+    query_engine = None
 
 
 @csrf_exempt
@@ -60,7 +71,7 @@ def webhook(request):
     return HttpResponse("OK")
 
 
-@handler.add(MessageEvent, message=TextMessage) # 
+@handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     """處理文字訊息"""
     user_id = event.source.user_id
@@ -69,8 +80,31 @@ def handle_text_message(event):
     # 記錄收到的訊息
     logger.info(f"收到使用者 {user_id} 的訊息: {user_message}")
     
-    # 簡單的回應邏輯
-    reply_message = f"您好！我收到了您的訊息：「{user_message}」"
+    # 使用 RAG 系統處理用戶查詢
+    if query_engine:
+        try:
+            # 呼叫 RAG 系統處理查詢
+            rag_response = query_engine.process_query(user_message)
+            
+            # 格式化回應訊息
+            if rag_response.get('success', False):
+                reply_message = rag_response.get('response', '抱歉，無法處理您的查詢。')
+                
+                # 如果有 SQL 查詢結果，可以加入更多資訊
+                if rag_response.get('sql_executed'):
+                    logger.info(f"執行了 SQL 查詢: {rag_response.get('sql_query', '')}")
+                    
+            else:
+                reply_message = rag_response.get('response', '抱歉，系統暫時無法處理您的查詢，請稍後再試。')
+                logger.warning(f"RAG 系統處理失敗: {rag_response.get('error', 'Unknown error')}")
+                
+        except Exception as e:
+            logger.error(f"RAG 系統處理查詢時發生錯誤: {str(e)}")
+            reply_message = "抱歉，系統暫時無法處理您的查詢，請稍後再試。"
+    else:
+        # 如果 RAG 系統未初始化，使用預設回應
+        reply_message = "抱歉，智能客服系統暫時無法使用，請聯繫人工客服。"
+        logger.warning("RAG 系統未初始化，使用預設回應")
     
     try:
         # 回覆訊息
@@ -78,7 +112,7 @@ def handle_text_message(event):
             event.reply_token,
             TextSendMessage(text=reply_message)
         )
-        logger.info(f"成功回覆訊息給使用者 {user_id}")
+        logger.info(f"成功回覆訊息給使用者 {user_id}: {reply_message[:50]}...")
         
     except LineBotApiError as e:
         logger.error(f"回覆訊息時發生錯誤: {e.message}")
