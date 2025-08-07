@@ -34,7 +34,8 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1','a6c956669815.ngrok-free.app']
+# ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*'] 
 
 
 # Application definition

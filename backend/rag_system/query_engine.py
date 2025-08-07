@@ -489,7 +489,28 @@ class CRMQueryEngine:
             ]
         }
         
+        # 客戶資料表 (修正資料表名稱)
+        customer_schema = {
+            "description": "客戶資料表",
+            "fields": {
+                "id": {"type": "int", "description": "客戶 ID，主鍵"},
+                "first_name": {"type": "varchar", "description": "名字"},
+                "last_name": {"type": "varchar", "description": "姓氏"},
+                "email": {"type": "varchar", "description": "電子郵件，唯一"},
+                "phone": {"type": "varchar", "description": "電話號碼"},
+                "company": {"type": "varchar", "description": "公司名稱"},
+                "address": {"type": "text", "description": "地址"},
+                "city": {"type": "varchar", "description": "城市"},
+                "created_at": {"type": "datetime", "description": "建立時間"},
+                "updated_at": {"type": "datetime", "description": "更新時間"}
+            },
+            "relationships": [
+                "與 customer_service_serviceticket 表通過 customer_id 關聯 (一對多)"
+            ]
+        }
+        
         # 將 schema 資訊存入知識庫
+        self.knowledge_base.add_schema_info("customers_customer", customer_schema)
         self.knowledge_base.add_schema_info("customer_service_faq", faq_schema)
         self.knowledge_base.add_schema_info("customer_service_knowledgebase", knowledgebase_schema)
         self.knowledge_base.add_schema_info("customer_service_serviceticket", serviceticket_schema)
