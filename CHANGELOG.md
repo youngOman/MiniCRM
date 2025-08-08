@@ -28,13 +28,58 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
-## [v2.0.6] - 2025-08-08
+## [v2.1.0] - 2025-08-09
 
 目前容易無法正確生成正確的 SQL
 
+- 優化 Text-to-SQL，提升 SQL 查詢生成的準確性和效率
+
 ![sql_generate_error](./images/changelog/sql_generate_error.png)
 
-- 優化 Text-to-SQL，提升 SQL 查詢生成的準確性和效率
+### SQL 錯誤原因
+
+1.  錯誤：錯誤 SQL 語法
+
+    - LEFT JOIN customers ct ON kt.id = ? AND kt.category_id IN (...)
+      SELECT fk.title FROM customer_service_knowledgebase faq_query WHERE
+      fk.content_type = 'faq'
+    - ? 是參數化查詢的佔位符，但這裡使用不當
+    - 應該要是具體的 JOIN 條件
+    - 解決：
+      1. 只生成單表 SELECT 查詢，避免複雜的 JOIN
+      2. 使用正確的表名和欄位名
+      3. 表別名要簡單：如 faq, kb, ticket
+      4. WHERE 條件要具體，不使用參數佔位符 ?
+      5. 優先查詢 is_active = true 的記錄
+      6. LIMIT 結果數量（通常 5-10 筆）
+
+2.  錯誤： LLM 回覆帶解釋文字，系統無法識別 SQL
+    - 原始回覆: "Here is the SELECT statement: `sql SELECT * FROM table; `
+      Note that..."
+    - 解決： `llm_service.py` 新增 \_extract_sql() 方法，支援多層解析
+      - 解析 ```sql 程式碼塊
+      - 解析一般 ``` 程式碼塊
+      - 識別以 SELECT 開頭的行
+      - 自動清理格式和添加分號
+3.  錯誤：「如何修改密碼」應該返回靜態回應，卻嘗試生成 SQL
+
+- 解決方案： 新增靜態回應檢查 (靜態回應=預先寫好的固定答案，不需要查詢資料庫)
+- ```python
+  def \_handle_sql_query():
+  # 步驟 1: 先檢查靜態回應
+  static_response = self.\_check_static_response(user_query, intent_info)
+  if static_response:
+  return static_response # 直接返回，不生成 SQL
+  # 步驟 2: 沒有靜態回應才生成 SQL
+  sql_query = self.llm_service.generate_sql(user_query, intent_info)
+  ```
+- 關鍵邏輯：
+  - 向量搜尋找到相似範例
+  - 檢查 sql_query 是否為空
+  - 如果為空且有 description，直接返回靜態回應
+  - 相似度計算確保匹配正確性
+
+## [v2.0.6] - 2025-08-08
 
 ### 修正 Docker 環境 RAG 系統連接錯誤問題
 
@@ -48,22 +93,22 @@
 
 - **添加 Ollama Docker 服務**：在 `docker compose.yml` 中新增 `ollama` 容器服務
 
-  - 使用官方 `ollama/ollama:latest` 映像檔
-  - 配置端口映射 `11434:11434`
-  - 持久化存儲 `ollama_data` 卷宗
-  - 健康檢查確保服務正常運行
+- 使用官方 `ollama/ollama:latest` 映像檔
+- 配置端口映射 `11434:11434`
+- 持久化存儲 `ollama_data` 卷宗
+- 健康檢查確保服務正常運行
 
 - **環境變數配置**：
 
-  - 啟用 `OLLAMA_HOST=ollama`
-  - 啟用 `OLLAMA_PORT=11434`
-  - 支援容器間網路通信
+- 啟用 `OLLAMA_HOST=ollama`
+- 啟用 `OLLAMA_PORT=11434`
+- 支援容器間網路通信
 
 - **llm_service 兼容度優化**：
-  - 修改 `llm_service.py` 支援動態 Ollama 主機配置
-  - Docker 環境自動使用容器服務：`http://ollama:11434`
-  - 本地環境自動使用預設配置：`localhost:11434`
-  - 向下兼容，不影響現有開發流程
+- 修改 `llm_service.py` 支援動態 Ollama 主機配置
+- Docker 環境自動使用容器服務：`http://ollama:11434`
+- 本地環境自動使用預設配置：`localhost:11434`
+- 向下兼容，不影響現有開發流程
 
 ### **服務架構優化**
 
@@ -88,10 +133,10 @@
 ### **智能互動功能**
 
 - **快速回覆選單**：每次回覆都提供常見功能選項
-  - ❓ 常見問題
-  - 📚 知識庫
-  - 🎫 工單查詢
-  - 🆘 人工客服
+- ❓ 常見問題
+- 📚 知識庫
+- 🎫 工單查詢
+- 🆘 人工客服
 - **特殊指令支援**：輸入 `help`、`menu`、`選單`、`幫助` 顯示完整功能介紹
 - **貼圖互動**：發送貼圖獲得友善回應
 
@@ -136,7 +181,7 @@
 3. 將 ngrok 提供的 webhook URL 設定到 LINE Developers Console
 
 - 優化 Text-to-SQL，提升 SQL 查詢生成的準確性和效率
-  - 目前很容易無法辨別用戶的意圖
+- 目前很容易無法辨別用戶的意圖
 
 ## [v2.0.5] - 2025-08-02
 
@@ -148,41 +193,44 @@
 
 1. **啟用 SQL 查詢路徑**
 
-   - 修改 `query_engine.py` 智慧路由系統
-   - FAQ、知識庫、客服工單查詢改為執行 SQL 而非靜態回應
-   - 保留友善引導機制處理不支援的查詢類型
+- 修改 `query_engine.py` 智慧路由系統
+- FAQ、知識庫、客服工單查詢改為執行 SQL 而非靜態回應
+- 保留友善引導機制處理不支援的查詢類型
 
 2. **真實資料表 Schema 整合**
-   - **FAQ 表** (`customer_service_faq`)：問題、答案、分類、狀態、查看次數等欄位
-   - **知識庫表** (`customer_service_knowledgebase`)：標題、內容、摘要、類型、精選狀態等欄位
-   - **客服工單表** (`customer_service_serviceticket`)：工單號碼、客戶資訊、狀態、優先級等欄位
-   - 完整欄位類型、關聯關係和業務邏輯說明
+
+- **FAQ 表** (`customer_service_faq`)：問題、答案、分類、狀態、查看次數等欄位
+- **知識庫表** (`customer_service_knowledgebase`)：標題、內容、摘要、類型、精選狀態等欄位
+- **客服工單表** (`customer_service_serviceticket`)：工單號碼、客戶資訊、狀態、優先級等欄位
+- 完整欄位類型、關聯關係和業務邏輯說明
 
 #### **查詢範例系統**
 
 3. **混合式範例設計**
 
-   - **靜態範例**：保留 "如何修改密碼" 等基礎 FAQ，便於程式碼理解
-   - **SQL 查詢範例**：
-     - `"搜尋密碼相關的常見問題"` → `SELECT question, answer FROM customer_service_faq WHERE question LIKE '%密碼%'`
-     - `"精選知識庫文章"` → `SELECT title, summary FROM customer_service_knowledgebase WHERE is_featured = true`
-     - `"顯示開啟中的工單"` → `SELECT ticket_number, title, status FROM customer_service_serviceticket WHERE status = 'open'`
+- **靜態範例**：保留 "如何修改密碼" 等基礎 FAQ，便於程式碼理解
+- **SQL 查詢範例**：
+  - `"搜尋密碼相關的常見問題"` → `SELECT question, answer FROM customer_service_faq WHERE question LIKE '%密碼%'`
+  - `"精選知識庫文章"` → `SELECT title, summary FROM customer_service_knowledgebase WHERE is_featured = true`
+  - `"顯示開啟中的工單"` → `SELECT ticket_number, title, status FROM customer_service_serviceticket WHERE status = 'open'`
 
 4. **智慧查詢類型支援**
-   - **FAQ 查詢**：關鍵字搜尋、熱門問題、分類瀏覽
-   - **知識庫查詢**：內容搜尋、精選文章、操作指南篩選
-   - **工單查詢**：狀態查詢、統計分析、優先級排序
+
+- **FAQ 查詢**：關鍵字搜尋、熱門問題、分類瀏覽
+- **知識庫查詢**：內容搜尋、精選文章、操作指南篩選
+- **工單查詢**：狀態查詢、統計分析、優先級排序
 
 #### **系統整合**
 
 5. **Django 應用註冊**
 
-   - 在 `settings.py` 中正式註冊 `rag_system` 應用
+- 在 `settings.py` 中正式註冊 `rag_system` 應用
 
 6. **測試腳本更新**
-   - 擴展 `test_rag.py` 包含 SQL 查詢測試案例
-   - 涵蓋靜態回應、SQL 生成、不支援功能等多種場景
-   - 驗證完整的 RAG 工作流程：意圖識別 → SQL 生成 → 查詢執行 → 自然語言回應
+
+- 擴展 `test_rag.py` 包含 SQL 查詢測試案例
+- 涵蓋靜態回應、SQL 生成、不支援功能等多種場景
+- 驗證完整的 RAG 工作流程：意圖識別 → SQL 生成 → 查詢執行 → 自然語言回應
 
 #### **技術實現亮點**
 
@@ -215,44 +263,45 @@
 
 1. **環境檢查測試**
 
-   - 驗證必要套件安裝：ollama, chromadb, sentence-transformers
-   - 確保測試環境完整性
-   - 提供清楚的錯誤指引
+- 驗證必要套件安裝：ollama, chromadb, sentence-transformers
+- 確保測試環境完整性
+- 提供清楚的錯誤指引
 
 2. **組件獨立測試** (`test_individual_components`)
 
-   - **knowledge_base 組件測試**：
-     - ChromaDB 向量資料庫連接
-     - SentenceTransformer 模型載入
-     - 添加範例資料功能 (`add_query_example`)
-     - 向量搜尋功能 (`search_similar_examples`)
-   - **llm_service 組件測試**：
-     - Ollama 服務連接
-     - llama3 模型可用性
-     - 意圖分類功能 (`classify_intent`)
-     - 與 knowledge_base 整合
+- **knowledge_base 組件測試**：
+  - ChromaDB 向量資料庫連接
+  - SentenceTransformer 模型載入
+  - 添加範例資料功能 (`add_query_example`)
+  - 向量搜尋功能 (`search_similar_examples`)
+- **llm_service 組件測試**：
+  - Ollama 服務連接
+  - llama3 模型可用性
+  - 意圖分類功能 (`classify_intent`)
+  - 與 knowledge_base 整合
 
 3. **簡化功能測試** (`test_simplified_functionality`)
 
-   - 測試不支援功能的友善引導機制
-   - 驗證用戶體驗設計（引導至支援功能）
-   - 確保系統穩定性（不會因不支援功能而崩潰）
+- 測試不支援功能的友善引導機制
+- 驗證用戶體驗設計（引導至支援功能）
+- 確保系統穩定性（不會因不支援功能而崩潰）
 
 4. **完整系統測試** (`test_rag_system`)
-   - **支援功能測試**：
-     - FAQ 常見問題查詢 (`faq_query`)
-     - 知識庫文章搜尋 (`knowledge_base_query`)
-     - 客服工單管理 (`ticket_management_query`)
-   - **端到端流程驗證**：
-     - 查詢引擎初始化
-     - 範例資料添加
-     - 完整 RAG 工作流程測試
-     - 意圖識別準確性驗證
+
+- **支援功能測試**：
+  - FAQ 常見問題查詢 (`faq_query`)
+  - 知識庫文章搜尋 (`knowledge_base_query`)
+  - 客服工單管理 (`ticket_management_query`)
+- **端到端流程驗證**：
+  - 查詢引擎初始化
+  - 範例資料添加
+  - 完整 RAG 工作流程測試
+  - 意圖識別準確性驗證
 
 **測試驗證項目：**
 
 ✅ **技術棧完整性** - ChromaDB + Ollama + SentenceTransformer 整合
-✅ **RAG 架構正確性** - 檢索、生成、整合流程驗證  
+✅ **RAG 架構正確性** - 檢索、生成、整合流程驗證
 ✅ **組件間協作** - knowledge_base ↔ llm_service ↔ query_engine
 ✅ **意圖分類準確性** - 9 種意圖類別識別測試
 ✅ **回應品質** - 自然語言生成品質驗證
@@ -285,39 +334,40 @@
 
 1. **process_query()** - 主要對外接口
 
-   - 完整的 RAG 工作流程：意圖分類 → 路由選擇 → 查詢處理 → 回應生成
-   - 返回標準化結果供 LINE Bot 使用
-   - 統一的錯誤處理和日誌記錄
+- 完整的 RAG 工作流程：意圖分類 → 路由選擇 → 查詢處理 → 回應生成
+- 返回標準化結果供 LINE Bot 使用
+- 統一的錯誤處理和日誌記錄
 
 2. **智慧路由系統**
 
-   - SQL 查詢路徑：customer_query, order_query, product_query, transaction_query, analytics_query
-   - 非 SQL 查詢路徑：faq_query, knowledge_base_query, ticket_management_query
-   - 根據意圖自動選擇最適合的處理方式
+- SQL 查詢路徑：customer_query, order_query, product_query, transaction_query, analytics_query
+- 非 SQL 查詢路徑：faq_query, knowledge_base_query, ticket_management_query
+- 根據意圖自動選擇最適合的處理方式
 
 3. **\_handle_sql_query()** - SQL 查詢處理流程
 
-   - 調用 LLM 生成 SQL (含向量搜尋增強)
-   - 安全執行 SQL 查詢
-   - 將結果轉為自然語言回應
+- 調用 LLM 生成 SQL (含向量搜尋增強)
+- 安全執行 SQL 查詢
+- 將結果轉為自然語言回應
 
 4. **\_handle_non_sql_query()** - 非 SQL 查詢處理
 
-   - \_search_faq() - FAQ 常見問題搜尋
-   - \_search_knowledge_base() - 知識庫文章搜尋
-   - \_handle_ticket_management() - 客服工單操作指引
+- \_search_faq() - FAQ 常見問題搜尋
+- \_search_knowledge_base() - 知識庫文章搜尋
+- \_handle_ticket_management() - 客服工單操作指引
 
 5. **\_execute_sql()** - 多層安全 SQL 執行機制
 
-   - 語句類型檢查：只允許 SELECT 語句
-   - 關鍵字黑名單：禁止 DROP、DELETE、UPDATE、INSERT、ALTER 等危險操作
-   - Django ORM 防護：自動防止 SQL 注入攻擊
-   - 錯誤隔離：失敗時不影響系統穩定性
+- 語句類型檢查：只允許 SELECT 語句
+- 關鍵字黑名單：禁止 DROP、DELETE、UPDATE、INSERT、ALTER 等危險操作
+- Django ORM 防護：自動防止 SQL 注入攻擊
+- 錯誤隔離：失敗時不影響系統穩定性
 
 6. **add_sample_data()** - 知識庫初始化
-   - 添加 CRM 資料表 schema 資訊
-   - 提供查詢範例和 FAQ 內容
-   - 為系統提供基礎訓練資料
+
+- 添加 CRM 資料表 schema 資訊
+- 提供查詢範例和 FAQ 內容
+- 為系統提供基礎訓練資料
 
 ### **安全機制設計**
 
@@ -334,12 +384,12 @@
 
 ```json
 {
-    "success": boolean,      // 查詢是否成功
-    "response": string,      // 給用戶的自然語言回應
-    "intent": string,        // 識別的查詢意圖
-    "sql_query": string,     // 執行的 SQL (如果有)
-    "result_count": integer, // 查詢結果筆數
-    "confidence": float      // 意圖識別信心度
+  "success": boolean,      // 查詢是否成功
+  "response": string,      // 給用戶的自然語言回應
+  "intent": string,        // 識別的查詢意圖
+  "sql_query": string,     // 執行的 SQL (如果有)
+  "result_count": integer, // 查詢結果筆數
+  "confidence": float      // 意圖識別信心度
 }
 ```
 

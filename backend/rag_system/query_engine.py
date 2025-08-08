@@ -96,7 +96,18 @@ class CRMQueryEngine:
             查詢處理結果
         """
         
-        # 步驟 2: 生成 SQL (LLM 會調用知識庫搜尋相關 schema 和範例)
+        # 步驟 2: 先檢查是否有靜態回應範例
+        static_response = self._check_static_response(user_query, intent_info)
+        if static_response:
+            logger.info(f"使用靜態回應: {static_response[:50]}...")
+            return {
+                "success": True,
+                "response": static_response,
+                "intent": intent_info['intent'],
+                "sql_executed": False
+            }
+        
+        # 步驟 3: 沒有靜態回應，生成 SQL 查詢
         sql_query = self.llm_service.generate_sql(user_query, intent_info)
         if not sql_query:
             return {
@@ -516,3 +527,42 @@ class CRMQueryEngine:
         self.knowledge_base.add_schema_info("customer_service_serviceticket", serviceticket_schema)
         
         logger.info("客服資料表 schema 添加完成")
+    
+    def _check_static_response(self, user_query: str, intent_info: Dict[str, Any]) -> str:
+        """
+        檢查是否有靜態回應範例（無需 SQL 的直接回答）
+        """
+        if not self.knowledge_base:
+            return ""
+            
+        # 搜尋相似的範例
+        examples = self.knowledge_base.search_similar_examples(user_query, n_results=3)
+        
+        for example in examples:
+            # 檢查是否為靜態回應（sql_query 為空）
+            if example.get('sql_query', '').strip() == '' and example.get('description', ''):
+                # 檢查相似度（簡單的關鍵字匹配）
+                if self._is_similar_query(user_query, example['natural_query']):
+                    return example['description']
+        
+        return ""
+    
+    def _is_similar_query(self, query1: str, query2: str) -> bool:
+        """
+        簡單的查詢相似度檢查
+        """
+        # 轉為小寫並分詞
+        words1 = set(query1.lower().replace('如何', '').replace('怎麼', '').split())
+        words2 = set(query2.lower().replace('如何', '').replace('怎麼', '').split())
+        
+        # 計算交集比例
+        if len(words1) == 0 or len(words2) == 0:
+            return False
+            
+        intersection = words1.intersection(words2)
+        union = words1.union(words2)
+        
+        similarity = len(intersection) / len(union) if len(union) > 0 else 0
+        
+        # 相似度閾值（提高到 0.6，讓靜態回應更嚴格）
+        return similarity > 0.6

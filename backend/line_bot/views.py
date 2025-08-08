@@ -164,7 +164,7 @@ def create_quick_reply_menu():
             action=MessageAction(label="🎫 工單查詢", text="顯示我的工單")
         ),
         QuickReplyButton(
-            action=MessageAction(label="🆘 人工客服", text="聯繫人工客服")
+            action=MessageAction(label="🆘 真人客服", text="聯繫真人客服")
         )
     ])
 
@@ -220,7 +220,7 @@ def process_user_query_async(user_id, user_message, reply_token):
                 logger.warning(f"RAG 系統處理失敗: {rag_response.get('error', 'Unknown error')}")
                 
         else:
-            reply_message = "🤖 抱歉，智能客服系統暫時無法使用。\n\n請稍後再試，或點選下方選單聯繫人工客服。"
+            reply_message = "抱歉，AI客服系統暫時無法使用。\n\n請稍後再試，或點選下方選單聯繫人工客服。"
             logger.warning("RAG 系統未初始化，使用預設回應")
         
         # 發送最終回應（使用 push message 因為 reply token 已使用）
@@ -271,7 +271,7 @@ def format_response_message(rag_response, user_query):
         formatted_response = f"🤖 {response}"
     
     # 添加提示訊息
-    formatted_response += "\n\n───────────────\n💡 您還可以詢問其他問題，或使用下方快速選單"
+    formatted_response += "\n\n───────────────\n 您還可以詢問其他問題，或使用下方快速選單"
     
     return formatted_response
 
@@ -281,7 +281,7 @@ def handle_error_response(rag_response):
     處理錯誤回應
     """
     error_msg = rag_response.get('response', '系統處理異常')
-    return f"❌ {error_msg}\n\n🔧 請嘗試：\n• 重新描述您的問題\n• 使用下方快速選單\n• 聯繫客服人員"
+    return f"❌ {error_msg}\n\n請嘗試：\n• 重新描述您的問題\n• 使用下方快速選單\n• 聯繫客服人員"
 
 
 @handler.add(MessageEvent, message=TextMessage)

@@ -118,7 +118,7 @@ class OllamaLLMService:
                     example_context += f"查詢: {ex['natural_query']}\n"
                     example_context += f"SQL: {ex['sql_query']}\n\n"
         
-        prompt = f"""你是 SQL 專家。根據用戶查詢生成 SELECT 語句。
+        prompt = f"""你是 SQL 專家。根據用戶查詢生成簡單的 SELECT 語句。
 
 用戶查詢: "{user_query}"
 意圖: {intent_info['intent']}
@@ -128,14 +128,23 @@ class OllamaLLMService:
 
 {example_context}
 
-規則:
-1. 只生成 SELECT 查詢
+**重要規則：**
+1. 只生成單表 SELECT 查詢，避免複雜的 JOIN
 2. 使用正確的表名和欄位名
-3. 考慮適當的 JOIN
-4. 添加合理的 WHERE 條件
-5. 確保語法正確
+3. 表別名要簡單：如 faq, kb, ticket
+4. WHERE 條件要具體，不使用參數佔位符 ?
+5. 優先查詢 is_active = true 的記錄
+6. LIMIT 結果數量（通常 5-10 筆）
 
-只回覆 SQL 語句:"""
+**範例格式：**
+```sql
+SELECT question, answer 
+FROM customer_service_faq 
+WHERE question LIKE '%密碼%' AND is_active = true 
+LIMIT 5;
+```
+
+只回覆一個完整的 SQL 語句，不要其他解釋："""
 
         try:
             response = self.client.chat(
@@ -143,20 +152,70 @@ class OllamaLLMService:
                 messages=[{"role": "user", "content": prompt}]
             )
             
-            sql = response['message']['content'].strip()
+            content = response['message']['content'].strip()
             
-            # 清理 SQL（移除 markdown）
-            if sql.startswith('```'):
-                sql = sql.split('\n', 1)[1] if '\n' in sql else sql[3:]
-            if sql.endswith('```'):
-                sql = sql.rsplit('\n', 1)[0] if '\n' in sql else sql[:-3]
+            # 提取 SQL 語句
+            sql = self._extract_sql(content)
             
             logger.info(f"生成 SQL: {sql}")
-            return sql.strip()
+            return sql
             
         except Exception as e:
             logger.error(f"SQL 生成失敗: {e}")
             return ""
+    
+    def _extract_sql(self, content: str) -> str:
+        """
+        從 LLM 回應中提取純 SQL 語句
+        """
+        import re
+        
+        # 方法 1: 尋找 ```sql 代碼塊
+        sql_pattern = r'```sql\s*(.*?)\s*```'
+        match = re.search(sql_pattern, content, re.DOTALL | re.IGNORECASE)
+        if match:
+            return match.group(1).strip()
+        
+        # 方法 2: 尋找一般 ``` 代碼塊
+        code_pattern = r'```\s*(.*?)\s*```'
+        match = re.search(code_pattern, content, re.DOTALL)
+        if match:
+            sql_candidate = match.group(1).strip()
+            # 檢查是否像 SQL
+            if sql_candidate.upper().startswith('SELECT'):
+                return sql_candidate
+        
+        # 方法 3: 尋找以 SELECT 開頭的行
+        lines = content.split('\n')
+        sql_lines = []
+        collecting = False
+        
+        for line in lines:
+            line = line.strip()
+            if line.upper().startswith('SELECT'):
+                collecting = True
+                sql_lines.append(line)
+            elif collecting:
+                if line.endswith(';') or line == '':
+                    sql_lines.append(line)
+                    if line.endswith(';'):
+                        break
+                else:
+                    sql_lines.append(line)
+        
+        if sql_lines:
+            sql = '\n'.join(sql_lines).strip()
+            if sql.endswith(';'):
+                return sql
+            else:
+                return sql + ';'
+        
+        # 方法 4: 最後嘗試找純 SQL（以 SELECT 開頭）
+        if content.upper().strip().startswith('SELECT'):
+            return content.strip()
+        
+        logger.warning(f"無法從回應中提取 SQL: {content}")
+        return ""
     
     def generate_response(self, user_query: str, sql_result: List[Dict], sql_query: str = "") -> str:
         """步驟3: 將查詢結果轉為自然語言回應"""
