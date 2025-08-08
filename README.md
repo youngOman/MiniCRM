@@ -679,7 +679,7 @@ DB_PORT=3306
 
 ```bash
 # 使用 Docker Compose 建置並執行
-docker-compose up --build
+docker compose up --build
 ```
 
 ---

@@ -25,8 +25,58 @@
 - 行銷自動化：建立 EDM 模板或與 LINE 串接，自動化內容推播
 
 - AI 智慧分析、生成
-  - AI 自動分析圖表與指標，生成營運跟銷售建議ㄎ
+  - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
+
+## [v2.0.6] - 2025-08-08
+
+目前容易無法正確生成正確的 SQL
+
+![sql_generate_error](./images/changelog/sql_generate_error.png)
+
+- 優化 Text-to-SQL，提升 SQL 查詢生成的準確性和效率
+
+### 修正 Docker 環境 RAG 系統連接錯誤問題
+
+#### **Docker 環境 Ollama 連接失敗**
+
+- **問題描述**：Docker 環境下 RAG 系統無法連接 Ollama 服務，導致 LINE Bot 只能使用預設回應
+- **錯誤訊息**：`連接 Ollama 失敗: [Errno 111] Connection refused`
+- **原因**：Docker 容器無法訪問主機上的 Ollama 服務
+
+#### 解決過程
+
+- **添加 Ollama Docker 服務**：在 `docker compose.yml` 中新增 `ollama` 容器服務
+
+  - 使用官方 `ollama/ollama:latest` 映像檔
+  - 配置端口映射 `11434:11434`
+  - 持久化存儲 `ollama_data` 卷宗
+  - 健康檢查確保服務正常運行
+
+- **環境變數配置**：
+
+  - 啟用 `OLLAMA_HOST=ollama`
+  - 啟用 `OLLAMA_PORT=11434`
+  - 支援容器間網路通信
+
+- **llm_service 兼容度優化**：
+  - 修改 `llm_service.py` 支援動態 Ollama 主機配置
+  - Docker 環境自動使用容器服務：`http://ollama:11434`
+  - 本地環境自動使用預設配置：`localhost:11434`
+  - 向下兼容，不影響現有開發流程
+
+### **服務架構優化**
+
+- **容器化 LLM 服務**：Ollama 服務容器化，避免主機依賴
+- **網路隔離**：所有服務運行在 `minicrm_network` 內部網路
+- **資料持久化**：Ollama 模型資料使用 Docker Volume 持久化存儲
+
+### **Docker 環境啟動流程**
+
+1. 啟動所有服務：`docker compose up -d`
+2. 下載 LLM 模型(會自動下載)：`docker compose exec ollama ollama pull llama3`
+3. 檢查服務狀態：`docker compose logs ollama`
+4. 測試 LINE Bot RAG 功能
 
 ## [v2.0.5] - 2025-08-07
 
@@ -88,15 +138,11 @@
 - 優化 Text-to-SQL，提升 SQL 查詢生成的準確性和效率
   - 目前很容易無法辨別用戶的意圖
 
-## [v2.0.5] - 2025-08-03
-
-正式整合 RAG 系統至 LINE Bot，實現自然語言查詢和資料庫交互
-
 ## [v2.0.5] - 2025-08-02
 
 ### 恢復並擴展 RAG 系統的 SQL 查詢功能
 
-實現真實資料庫查詢功能，讓用戶可以透過自然語言查詢 FAQ、知識庫和客服工單的真實資料。
+開始開發真實 DB 查詢功能，讓用戶可以透過自然語言查詢 FAQ、知識庫和客服工單的真實資料。
 
 #### **核心功能恢復**
 

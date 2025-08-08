@@ -12,7 +12,21 @@ class OllamaLLMService:
     def __init__(self, model_name: str = "llama3", knowledge_base: Optional[CRMKnowledgeBase] = None):
         self.model_name = model_name
         self.knowledge_base = knowledge_base
-        self.client = ollama.Client()
+        
+        # 從環境變數讀取 Ollama 主機設定
+        import os
+        ollama_host = os.getenv('OLLAMA_HOST', 'localhost')
+        ollama_port = os.getenv('OLLAMA_PORT', '11434')
+        
+        if ollama_host != 'localhost':
+            # Docker 環境中使用容器名稱
+            base_url = f"http://{ollama_host}:{ollama_port}"
+            self.client = ollama.Client(host=base_url)
+            logger.info(f"使用 Docker Ollama 服務: {base_url}")
+        else:
+            # 本地環境使用預設設定
+            self.client = ollama.Client()
+            logger.info("使用本地 Ollama 服務")
         
         # 測試 Ollama 連接
         try:
