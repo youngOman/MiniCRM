@@ -130,11 +130,16 @@ class OllamaLLMService:
 
 **重要規則：**
 1. 只生成單表 SELECT 查詢，避免複雜的 JOIN
-2. 使用正確的表名和欄位名
+2. **嚴格使用提供的表名和欄位名，不要猜測**
 3. 表別名要簡單：如 faq, kb, ticket
 4. WHERE 條件要具體，不使用參數佔位符 ?
 5. 優先查詢 is_active = true 的記錄
 6. LIMIT 結果數量（通常 5-10 筆）
+
+**關鍵欄位對應：**
+- customer_service_faq 表：使用 question, answer (不是 title)
+- customer_service_knowledgebase 表：使用 title, content, summary
+- customer_service_serviceticket 表：使用 ticket_number, title, description
 
 **範例格式：**
 ```sql

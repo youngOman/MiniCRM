@@ -198,11 +198,15 @@ class CRMQueryEngine:
                 logger.warning(f"拒絕執行非 SELECT 語句: {sql_query}")
                 return None
             
-            # 安全檢查 2：禁止危險關鍵字
+            # 安全檢查 2：禁止危險關鍵字（使用完整單詞邊界匹配）
+            import re
             forbidden_keywords = ['DROP', 'DELETE', 'UPDATE', 'INSERT', 'ALTER', 'CREATE', 'TRUNCATE']
-            if any(keyword in sql_clean for keyword in forbidden_keywords):
-                logger.warning(f"拒絕執行包含危險關鍵字的 SQL: {sql_query}")
-                return None
+            for keyword in forbidden_keywords:
+                # 使用單詞邊界 \b 確保完整單詞匹配，避免誤判 created_at 中的 CREATE
+                pattern = r'\b' + keyword + r'\b'
+                if re.search(pattern, sql_clean, re.IGNORECASE):
+                    logger.warning(f"拒絕執行包含危險關鍵字 '{keyword}' 的 SQL: {sql_query}")
+                    return None
             
             # 使用 Django 的資料庫連接執行查詢
             with connection.cursor() as cursor:
@@ -362,6 +366,12 @@ class CRMQueryEngine:
                 "natural_query": "顯示所有常見問題",
                 "sql_query": "SELECT question, answer FROM customer_service_faq WHERE is_active = true ORDER BY is_featured DESC, sort_order ASC LIMIT 10",
                 "description": "顯示前10個常見問題"
+            },
+            {
+                "intent": "faq_query",
+                "natural_query": "列出常見問題清單",
+                "sql_query": "SELECT question, answer FROM customer_service_faq WHERE is_active = true ORDER BY view_count DESC LIMIT 5",
+                "description": "顯示最多人查看的常見問題"
             },
             
             # 知識庫靜態範例（保留用於理解）

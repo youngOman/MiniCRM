@@ -28,6 +28,13 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
+
+## [v2.1.0] - 2025-08-10
+
+1. SQL 中包含 ORDER BY `created_at DESC`，其中的 `CREATE` 字串被危險關鍵字檢查誤判，導致 SQL 查詢失敗
+   - 說明:
+   - query_engine 有限制 LLM 生成 `forbidden_keywords = ['DROP', 'DELETE', 'UPDATE', 'INSERT', 'ALTER', 'CREATE', 'TRUNCATE']` 的相關SQL，避免 SQL 注入攻擊
+
 ## [v2.1.0] - 2025-08-09
 
 目前容易無法正確生成正確的 SQL
