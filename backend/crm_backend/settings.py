@@ -35,7 +35,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-your-secret-key-here'
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1']
-ALLOWED_HOSTS = ['*'] 
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -104,6 +104,18 @@ WSGI_APPLICATION = 'crm_backend.wsgi.application'
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+# PostgreSQL 設定
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'minicrm',
+#         'USER': 'postgres',
+#         'PASSWORD': '你的密碼',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
 #     }
 # }
 
