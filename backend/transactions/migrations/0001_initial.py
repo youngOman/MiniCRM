@@ -6,43 +6,154 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('orders', '0001_initial'),
-        ('customers', '0001_initial'),
+        ("orders", "0001_initial"),
+        ("customers", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('transaction_id', models.CharField(editable=False, max_length=50, unique=True)),
-                ('transaction_type', models.CharField(choices=[('sale', 'Sale'), ('refund', 'Refund'), ('payment', 'Payment'), ('chargeback', 'Chargeback')], default='sale', max_length=20)),
-                ('payment_method', models.CharField(choices=[('credit_card', 'Credit Card'), ('debit_card', 'Debit Card'), ('paypal', 'PayPal'), ('stripe', 'Stripe'), ('cash', 'Cash'), ('check', 'Check'), ('bank_transfer', 'Bank Transfer'), ('other', 'Other')], default='credit_card', max_length=20)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('completed', 'Completed'), ('failed', 'Failed'), ('cancelled', 'Cancelled'), ('refunded', 'Refunded')], default='pending', max_length=20)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('fee_amount', models.DecimalField(decimal_places=2, default=0, max_digits=10)),
-                ('net_amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('currency', models.CharField(default='USD', max_length=3)),
-                ('gateway_transaction_id', models.CharField(blank=True, max_length=200, null=True)),
-                ('gateway_response', models.TextField(blank=True, null=True)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('notes', models.TextField(blank=True, null=True)),
-                ('processed_at', models.DateTimeField(blank=True, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_transactions', to=settings.AUTH_USER_MODEL)),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='customers.customer')),
-                ('order', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='transactions', to='orders.order')),
-                ('updated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='updated_transactions', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "transaction_id",
+                    models.CharField(editable=False, max_length=50, unique=True),
+                ),
+                (
+                    "transaction_type",
+                    models.CharField(
+                        choices=[
+                            ("sale", "Sale"),
+                            ("refund", "Refund"),
+                            ("payment", "Payment"),
+                            ("chargeback", "Chargeback"),
+                        ],
+                        default="sale",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "payment_method",
+                    models.CharField(
+                        choices=[
+                            ("credit_card", "Credit Card"),
+                            ("debit_card", "Debit Card"),
+                            ("paypal", "PayPal"),
+                            ("stripe", "Stripe"),
+                            ("cash", "Cash"),
+                            ("check", "Check"),
+                            ("bank_transfer", "Bank Transfer"),
+                            ("other", "Other"),
+                        ],
+                        default="credit_card",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("completed", "Completed"),
+                            ("failed", "Failed"),
+                            ("cancelled", "Cancelled"),
+                            ("refunded", "Refunded"),
+                        ],
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "fee_amount",
+                    models.DecimalField(decimal_places=2, default=0, max_digits=10),
+                ),
+                ("net_amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("currency", models.CharField(default="USD", max_length=3)),
+                (
+                    "gateway_transaction_id",
+                    models.CharField(blank=True, max_length=200, null=True),
+                ),
+                ("gateway_response", models.TextField(blank=True, null=True)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("notes", models.TextField(blank=True, null=True)),
+                ("processed_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="created_transactions",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="transactions",
+                        to="customers.customer",
+                    ),
+                ),
+                (
+                    "order",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="transactions",
+                        to="orders.order",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="updated_transactions",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'ordering': ['-created_at'],
-                'indexes': [models.Index(fields=['transaction_id'], name='transaction_transac_fee96f_idx'), models.Index(fields=['customer'], name='transaction_custome_a08692_idx'), models.Index(fields=['order'], name='transaction_order_i_0e7560_idx'), models.Index(fields=['status'], name='transaction_status_71abbb_idx'), models.Index(fields=['created_at'], name='transaction_created_67ce7b_idx'), models.Index(fields=['gateway_transaction_id'], name='transaction_gateway_a599e0_idx')],
+                "ordering": ["-created_at"],
+                "indexes": [
+                    models.Index(
+                        fields=["transaction_id"], name="transaction_transac_fee96f_idx"
+                    ),
+                    models.Index(
+                        fields=["customer"], name="transaction_custome_a08692_idx"
+                    ),
+                    models.Index(
+                        fields=["order"], name="transaction_order_i_0e7560_idx"
+                    ),
+                    models.Index(
+                        fields=["status"], name="transaction_status_71abbb_idx"
+                    ),
+                    models.Index(
+                        fields=["created_at"], name="transaction_created_67ce7b_idx"
+                    ),
+                    models.Index(
+                        fields=["gateway_transaction_id"],
+                        name="transaction_gateway_a599e0_idx",
+                    ),
+                ],
             },
         ),
     ]

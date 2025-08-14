@@ -8,20 +8,18 @@ from rest_framework_simplejwt.views import (
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    
+    path("admin/", admin.site.urls),
     # JWT Authentication endpoints
-    path('api/auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    
+    path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("api/auth/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # API endpoints
-    path('api/customers/', include('customers.urls')),
-    path('api/orders/', include('orders.urls')),
-    path('api/transactions/', include('transactions.urls')),
-    path('api/reports/', include('reports.urls')),
-    path('api/products/', include('products.urls')),
-    path('api/customer-service/', include('customer_service.urls')),
-    path('api/line-bot/', include('line_bot.urls')),
+    path("api/customers/", include("customers.urls")),
+    path("api/orders/", include("orders.urls")),
+    path("api/transactions/", include("transactions.urls")),
+    path("api/reports/", include("reports.urls")),
+    path("api/products/", include("products.urls")),
+    path("api/customer-service/", include("customer_service.urls")),
+    path("api/line-bot/", include("line_bot.urls")),
 ]
 
 if settings.DEBUG:

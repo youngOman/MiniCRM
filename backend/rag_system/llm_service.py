@@ -10,16 +10,21 @@ logger = logging.getLogger(__name__)
 class OllamaLLMService:
     """Ollama LLM 服務 - RAG 的生成部分"""
 
-    def __init__(self, model_name: str = "gpt-oss:20b", knowledge_base: Optional[CRMKnowledgeBase] = None):
+    def __init__(
+        self,
+        model_name: str = "gpt-oss:20b",
+        knowledge_base: Optional[CRMKnowledgeBase] = None,
+    ):
         self.model_name = model_name
         self.knowledge_base = knowledge_base
 
         # 從環境變數讀取 Ollama 主機設定
         import os
-        ollama_host = os.getenv('OLLAMA_HOST', 'localhost')
-        ollama_port = os.getenv('OLLAMA_PORT', '11434')
 
-        if ollama_host != 'localhost':
+        ollama_host = os.getenv("OLLAMA_HOST", "localhost")
+        ollama_port = os.getenv("OLLAMA_PORT", "11434")
+
+        if ollama_host != "localhost":
             # Docker 環境中使用容器名稱
             base_url = f"http://{ollama_host}:{ollama_port}"
             self.client = ollama.Client(host=base_url)
@@ -32,7 +37,9 @@ class OllamaLLMService:
         # 測試 Ollama 連接
         try:
             models = self.client.list()
-            logger.info(f"成功連接 Ollama，可用模型: {[m['name'] for m in models['models']]}")
+            logger.info(
+                f"成功連接 Ollama，可用模型: {[m['name'] for m in models['models']]}"
+            )
         except Exception as e:
             logger.error(f"連接 Ollama 失敗: {e}")
             raise
@@ -43,7 +50,9 @@ class OllamaLLMService:
         # RAG: 從知識庫檢索相似範例
         context = ""
         if self.knowledge_base:
-            similar_examples = self.knowledge_base.search_similar_examples(user_query, n_results=3)
+            similar_examples = self.knowledge_base.search_similar_examples(
+                user_query, n_results=3
+            )
             if similar_examples:
                 context = "參考範例:\n"
                 for i, ex in enumerate(similar_examples, 1):
@@ -76,15 +85,14 @@ class OllamaLLMService:
 
         try:
             response = self.client.chat(
-                model=self.model_name,
-                messages=[{"role": "user", "content": prompt}]
+                model=self.model_name, messages=[{"role": "user", "content": prompt}]
             )
 
-            content = response['message']['content']
+            content = response["message"]["content"]
 
             # 提取 JSON
-            json_start = content.find('{')
-            json_end = content.rfind('}') + 1
+            json_start = content.find("{")
+            json_end = content.rfind("}") + 1
             if json_start != -1 and json_end != -1:
                 result = json.loads(content[json_start:json_end])
                 logger.info(f"意圖分類: {result['intent']}")
@@ -105,14 +113,18 @@ class OllamaLLMService:
 
         if self.knowledge_base:
             # 獲取相關資料表結構
-            schemas = self.knowledge_base.search_relevant_schemas(user_query, n_results=3)
+            schemas = self.knowledge_base.search_relevant_schemas(
+                user_query, n_results=3
+            )
             if schemas:
                 schema_context = "相關資料表:\n"
                 for schema in schemas:
                     schema_context += f"{schema['schema_text']}\n"
 
             # 獲取類似查詢範例
-            examples = self.knowledge_base.search_similar_examples(user_query, n_results=2)
+            examples = self.knowledge_base.search_similar_examples(
+                user_query, n_results=2
+            )
             if examples:
                 example_context = "參考 SQL 範例:\n"
                 for ex in examples:
@@ -121,8 +133,8 @@ class OllamaLLMService:
 
         prompt = f"""你是 SQL 專家。根據用戶查詢生成簡單的 SELECT 語句。
                 用戶查詢: "{user_query}"
-                意圖: {intent_info['intent']}
-                關鍵字: {intent_info.get('entities', [])}
+                意圖: {intent_info["intent"]}
+                關鍵字: {intent_info.get("entities", [])}
 
                 {schema_context}
 
@@ -152,11 +164,10 @@ class OllamaLLMService:
 
         try:
             response = self.client.chat(
-                model=self.model_name,
-                messages=[{"role": "user", "content": prompt}]
+                model=self.model_name, messages=[{"role": "user", "content": prompt}]
             )
 
-            content = response['message']['content'].strip()
+            content = response["message"]["content"].strip()
 
             # 提取 SQL 語句
             sql = self._extract_sql(content)
@@ -175,53 +186,55 @@ class OllamaLLMService:
         import re
 
         # 方法 1: 尋找 ```sql 代碼塊
-        sql_pattern = r'```sql\s*(.*?)\s*```'
+        sql_pattern = r"```sql\s*(.*?)\s*```"
         match = re.search(sql_pattern, content, re.DOTALL | re.IGNORECASE)
         if match:
             return match.group(1).strip()
 
         # 方法 2: 尋找一般 ``` 代碼塊
-        code_pattern = r'```\s*(.*?)\s*```'
+        code_pattern = r"```\s*(.*?)\s*```"
         match = re.search(code_pattern, content, re.DOTALL)
         if match:
             sql_candidate = match.group(1).strip()
             # 檢查是否像 SQL
-            if sql_candidate.upper().startswith('SELECT'):
+            if sql_candidate.upper().startswith("SELECT"):
                 return sql_candidate
 
         # 方法 3: 尋找以 SELECT 開頭的行
-        lines = content.split('\n')
+        lines = content.split("\n")
         sql_lines = []
         collecting = False
 
         for line in lines:
             line = line.strip()
-            if line.upper().startswith('SELECT'):
+            if line.upper().startswith("SELECT"):
                 collecting = True
                 sql_lines.append(line)
             elif collecting:
-                if line.endswith(';') or line == '':
+                if line.endswith(";") or line == "":
                     sql_lines.append(line)
-                    if line.endswith(';'):
+                    if line.endswith(";"):
                         break
                 else:
                     sql_lines.append(line)
 
         if sql_lines:
-            sql = '\n'.join(sql_lines).strip()
-            if sql.endswith(';'):
+            sql = "\n".join(sql_lines).strip()
+            if sql.endswith(";"):
                 return sql
             else:
-                return sql + ';'
+                return sql + ";"
 
         # 方法 4: 最後嘗試找純 SQL（以 SELECT 開頭）
-        if content.upper().strip().startswith('SELECT'):
+        if content.upper().strip().startswith("SELECT"):
             return content.strip()
 
         logger.warning(f"無法從回應中提取 SQL: {content}")
         return ""
 
-    def generate_response(self, user_query: str, sql_result: List[Dict], sql_query: str = "") -> str:
+    def generate_response(
+        self, user_query: str, sql_result: List[Dict], sql_query: str = ""
+    ) -> str:
         """步驟3: 將查詢結果轉為自然語言回應"""
 
         # 限制結果避免過長
@@ -243,11 +256,10 @@ class OllamaLLMService:
 
         try:
             response = self.client.chat(
-                model=self.model_name,
-                messages=[{"role": "user", "content": prompt}]
+                model=self.model_name, messages=[{"role": "user", "content": prompt}]
             )
 
-            return response['message']['content'].strip()
+            return response["message"]["content"].strip()
 
         except Exception as e:
             logger.error(f"回應生成失敗: {e}")
@@ -257,26 +269,31 @@ class OllamaLLMService:
         """備用意圖分類"""
         query_lower = query.lower()
 
-        if any(word in query_lower for word in ['客戶', '顧客', 'customer']):
-            intent = 'customer_query'
-        elif any(word in query_lower for word in ['訂單', 'order']):
-            intent = 'order_query'
-        elif any(word in query_lower for word in ['產品', '商品', 'product']):
-            intent = 'product_query'
-        elif any(word in query_lower for word in ['faq', '常見問題', '問答']):
-            intent = 'faq_query'
-        elif any(word in query_lower for word in ['知識庫', '知識', '文章', 'knowledge']):
-            intent = 'knowledge_base_query'
-        elif any(word in query_lower for word in ['工單', '客服', '服務', 'ticket', 'service']):
-            intent = 'ticket_management_query'
+        if any(word in query_lower for word in ["客戶", "顧客", "customer"]):
+            intent = "customer_query"
+        elif any(word in query_lower for word in ["訂單", "order"]):
+            intent = "order_query"
+        elif any(word in query_lower for word in ["產品", "商品", "product"]):
+            intent = "product_query"
+        elif any(word in query_lower for word in ["faq", "常見問題", "問答"]):
+            intent = "faq_query"
+        elif any(
+            word in query_lower for word in ["知識庫", "知識", "文章", "knowledge"]
+        ):
+            intent = "knowledge_base_query"
+        elif any(
+            word in query_lower
+            for word in ["工單", "客服", "服務", "ticket", "service"]
+        ):
+            intent = "ticket_management_query"
         else:
-            intent = 'general_info'
+            intent = "general_info"
 
         return {
             "intent": intent,
             "confidence": 0.6,
             "entities": [],
-            "reasoning": "關鍵字匹配"
+            "reasoning": "關鍵字匹配",
         }
 
     def _fallback_response(self, sql_result: List[Dict]) -> str:

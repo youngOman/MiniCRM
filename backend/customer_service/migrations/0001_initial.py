@@ -6,124 +6,420 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('customers', '0002_customer_age_customer_gender_and_more'),
+        ("customers", "0002_customer_age_customer_gender_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ServiceTicket',
+            name="ServiceTicket",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('ticket_number', models.CharField(max_length=20, unique=True, verbose_name='工單號碼')),
-                ('title', models.CharField(max_length=200, verbose_name='工單標題')),
-                ('description', models.TextField(verbose_name='問題描述')),
-                ('category', models.CharField(choices=[('general', '一般諮詢'), ('technical', '技術問題'), ('billing', '計費問題'), ('product', '產品問題'), ('shipping', '物流問題'), ('return', '退換貨'), ('complaint', '客訴'), ('feature_request', '功能建議')], default='general', max_length=50, verbose_name='問題分類')),
-                ('priority', models.CharField(choices=[('low', '低'), ('medium', '中'), ('high', '高'), ('urgent', '緊急')], default='medium', max_length=20, verbose_name='優先級')),
-                ('status', models.CharField(choices=[('open', '開啟中'), ('in_progress', '處理中'), ('pending', '等待回應'), ('resolved', '已解決'), ('closed', '已關閉')], default='open', max_length=20, verbose_name='狀態')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='建立時間')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新時間')),
-                ('first_response_at', models.DateTimeField(blank=True, null=True, verbose_name='首次回應時間')),
-                ('resolved_at', models.DateTimeField(blank=True, null=True, verbose_name='解決時間')),
-                ('closed_at', models.DateTimeField(blank=True, null=True, verbose_name='關閉時間')),
-                ('tags', models.JSONField(blank=True, default=list, verbose_name='標籤')),
-                ('satisfaction_rating', models.IntegerField(blank=True, help_text='1-5分', null=True, verbose_name='滿意度評分')),
-                ('satisfaction_comment', models.TextField(blank=True, verbose_name='滿意度評語')),
-                ('assigned_to', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='assigned_tickets', to=settings.AUTH_USER_MODEL, verbose_name='負責人員')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='created_tickets', to=settings.AUTH_USER_MODEL, verbose_name='建立人員')),
-                ('customer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='service_tickets', to='customers.customer', verbose_name='客戶')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "ticket_number",
+                    models.CharField(
+                        max_length=20, unique=True, verbose_name="工單號碼"
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="工單標題")),
+                ("description", models.TextField(verbose_name="問題描述")),
+                (
+                    "category",
+                    models.CharField(
+                        choices=[
+                            ("general", "一般諮詢"),
+                            ("technical", "技術問題"),
+                            ("billing", "計費問題"),
+                            ("product", "產品問題"),
+                            ("shipping", "物流問題"),
+                            ("return", "退換貨"),
+                            ("complaint", "客訴"),
+                            ("feature_request", "功能建議"),
+                        ],
+                        default="general",
+                        max_length=50,
+                        verbose_name="問題分類",
+                    ),
+                ),
+                (
+                    "priority",
+                    models.CharField(
+                        choices=[
+                            ("low", "低"),
+                            ("medium", "中"),
+                            ("high", "高"),
+                            ("urgent", "緊急"),
+                        ],
+                        default="medium",
+                        max_length=20,
+                        verbose_name="優先級",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("open", "開啟中"),
+                            ("in_progress", "處理中"),
+                            ("pending", "等待回應"),
+                            ("resolved", "已解決"),
+                            ("closed", "已關閉"),
+                        ],
+                        default="open",
+                        max_length=20,
+                        verbose_name="狀態",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="建立時間"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="更新時間"),
+                ),
+                (
+                    "first_response_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="首次回應時間"
+                    ),
+                ),
+                (
+                    "resolved_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="解決時間"
+                    ),
+                ),
+                (
+                    "closed_at",
+                    models.DateTimeField(
+                        blank=True, null=True, verbose_name="關閉時間"
+                    ),
+                ),
+                (
+                    "tags",
+                    models.JSONField(blank=True, default=list, verbose_name="標籤"),
+                ),
+                (
+                    "satisfaction_rating",
+                    models.IntegerField(
+                        blank=True,
+                        help_text="1-5分",
+                        null=True,
+                        verbose_name="滿意度評分",
+                    ),
+                ),
+                (
+                    "satisfaction_comment",
+                    models.TextField(blank=True, verbose_name="滿意度評語"),
+                ),
+                (
+                    "assigned_to",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="assigned_tickets",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="負責人員",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="created_tickets",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="建立人員",
+                    ),
+                ),
+                (
+                    "customer",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="service_tickets",
+                        to="customers.customer",
+                        verbose_name="客戶",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '客服工單',
-                'verbose_name_plural': '客服工單',
-                'ordering': ['-created_at'],
+                "verbose_name": "客服工單",
+                "verbose_name_plural": "客服工單",
+                "ordering": ["-created_at"],
             },
         ),
         migrations.CreateModel(
-            name='ServiceNote',
+            name="ServiceNote",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField(verbose_name='記錄內容')),
-                ('note_type', models.CharField(choices=[('internal', '內部備註'), ('customer', '客戶回應'), ('system', '系統記錄'), ('resolution', '解決方案')], default='internal', max_length=20, verbose_name='記錄類型')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='記錄時間')),
-                ('is_visible_to_customer', models.BooleanField(default=False, verbose_name='客戶可見')),
-                ('attachments', models.JSONField(blank=True, default=list, verbose_name='附件')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='記錄人員')),
-                ('ticket', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notes', to='customer_service.serviceticket', verbose_name='工單')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField(verbose_name="記錄內容")),
+                (
+                    "note_type",
+                    models.CharField(
+                        choices=[
+                            ("internal", "內部備註"),
+                            ("customer", "客戶回應"),
+                            ("system", "系統記錄"),
+                            ("resolution", "解決方案"),
+                        ],
+                        default="internal",
+                        max_length=20,
+                        verbose_name="記錄類型",
+                    ),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="記錄時間"),
+                ),
+                (
+                    "is_visible_to_customer",
+                    models.BooleanField(default=False, verbose_name="客戶可見"),
+                ),
+                (
+                    "attachments",
+                    models.JSONField(blank=True, default=list, verbose_name="附件"),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="記錄人員",
+                    ),
+                ),
+                (
+                    "ticket",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="notes",
+                        to="customer_service.serviceticket",
+                        verbose_name="工單",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '客服記錄',
-                'verbose_name_plural': '客服記錄',
-                'ordering': ['created_at'],
+                "verbose_name": "客服記錄",
+                "verbose_name_plural": "客服記錄",
+                "ordering": ["created_at"],
             },
         ),
         migrations.CreateModel(
-            name='KnowledgeBaseCategory',
+            name="KnowledgeBaseCategory",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100, verbose_name='分類名稱')),
-                ('description', models.TextField(blank=True, verbose_name='分類描述')),
-                ('sort_order', models.IntegerField(default=0, verbose_name='排序')),
-                ('is_active', models.BooleanField(default=True, verbose_name='是否啟用')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='建立時間')),
-                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='customer_service.knowledgebasecategory', verbose_name='上級分類')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100, verbose_name="分類名稱")),
+                ("description", models.TextField(blank=True, verbose_name="分類描述")),
+                ("sort_order", models.IntegerField(default=0, verbose_name="排序")),
+                (
+                    "is_active",
+                    models.BooleanField(default=True, verbose_name="是否啟用"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="建立時間"),
+                ),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="children",
+                        to="customer_service.knowledgebasecategory",
+                        verbose_name="上級分類",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '知識庫分類',
-                'verbose_name_plural': '知識庫分類',
-                'ordering': ['sort_order', 'name'],
+                "verbose_name": "知識庫分類",
+                "verbose_name_plural": "知識庫分類",
+                "ordering": ["sort_order", "name"],
             },
         ),
         migrations.CreateModel(
-            name='KnowledgeBase',
+            name="KnowledgeBase",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, verbose_name='標題')),
-                ('content', models.TextField(verbose_name='內容')),
-                ('summary', models.CharField(blank=True, max_length=500, verbose_name='摘要')),
-                ('content_type', models.CharField(choices=[('faq', 'FAQ'), ('guide', '操作指南'), ('policy', '政策說明'), ('troubleshooting', '故障排除'), ('sop', 'SOP 標準作業程序')], default='faq', max_length=20, verbose_name='內容類型')),
-                ('tags', models.JSONField(blank=True, default=list, verbose_name='標籤')),
-                ('is_public', models.BooleanField(default=True, verbose_name='公開可見')),
-                ('is_featured', models.BooleanField(default=False, verbose_name='精選文章')),
-                ('is_active', models.BooleanField(default=True, verbose_name='是否啟用')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='建立時間')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新時間')),
-                ('view_count', models.IntegerField(default=0, verbose_name='查看次數')),
-                ('helpful_count', models.IntegerField(default=0, verbose_name='有用次數')),
-                ('not_helpful_count', models.IntegerField(default=0, verbose_name='無用次數')),
-                ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='customer_service.knowledgebasecategory', verbose_name='分類')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='knowledge_articles', to=settings.AUTH_USER_MODEL, verbose_name='建立人員')),
-                ('updated_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='updated_knowledge_articles', to=settings.AUTH_USER_MODEL, verbose_name='更新人員')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=200, verbose_name="標題")),
+                ("content", models.TextField(verbose_name="內容")),
+                (
+                    "summary",
+                    models.CharField(blank=True, max_length=500, verbose_name="摘要"),
+                ),
+                (
+                    "content_type",
+                    models.CharField(
+                        choices=[
+                            ("faq", "FAQ"),
+                            ("guide", "操作指南"),
+                            ("policy", "政策說明"),
+                            ("troubleshooting", "故障排除"),
+                            ("sop", "SOP 標準作業程序"),
+                        ],
+                        default="faq",
+                        max_length=20,
+                        verbose_name="內容類型",
+                    ),
+                ),
+                (
+                    "tags",
+                    models.JSONField(blank=True, default=list, verbose_name="標籤"),
+                ),
+                (
+                    "is_public",
+                    models.BooleanField(default=True, verbose_name="公開可見"),
+                ),
+                (
+                    "is_featured",
+                    models.BooleanField(default=False, verbose_name="精選文章"),
+                ),
+                (
+                    "is_active",
+                    models.BooleanField(default=True, verbose_name="是否啟用"),
+                ),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="建立時間"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="更新時間"),
+                ),
+                ("view_count", models.IntegerField(default=0, verbose_name="查看次數")),
+                (
+                    "helpful_count",
+                    models.IntegerField(default=0, verbose_name="有用次數"),
+                ),
+                (
+                    "not_helpful_count",
+                    models.IntegerField(default=0, verbose_name="無用次數"),
+                ),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="customer_service.knowledgebasecategory",
+                        verbose_name="分類",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="knowledge_articles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="建立人員",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="updated_knowledge_articles",
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="更新人員",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '知識庫文章',
-                'verbose_name_plural': '知識庫文章',
-                'ordering': ['-updated_at'],
+                "verbose_name": "知識庫文章",
+                "verbose_name_plural": "知識庫文章",
+                "ordering": ["-updated_at"],
             },
         ),
         migrations.CreateModel(
-            name='FAQ',
+            name="FAQ",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('question', models.CharField(max_length=300, verbose_name='問題')),
-                ('answer', models.TextField(verbose_name='答案')),
-                ('is_active', models.BooleanField(default=True, verbose_name='是否啟用')),
-                ('is_featured', models.BooleanField(default=False, verbose_name='是否置頂')),
-                ('sort_order', models.IntegerField(default=0, verbose_name='排序')),
-                ('view_count', models.IntegerField(default=0, verbose_name='查看次數')),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='建立時間')),
-                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='更新時間')),
-                ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='customer_service.knowledgebasecategory', verbose_name='分類')),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='建立人員')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("question", models.CharField(max_length=300, verbose_name="問題")),
+                ("answer", models.TextField(verbose_name="答案")),
+                (
+                    "is_active",
+                    models.BooleanField(default=True, verbose_name="是否啟用"),
+                ),
+                (
+                    "is_featured",
+                    models.BooleanField(default=False, verbose_name="是否置頂"),
+                ),
+                ("sort_order", models.IntegerField(default=0, verbose_name="排序")),
+                ("view_count", models.IntegerField(default=0, verbose_name="查看次數")),
+                (
+                    "created_at",
+                    models.DateTimeField(auto_now_add=True, verbose_name="建立時間"),
+                ),
+                (
+                    "updated_at",
+                    models.DateTimeField(auto_now=True, verbose_name="更新時間"),
+                ),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="customer_service.knowledgebasecategory",
+                        verbose_name="分類",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name="建立人員",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': '常見問題',
-                'verbose_name_plural': '常見問題',
-                'ordering': ['-is_featured', 'sort_order', 'question'],
+                "verbose_name": "常見問題",
+                "verbose_name_plural": "常見問題",
+                "ordering": ["-is_featured", "sort_order", "question"],
             },
         ),
     ]
