@@ -1,36 +1,37 @@
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Count, Sum, Q, F
-from django.db.models.functions import Coalesce
 from decimal import Decimal
 
+from django.db.models import Count, F, Q, Sum
+from django.db.models.functions import Coalesce
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+
 from .models import (
-    Category,
     Brand,
-    Supplier,
+    Category,
+    Inventory,
+    PriceHistory,
     Product,
     ProductVariant,
-    Inventory,
     StockMovement,
-    PriceHistory,
+    Supplier,
 )
 from .serializers import (
-    CategorySerializer,
     BrandSerializer,
-    SupplierSerializer,
-    ProductListSerializer,
-    ProductDetailSerializer,
-    ProductCreateUpdateSerializer,
-    ProductVariantSerializer,
-    InventorySerializer,
-    StockMovementSerializer,
-    PriceHistorySerializer,
-    ProductStatsSerializer,
+    CategorySerializer,
     CategoryStatsSerializer,
     InventoryAlertSerializer,
+    InventorySerializer,
+    PriceHistorySerializer,
+    ProductCreateUpdateSerializer,
+    ProductDetailSerializer,
+    ProductListSerializer,
+    ProductStatsSerializer,
+    ProductVariantSerializer,
+    StockMovementSerializer,
+    SupplierSerializer,
 )
 
 
@@ -133,10 +134,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ProductListSerializer
-        elif self.action in ["create", "update", "partial_update"]:
+        if self.action in ["create", "update", "partial_update"]:
             return ProductCreateUpdateSerializer
-        else:
-            return ProductDetailSerializer
+        return ProductDetailSerializer
 
     @action(detail=True, methods=["get"])
     def variants(self, request, pk=None):

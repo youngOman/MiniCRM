@@ -1,14 +1,15 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
 from .views import (
-    CategoryViewSet,
     BrandViewSet,
-    SupplierViewSet,
-    ProductViewSet,
-    ProductVariantViewSet,
+    CategoryViewSet,
     InventoryViewSet,
-    StockMovementViewSet,
     PriceHistoryViewSet,
+    ProductVariantViewSet,
+    ProductViewSet,
+    StockMovementViewSet,
+    SupplierViewSet,
 )
 
 router = DefaultRouter()

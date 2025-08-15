@@ -6,16 +6,18 @@
 
 import os
 import sys
-import django
 from pathlib import Path
+
+import django
 
 # 設定 Django 環境
 sys.path.append(str(Path(__file__).parent))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "crm_backend.settings")
 django.setup()
 
-from rag_system.knowledge_base import CRMKnowledgeBase
 import logging
+
+from rag_system.knowledge_base import CRMKnowledgeBase
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

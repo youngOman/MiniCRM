@@ -1,10 +1,11 @@
 from django.contrib import admin
+
 from .models import (
-    ServiceTicket,
-    ServiceNote,
+    FAQ,
     KnowledgeBase,
     KnowledgeBaseCategory,
-    FAQ,
+    ServiceNote,
+    ServiceTicket,
 )
 
 

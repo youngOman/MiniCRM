@@ -1,13 +1,13 @@
+from datetime import datetime, timedelta
+
+from customers.models import Customer
+from django.db.models import Avg, Count, DecimalField, F, Q, Sum, Value
+from django.db.models.functions import Coalesce, TruncDate, TruncMonth, TruncYear
+from django.utils import timezone
+from orders.models import Order
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.db.models import Count, Sum, Avg, Q, F, DecimalField, Value
-from django.db.models.functions import TruncDate, TruncMonth, TruncYear, Coalesce
-from django.utils import timezone
-from datetime import datetime, timedelta
-from decimal import Decimal
-from customers.models import Customer
-from orders.models import Order
 from transactions.models import Transaction
 
 
@@ -559,14 +559,13 @@ def customer_demographics_analytics(request):
     def get_customer_tier(total_spent, total_orders):
         if total_spent >= 60000:
             return "白金客戶"
-        elif total_spent >= 20000 and total_orders >= 1:
+        if total_spent >= 20000 and total_orders >= 1:
             return "黃金客戶"
-        elif total_spent >= 5000 and total_orders >= 2:
+        if total_spent >= 5000 and total_orders >= 2:
             return "白銀客戶"
-        elif total_spent > 0 and total_orders >= 1:
+        if total_spent > 0 and total_orders >= 1:
             return "一般客戶"
-        else:
-            return "潛在客戶"
+        return "潛在客戶"
 
     for customer in customers_qs.filter(age__isnull=False)[
         :100
@@ -689,7 +688,6 @@ def calculate_avg_clv(customers_qs):
     4. 平均顧客壽命 = 每位顧客的消費時間長度 ÷ 顧客數
     5. CLV = 顧客價值 × 平均顧客壽命
     """
-    from datetime import date
 
     customers_with_orders = customers_qs.filter(orders__isnull=False).distinct()
 
@@ -750,7 +748,7 @@ def calculate_avg_clv(customers_qs):
     clv = customer_value * avg_customer_lifespan_years
 
     # Debug: 列印計算過程，幫助診斷問題
-    print(f"DEBUG CLV 計算過程:")
+    print("DEBUG CLV 計算過程:")
     print(f"  客戶數: {customers_with_orders.count()}")
     print(f"  總營收: ${total_revenue:,.2f}")
     print(f"  總訂單數: {total_orders}")
@@ -770,7 +768,6 @@ def calculate_avg_purchase_frequency(customers_qs):
     """
     計算平均購買頻率（每月訂單數）
     """
-    from django.db.models import Count
     from datetime import date
 
     # 計算有訂單的客戶數和總訂單數
@@ -812,7 +809,7 @@ def customer_clv_analytics(request):
     """
     客戶生命週期價值 (CLV) 專門分析
     """
-    from django.db.models import Min, Max
+    from django.db.models import Max, Min
 
     # 取得篩選參數
     date_from = request.GET.get("date_from")
@@ -904,10 +901,9 @@ def customer_clv_analytics(request):
                 if clv >= min_clv:
                     segment_customers.append(customer_id)
                     segment_total_value += clv
-            else:
-                if min_clv <= clv < max_clv:
-                    segment_customers.append(customer_id)
-                    segment_total_value += clv
+            elif min_clv <= clv < max_clv:
+                segment_customers.append(customer_id)
+                segment_total_value += clv
 
         count = len(segment_customers)
         total_customers_with_orders = len(customer_clv_dict)

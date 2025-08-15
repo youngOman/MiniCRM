@@ -1,12 +1,13 @@
-from rest_framework import viewsets, filters, status
+from django.db.models import Count, DecimalField, Sum, Value
+from django.db.models.functions import Coalesce
+from django_filters import rest_framework as filters_drf
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from django_filters import rest_framework as filters_drf
-from django.db.models import Sum, Count, Value, DecimalField
-from django.db.models.functions import Coalesce
+
 from .models import Customer
-from .serializers import CustomerSerializer, CustomerCreateUpdateSerializer
+from .serializers import CustomerCreateUpdateSerializer, CustomerSerializer
 
 
 # 多新增一個篩選器，讓使用者可以根據創建日期範圍來過濾客戶資料

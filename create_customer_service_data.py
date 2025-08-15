@@ -5,23 +5,24 @@
 使用直接 MySQL 連接，參考 create_enhanced_dummy_data 的做法
 """
 
-import pymysql
+import json
 import os
+import pathlib
 import random
 from datetime import datetime, timedelta
-from decimal import Decimal
+
+import pymysql
 from dotenv import load_dotenv
-import json
 
 # Load environment variables
-env_path = os.path.join(os.path.dirname(__file__), ".env")
+env_path = os.path.join(pathlib.Path(__file__).parent, ".env")
 print(f"🔍 載入環境變數檔案: {env_path}")
 load_dotenv(env_path, override=True)
 
 # 調試環境變數
 print(f"🔍 DB_HOST 原始值: '{os.getenv('DB_HOST')}'")
 print(f"🔍 DB_HOST 長度: {len(os.getenv('DB_HOST', ''))}")
-print(f"🔍 DB_HOST repr: {repr(os.getenv('DB_HOST'))}")
+print(f"🔍 DB_HOST repr: {os.getenv('DB_HOST')!r}")
 
 # 清理 DB_HOST (移除可能的空格和註解)
 db_host_raw = os.getenv("DB_HOST", "localhost")
@@ -786,7 +787,7 @@ class CustomerServiceDataGenerator:
 
             print("=" * 50)
             print("✅ 所有測試資料創建完成！")
-            print(f"📊 統計資料：")
+            print("📊 統計資料：")
 
             # 統計實際數據
             self.cursor.execute("SELECT COUNT(*) FROM customers_customer")

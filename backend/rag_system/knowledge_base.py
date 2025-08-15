@@ -1,13 +1,14 @@
-import os
 import json
+import os
 
 # 必須在 import chromadb 之前設定
 os.environ["ANONYMIZED_TELEMETRY"] = "False"
 
+import logging
+from typing import Any
+
 import chromadb
 from sentence_transformers import SentenceTransformer
-from typing import List, Dict, Any
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class CRMKnowledgeBase:
         except:
             return self.client.create_collection(name)  # 如果不存在則創建新的集合
 
-    def add_schema_info(self, table_name: str, schema_info: Dict[str, Any]):
+    def add_schema_info(self, table_name: str, schema_info: dict[str, Any]):
         """
         添加資料表 schema 資訊
         將資料表結構轉換為可搜尋的向量
@@ -94,7 +95,7 @@ class CRMKnowledgeBase:
 
     def search_similar_examples(
         self, query: str, n_results: int = 3
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         搜尋相似的查詢範例
 
@@ -145,7 +146,7 @@ class CRMKnowledgeBase:
 
     def search_relevant_schemas(
         self, query: str, n_results: int = 5
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         搜尋相關的資料表 schema
 
@@ -177,7 +178,7 @@ class CRMKnowledgeBase:
 
         return schemas
 
-    def _format_schema_text(self, table_name: str, schema_info: Dict[str, Any]) -> str:
+    def _format_schema_text(self, table_name: str, schema_info: dict[str, Any]) -> str:
         """
         格式化 schema 資訊為文本
 

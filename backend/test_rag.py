@@ -10,14 +10,16 @@ RAG 系統測試腳本
 
 import os
 import sys
+
 import django
 
 # 設定 Django 環境
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "crm_backend.settings")
 django.setup()
 
-from rag_system.query_engine import CRMQueryEngine
 import logging
+
+from rag_system.query_engine import CRMQueryEngine
 
 # 設定日誌級別
 logging.basicConfig(level=logging.INFO)

@@ -1,30 +1,29 @@
-from rest_framework import viewsets, status, filters
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Q, Count, F
+from django.db.models import Count, F, Q
 from django.utils import timezone
-from datetime import timedelta
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from .models import (
-    ServiceTicket,
-    ServiceNote,
+    FAQ,
     KnowledgeBase,
     KnowledgeBaseCategory,
-    FAQ,
+    ServiceNote,
+    ServiceTicket,
 )
 from .serializers import (
-    ServiceTicketListSerializer,
-    ServiceTicketDetailSerializer,
-    ServiceTicketCreateUpdateSerializer,
-    ServiceNoteSerializer,
-    KnowledgeBaseListSerializer,
-    KnowledgeBaseDetailSerializer,
-    KnowledgeBaseCreateUpdateSerializer,
-    KnowledgeBaseCategorySerializer,
-    FAQSerializer,
     FAQCreateUpdateSerializer,
+    FAQSerializer,
+    KnowledgeBaseCategorySerializer,
+    KnowledgeBaseCreateUpdateSerializer,
+    KnowledgeBaseDetailSerializer,
+    KnowledgeBaseListSerializer,
+    ServiceNoteSerializer,
+    ServiceTicketCreateUpdateSerializer,
+    ServiceTicketDetailSerializer,
+    ServiceTicketListSerializer,
 )
 
 
@@ -57,10 +56,9 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ServiceTicketListSerializer
-        elif self.action in ["create", "update", "partial_update"]:
+        if self.action in ["create", "update", "partial_update"]:
             return ServiceTicketCreateUpdateSerializer
-        else:
-            return ServiceTicketDetailSerializer
+        return ServiceTicketDetailSerializer
 
     @action(detail=True, methods=["post"])
     def add_note(self, request, pk=None):
@@ -240,10 +238,9 @@ class KnowledgeBaseViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return KnowledgeBaseListSerializer
-        elif self.action in ["create", "update", "partial_update"]:
+        if self.action in ["create", "update", "partial_update"]:
             return KnowledgeBaseCreateUpdateSerializer
-        else:
-            return KnowledgeBaseDetailSerializer
+        return KnowledgeBaseDetailSerializer
 
     def retrieve(self, request, *args, **kwargs):
         """獲取詳情時增加瀏覽次數"""
@@ -322,8 +319,7 @@ class FAQViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ["create", "update", "partial_update"]:
             return FAQCreateUpdateSerializer
-        else:
-            return FAQSerializer
+        return FAQSerializer
 
     def retrieve(self, request, *args, **kwargs):
         """獲取詳情時增加瀏覽次數"""

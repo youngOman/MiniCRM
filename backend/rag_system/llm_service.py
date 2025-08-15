@@ -1,7 +1,9 @@
-import ollama
 import json
 import logging
-from typing import Dict, List, Any, Optional
+from typing import Any
+
+import ollama
+
 from .knowledge_base import CRMKnowledgeBase
 
 logger = logging.getLogger(__name__)
@@ -13,7 +15,7 @@ class OllamaLLMService:
     def __init__(
         self,
         model_name: str = "gpt-oss:20b",
-        knowledge_base: Optional[CRMKnowledgeBase] = None,
+        knowledge_base: CRMKnowledgeBase | None = None,
     ):
         self.model_name = model_name
         self.knowledge_base = knowledge_base
@@ -44,7 +46,7 @@ class OllamaLLMService:
             logger.error(f"連接 Ollama 失敗: {e}")
             raise
 
-    def classify_intent(self, user_query: str) -> Dict[str, Any]:
+    def classify_intent(self, user_query: str) -> dict[str, Any]:
         """步驟1: 分類用戶意圖"""
 
         # RAG: 從知識庫檢索相似範例
@@ -97,14 +99,13 @@ class OllamaLLMService:
                 result = json.loads(content[json_start:json_end])
                 logger.info(f"意圖分類: {result['intent']}")
                 return result
-            else:
-                return self._fallback_intent(user_query)
+            return self._fallback_intent(user_query)
 
         except Exception as e:
             logger.error(f"意圖分類失敗: {e}")
             return self._fallback_intent(user_query)
 
-    def generate_sql(self, user_query: str, intent_info: Dict[str, Any]) -> str:
+    def generate_sql(self, user_query: str, intent_info: dict[str, Any]) -> str:
         """步驟2: 生成 SQL 查詢"""
 
         # RAG: 檢索相關的 schema 和範例
@@ -222,8 +223,7 @@ class OllamaLLMService:
             sql = "\n".join(sql_lines).strip()
             if sql.endswith(";"):
                 return sql
-            else:
-                return sql + ";"
+            return sql + ";"
 
         # 方法 4: 最後嘗試找純 SQL（以 SELECT 開頭）
         if content.upper().strip().startswith("SELECT"):
@@ -233,7 +233,7 @@ class OllamaLLMService:
         return ""
 
     def generate_response(
-        self, user_query: str, sql_result: List[Dict], sql_query: str = ""
+        self, user_query: str, sql_result: list[dict], sql_query: str = ""
     ) -> str:
         """步驟3: 將查詢結果轉為自然語言回應"""
 
@@ -265,7 +265,7 @@ class OllamaLLMService:
             logger.error(f"回應生成失敗: {e}")
             return self._fallback_response(sql_result)
 
-    def _fallback_intent(self, query: str) -> Dict[str, Any]:
+    def _fallback_intent(self, query: str) -> dict[str, Any]:
         """備用意圖分類"""
         query_lower = query.lower()
 
@@ -296,7 +296,7 @@ class OllamaLLMService:
             "reasoning": "關鍵字匹配",
         }
 
-    def _fallback_response(self, sql_result: List[Dict]) -> str:
+    def _fallback_response(self, sql_result: list[dict]) -> str:
         """備用回應"""
         if not sql_result:
             return "抱歉，沒有找到符合的資料。"

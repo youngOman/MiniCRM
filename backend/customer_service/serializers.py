@@ -1,13 +1,14 @@
-from rest_framework import serializers
+from customers.serializers import CustomerSerializer
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 from .models import (
-    ServiceTicket,
-    ServiceNote,
+    FAQ,
     KnowledgeBase,
     KnowledgeBaseCategory,
-    FAQ,
+    ServiceNote,
+    ServiceTicket,
 )
-from customers.serializers import CustomerSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):

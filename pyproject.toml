@@ -1,0 +1,83 @@
+[project]
+name = "minicrm"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.2.5",
+]
+
+
+## ruff
+# <https://docs.astral.sh/ruff/settings/>
+[tool.ruff]
+required-version = ">=0.12.1"
+target-version = "py313"
+output-format = "concise"
+show-fixes = true
+line-length = 88
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]
+exclude = ["playground/*.py"]
+
+ignore = [
+    ### Intentionally disabled
+    "E501",   # line-too-long (format 會自動處理)
+    "COM819", # prohibited-trailing-commas (與 ruff format 同時使用時候，執行順序將影響結果)
+    "COM812", # missing-trailing-comma (會與 ruff format 衝突)
+
+    "S101",   # assert  (不允許使用 assert)
+    "RUF001", # ambiguous-unicode-character-string (不要使用不明確的 Unicode 字元)
+    "RUF002", # ambiguous-unicode-character-docstring (不要使用不明確的 Unicode 字元)
+    "RUF003", # ambiguous-unicode-character-comment (不要使用不明確的 Unicode 字元)
+    "D415",   # ends-in-punctuation (註釋結尾應該有標點符號)
+    "TD001",  # invalid-todo-tag (禁止使用 TODO 以外的 tag)
+    "FIX001", # line-contains-fixme (註釋包含 FIXME)
+    "FIX002", # flake8-fixme (註釋包含 TODO)
+
+    "B008",   # unction-call-in-default-argument (不要在默認參數中調用函數)
+    "FBT",    # flake8-boolean-trap (不要使用 True/False 作為函數的位置參數)
+    "SIM117", # multiple-with-statements (不要使用嵌套 with)
+    "EM",     # flake8-errmsg (錯誤訊息字串要先分配給變數)
+    "TRY003", # raise-vanilla-args (自定義例外包含額外的長訊息)
+    "TRY400", # error-instead-of-exception (logging 應該用 exception 取代 error)
+
+    "D", 
+
+    ### preview
+    "DOC",    # pydoclint (docstring 需要完整寫出 return / yield / raise)
+    "T201",   # print (允許使用 print)
+    "S",
+    "CPY001", # missing-copyright-notice (缺少版權聲明)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/x_utils/*.py" = [
+    "T201", # print (允許使用 print)
+]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-type-checking]
+exempt-modules = [
+    "typing",
+    "typing_extensions",
+    "langchain_core.runnables.RunnableConfig",
+]
+
+[tool.ruff.lint.pylint]
+max-returns = 6     # default is 6
+max-branches = 12   # default is 12
+max-args = 6        # default is 5
+max-statements = 50 # default is 50
+
+[tool.ruff.format]
+docstring-code-format = true
+skip-magic-trailing-comma = false # 預設就是 false，當你想要消除尾隨逗號時候可以暫時開啟

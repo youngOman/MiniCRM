@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from .models import Transaction
 from customers.serializers import CustomerSerializer
+from rest_framework import serializers
+
+from .models import Transaction
 
 
 class TransactionSerializer(serializers.ModelSerializer):

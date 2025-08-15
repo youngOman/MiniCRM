@@ -1,7 +1,8 @@
 import logging
-from typing import Dict, List, Any, Optional
-from django.db import connection, transaction
-from django.conf import settings
+from typing import Any
+
+from django.db import connection
+
 from .knowledge_base import CRMKnowledgeBase
 from .llm_service import OllamaLLMService
 
@@ -25,7 +26,7 @@ class CRMQueryEngine:
         self.llm_service = OllamaLLMService(knowledge_base=self.knowledge_base)
         logger.info("CRM 查詢引擎初始化完成")
 
-    def process_query(self, user_query: str) -> Dict[str, Any]:
+    def process_query(self, user_query: str) -> dict[str, Any]:
         """
         處理用戶查詢的完整流程 - 這是對外的主要接口
 
@@ -64,14 +65,13 @@ class CRMQueryEngine:
             ]:
                 # SQL 查詢：查詢真實的 FAQ、知識庫、工單資料
                 return self._handle_sql_query(user_query, intent_info)
-            else:
-                # 不支援的查詢類型，引導用戶
-                return {
-                    "success": True,
-                    "response": "目前我只能協助您：\n1. FAQ 常見問題查詢\n2. 知識庫文章搜尋\n3. 客服工單查詢\n\n請問您需要哪種協助？",
-                    "intent": intent_info["intent"],
-                    "confidence": intent_info.get("confidence", 0),
-                }
+            # 不支援的查詢類型，引導用戶
+            return {
+                "success": True,
+                "response": "目前我只能協助您：\n1. FAQ 常見問題查詢\n2. 知識庫文章搜尋\n3. 客服工單查詢\n\n請問您需要哪種協助？",
+                "intent": intent_info["intent"],
+                "confidence": intent_info.get("confidence", 0),
+            }
 
         except Exception as e:
             logger.error(f"查詢處理失敗: {e}")
@@ -84,8 +84,8 @@ class CRMQueryEngine:
             }
 
     def _handle_sql_query(
-        self, user_query: str, intent_info: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, user_query: str, intent_info: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         處理需要執行 SQL 的查詢 (customer_query, order_query 等)
 
@@ -146,8 +146,8 @@ class CRMQueryEngine:
         }
 
     def _handle_non_sql_query(
-        self, user_query: str, intent_info: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, user_query: str, intent_info: dict[str, Any]
+    ) -> dict[str, Any]:
         """
         處理不需要執行 SQL 的查詢（FAQ、知識庫、客服工單管理等）
 
@@ -183,7 +183,7 @@ class CRMQueryEngine:
             "confidence": intent_info.get("confidence", 0),
         }
 
-    def _execute_sql(self, sql_query: str) -> Optional[List[Dict[str, Any]]]:
+    def _execute_sql(self, sql_query: str) -> list[dict[str, Any]] | None:
         """
         安全執行 SQL 查詢 - 這是系統安全的關鍵部分
 
@@ -238,7 +238,7 @@ class CRMQueryEngine:
                 # 轉換為字典列表格式 (更容易處理)
                 result = []
                 for row in rows:
-                    result.append(dict(zip(columns, row)))
+                    result.append(dict(zip(columns, row, strict=False)))
 
                 logger.info(f"SQL 執行成功，返回 {len(result)} 筆結果")
                 return result
@@ -273,7 +273,7 @@ class CRMQueryEngine:
                 # 只顯示 FAQ 相關的結果
                 if "faq" in example.get("intent", "").lower():
                     response += f"{i}. {example['natural_query']}\n"
-                    if "description" in example and example["description"]:
+                    if example.get("description"):
                         response += f"   答案：{example['description']}\n\n"
 
             # 如果沒有找到 FAQ 相關內容
@@ -309,7 +309,7 @@ class CRMQueryEngine:
             response = "以下是相關的知識庫內容：\n\n"
             for i, example in enumerate(examples, 1):
                 response += f"{i}. {example['natural_query']}\n"
-                if "description" in example and example["description"]:
+                if example.get("description"):
                     response += f"   說明：{example['description']}\n\n"
 
             return response.strip()
@@ -337,14 +337,13 @@ class CRMQueryEngine:
             if any(word in query_lower for word in ["建立", "新增", "創建"]):
                 return "您可以透過以下方式建立客服工單：\n1. 在系統中點選「新增工單」\n2. 填寫問題描述和聯絡資訊\n3. 選擇適當的問題分類\n4. 提交後會自動分配工單號碼"
 
-            elif any(word in query_lower for word in ["狀態", "進度", "查詢"]):
+            if any(word in query_lower for word in ["狀態", "進度", "查詢"]):
                 return "您可以通過工單號碼查詢工單狀態：\n- 開啟中：已收到您的工單\n- 處理中：客服正在處理\n- 等待回應：需要您提供更多資訊\n- 已解決：問題已處理完成"
 
-            elif any(word in query_lower for word in ["聯絡", "客服", "電話"]):
+            if any(word in query_lower for word in ["聯絡", "客服", "電話"]):
                 return "客服聯絡方式：\n- 系統內工單：隨時可建立\n- 緊急問題：請致電客服專線\n- 一般諮詢：透過 LINE 聯繫"
 
-            else:
-                return "關於客服工單，我可以幫您：\n1. 了解如何建立工單\n2. 查詢工單狀態\n3. 提供客服聯絡方式\n\n請告訴我您需要哪種協助？"
+            return "關於客服工單，我可以幫您：\n1. 了解如何建立工單\n2. 查詢工單狀態\n3. 提供客服聯絡方式\n\n請告訴我您需要哪種協助？"
 
         except Exception as e:
             logger.error(f"工單管理處理失敗: {e}")
@@ -584,7 +583,7 @@ class CRMQueryEngine:
         logger.info("客服資料表 schema 添加完成")
 
     def _check_static_response(
-        self, user_query: str, intent_info: Dict[str, Any]
+        self, user_query: str, intent_info: dict[str, Any]
     ) -> str:
         """
         檢查是否有靜態回應範例（無需 SQL 的直接回答）

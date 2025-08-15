@@ -1,7 +1,8 @@
-from django.db import models
-from django.contrib.auth.models import User
-from customers.models import Customer
 import uuid
+
+from customers.models import Customer
+from django.contrib.auth.models import User
+from django.db import models
 
 
 class Order(models.Model):

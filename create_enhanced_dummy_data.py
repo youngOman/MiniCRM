@@ -1,11 +1,12 @@
-import pymysql
-import os
 import json
-from decimal import Decimal
+import os
 import random
-from datetime import datetime, timedelta
-from dotenv import load_dotenv
 import re
+from datetime import datetime, timedelta
+from decimal import Decimal
+
+import pymysql
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
@@ -18,8 +19,7 @@ def generate_slug(text):
     # 將空格替換為破折號
     text = re.sub(r"[\s_-]+", "-", text)
     # 轉為小寫
-    text = text.lower().strip("-")
-    return text
+    return text.lower().strip("-")
 
 
 # MySQL connection configuration from environment variables
@@ -1033,7 +1033,7 @@ def create_enhanced_dummy_data():
                     ),
                 )
 
-        print(f"Created stock movements for products")
+        print("Created stock movements for products")
 
         # Insert sample orders with better date distribution
         order_insert_query = """
@@ -1204,7 +1204,7 @@ def create_enhanced_dummy_data():
 
         # Insert sample transactions
         transaction_insert_query = """
-        INSERT INTO transactions_transaction 
+        INSERT INTO transactions_transaction
         (transaction_id, customer_id, order_id, transaction_type, payment_method, status, amount, fee_amount, net_amount, currency, gateway_transaction_id, description, notes, processed_at, created_at, updated_at, created_by_id, updated_by_id) 
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """

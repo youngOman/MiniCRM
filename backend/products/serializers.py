@@ -1,13 +1,14 @@
 from rest_framework import serializers
+
 from .models import (
-    Category,
     Brand,
-    Supplier,
+    Category,
+    Inventory,
+    PriceHistory,
     Product,
     ProductVariant,
-    Inventory,
     StockMovement,
-    PriceHistory,
+    Supplier,
 )
 
 
@@ -228,10 +229,9 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
             # 更新時，排除當前實例
             if Product.objects.exclude(pk=self.instance.pk).filter(sku=value).exists():
                 raise serializers.ValidationError("此 SKU 已存在")
-        else:
-            # 建立時
-            if Product.objects.filter(sku=value).exists():
-                raise serializers.ValidationError("此 SKU 已存在")
+        # 建立時
+        elif Product.objects.filter(sku=value).exists():
+            raise serializers.ValidationError("此 SKU 已存在")
         return value
 
     def validate(self, data):

@@ -1,12 +1,10 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
-from django.utils.decorators import method_decorator
-from django.views import View
 import logging
 import os
 from pathlib import Path
+
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from dotenv import load_dotenv
 
 # 載入專案根目錄的 .env 檔案
@@ -14,31 +12,30 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # 回到專案根�
 ENV_FILE = PROJECT_ROOT / ".env"
 load_dotenv(ENV_FILE)
 
+import asyncio
+import threading
+import time
+
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import (
+    MessageAction,
     MessageEvent,
-    TextMessage,
-    TextSendMessage,
-    StickerMessage,
-    StickerSendMessage,
     QuickReply,
     QuickReplyButton,
-    MessageAction,
+    StickerMessage,
+    StickerSendMessage,
+    TextMessage,
+    TextSendMessage,
 )
 
 # LINE Bot SDK v3 for loading animation
 from linebot.v3.messaging import (
-    Configuration,
-    ApiClient,
-    MessagingApi,
     AsyncApiClient,
     AsyncMessagingApi,
+    Configuration,
     ShowLoadingAnimationRequest,
 )
-import asyncio
-import time
-import threading
 
 # 引入 RAG 系統
 from rag_system.query_engine import CRMQueryEngine
@@ -67,7 +64,7 @@ try:
     query_engine = CRMQueryEngine()
     logger.info("RAG 系統初始化成功")
 except Exception as e:
-    logger.error(f"RAG 系統初始化失敗: {str(e)}")
+    logger.error(f"RAG 系統初始化失敗: {e!s}")
     query_engine = None
 
 # 用戶處理狀態追蹤
@@ -114,7 +111,7 @@ def show_loading_animation_sync(user_id, loading_seconds=10):
     ).start()  # 使用 daemon=True 確保主執行緒結束時，此執行緒也會被強制結束
 
 
-def send_processing_message(reply_token, user_id):
+def send_processing_message(reply_token, user_id) -> None:
     """
     發送正在處理的文字訊息並顯示載入動畫
     """
@@ -199,8 +196,8 @@ def webhook(request):
         logger.error("無效的簽名")
         return HttpResponseBadRequest("Invalid signature")
     except Exception as e:
-        logger.error(f"處理 Webhook 時發生錯誤: {str(e)}")
-        return HttpResponseBadRequest(f"Error: {str(e)}")
+        logger.error(f"處理 Webhook 時發生錯誤: {e!s}")
+        return HttpResponseBadRequest(f"Error: {e!s}")
 
     return HttpResponse("OK")
 
@@ -243,7 +240,7 @@ def process_user_query_async(user_id, user_message, reply_token):
         logger.info(f"成功回覆訊息給使用者 {user_id}: {reply_message[:50]}...")
 
     except Exception as e:
-        logger.error(f"處理用戶查詢時發生錯誤: {str(e)}")
+        logger.error(f"處理用戶查詢時發生錯誤: {e!s}")
         error_message = (
             "🚫 系統發生錯誤，請稍後再試。\n\n如果問題持續存在，請聯繫客服人員。"
         )
@@ -256,7 +253,7 @@ def process_user_query_async(user_id, user_message, reply_token):
                 ),
             )
         except Exception as push_error:
-            logger.error(f"發送錯誤訊息失敗: {str(push_error)}")
+            logger.error(f"發送錯誤訊息失敗: {push_error!s}")
 
     finally:
         # 清除用戶處理狀態
