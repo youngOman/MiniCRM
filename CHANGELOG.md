@@ -12,8 +12,7 @@
 
 1. 即時更新：WebSocket 即時推送
 2. 匯出資料、匯出 PDF 報表
-3. 行銷管理 (Marketing Management)
-4. 在訂單管理介面，在訂單編輯頁面 新增 產品判斷若該產品沒有在 產品管理內，產品管理就會自動新增該產品
+3. 在訂單管理介面，在訂單編輯頁面 新增 產品判斷若該產品沒有在 產品管理內，產品管理就會自動新增該產品
    1. 用戶開始輸入 SKU → 即時搜索提示
    2. 找到產品 → 顯示產品資訊，確認添加
    3. 未找到產品 → 顯示「創建新產品」按鈕
@@ -27,6 +26,11 @@
 - AI 智慧分析、生成
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
+
+## [v3] - 2025-08-20
+
+1. 改用 `pyproject.toml` 來管理套件
+2. DB 改用 docker 的 PostgreSQL
 
 ## [v2.1.2] - 2025-08-12
 
@@ -48,7 +52,7 @@
 
 ### SQL 錯誤原因
 
-1.  錯誤：錯誤 SQL 語法
+1. 錯誤：錯誤 SQL 語法
 
     - LEFT JOIN customers ct ON kt.id = ? AND kt.category_id IN (...)
       SELECT fk.title FROM customer_service_knowledgebase faq_query WHERE
@@ -63,17 +67,18 @@
       5. 優先查詢 is_active = true 的記錄
       6. LIMIT 結果數量（通常 5-10 筆）
 
-2.  錯誤： LLM 回覆帶解釋文字，系統無法識別 SQL
-    - 原始回覆: "Here is the SELECT statement: `sql SELECT * FROM table; `
+2. 錯誤： LLM 回覆帶解釋文字，系統無法識別 SQL
+    - 原始回覆: "Here is the SELECT statement: `sql SELECT * FROM table;`
       Note that..."
     - 解決： `llm_service.py` 新增 \_extract_sql() 方法，支援多層解析
       - 解析 ```sql 程式碼塊
       - 解析一般 ``` 程式碼塊
       - 識別以 SELECT 開頭的行
       - 自動清理格式和添加分號
-3.  錯誤：「如何修改密碼」應該返回靜態回應，卻嘗試生成 SQL
+3. 錯誤：「如何修改密碼」應該返回靜態回應，卻嘗試生成 SQL
 
 - 解決方案： 新增靜態回應檢查 (靜態回應=預先寫好的固定答案，不需要查詢資料庫)
+
 - ```python
   def \_handle_sql_query():
   # 步驟 1: 先檢查靜態回應
@@ -83,6 +88,7 @@
   # 步驟 2: 沒有靜態回應才生成 SQL
   sql_query = self.llm_service.generate_sql(user_query, intent_info)
   ```
+
 - 關鍵邏輯：
   - 向量搜尋找到相似範例
   - 檢查 sql_query 是否為空
@@ -333,7 +339,7 @@
 
 ### 開發 query_engine.py，負責 RAG 系統的查詢處理和 SQL 執行，作為整個 RAG 系統的「大腦中樞」
 
-**query_engine 作為 RAG 系統協調器的角色**
+query_engine 作為 RAG 系統協調器的角色
 
 - 整合 knowledge_base (檢索) 和 llm_service (生成) 兩大組件
 - 提供統一的查詢入口點給 LINE Bot 使用
@@ -354,11 +360,10 @@
 - 非 SQL 查詢路徑：faq_query, knowledge_base_query, ticket_management_query
 - 根據意圖自動選擇最適合的處理方式
 
-3. **\_handle_sql_query()** - SQL 查詢處理流程
-
-- 調用 LLM 生成 SQL (含向量搜尋增強)
-- 安全執行 SQL 查詢
-- 將結果轉為自然語言回應
+1. **\_handle_sql_query()** - SQL 查詢處理流程
+   - 調用 LLM 生成 SQL (含向量搜尋增強)
+   - 安全執行 SQL 查詢
+   - 將結果轉為自然語言回應
 
 4. **\_handle_non_sql_query()** - 非 SQL 查詢處理
 
@@ -459,7 +464,7 @@
 
 **下載本地 LLM：**
 
-- Ollama llama3 模型：https://ollama.com/
+- Ollama llama3 模型：<https://ollama.com/>
 
 ## [v2.0.2] - 2025-07-26
 
@@ -636,23 +641,26 @@
 
 - 原因：錯誤地使用 `product.category.id` 而不是 `product.category`
 - 修復：根據後端實際資料格式修正
+
   ```javascript
   // 修復前
   category: product.category?.id?.toString() || "",
   // 修復後
   category: product.category?.toString() || "",
   ```
+
 - **後端返回資料格式**：
+
   ```json
   {
-  	"id": 1,
-  	"name": "產品名稱",
-  	"category": 186, // 直接是 ID 數值
-  	"category_name": "3C 配件",
-  	"brand": 205, // 直接是 ID 數值
-  	"brand_name": "Adidas",
-  	"supplier": 146, // 直接是 ID 數值
-  	"supplier_name": "亞洲科技供應商"
+   "id": 1,
+   "name": "產品名稱",
+   "category": 186, // 直接是 ID 數值
+   "category_name": "3C 配件",
+   "brand": 205, // 直接是 ID 數值
+   "brand_name": "Adidas",
+   "supplier": 146, // 直接是 ID 數值
+   "supplier_name": "亞洲科技供應商"
   }
   ```
 
@@ -736,14 +744,14 @@
 
 **產品管理系統開發**
 
-1.  產品管理 CRUD
+1. 產品管理 CRUD
     1. 產品 Form 表單頁面，編輯、新增
-2.  產品 detail 詳情頁面
+2. 產品 detail 詳情頁面
     - 基本資訊 Tab：產品名稱、SKU、價格、成本、分類、品牌、供應商
     - 產品款式變體 Tab：顯示所有產品款式變體，支援新增/編輯/刪除
     - 庫存狀況 Tab：實時庫存、預留庫存、可用庫存、庫存警示
     - 庫存異動 Tab：完整的入庫/出庫/調整記錄
-3.  新增 ProductForm 組件，用於新增/編輯產品
+3. 新增 ProductForm 組件，用於新增/編輯產品
     1. 在 ProductDetail 中新增編輯功能 URL 和按鈕
     2. 產品資訊編輯表單，實作 PUT API 呼叫更新產品
     3. 處理分類、品牌、供應商的下拉選單
@@ -785,14 +793,15 @@
    - 直接使用 parseInt() 轉換 category、brand、supplier，但如果這些欄位是空字串，parseInt("") 會回傳 NaN，這會導致後端收到無效的資料。
 7. 前端產品在 ProductDetailSerializer 中，category, brand, supplier 欄位只包含 ID，而不是完整的物件。完整的名稱資訊在 category_name, brand_name,supplier_name 欄位中，所以前端要改讀 category_name...來顯示
    - 後端 ProductDetailSerializer 回傳的是：
+
      ```json
      {
-     	"category": 186, // 只有 ID
-     	"category_name": "3C 配件", // 完整名稱
-     	"brand": 205,
-     	"brand_name": "Adidas",
-     	"supplier": 146,
-     	"supplier_name": "亞洲科技供應商"
+      "category": 186, // 只有 ID
+      "category_name": "3C 配件", // 完整名稱
+      "brand": 205,
+      "brand_name": "Adidas",
+      "supplier": 146,
+      "supplier_name": "亞洲科技供應商"
      }
      ```
 
@@ -1031,7 +1040,7 @@ frontend/src/components/
 
 ## [v1.5] - 2025-07-02
 
-### 把 `orders`、` transactions`、`customer`、`reports` 等後端 apps 整理至 `backend` 資料夾中
+### 把 `orders`、`transactions`、`customer`、`reports` 等後端 apps 整理至 `backend` 資料夾中
 
 ### 新增快速搜尋篩選功能
 
