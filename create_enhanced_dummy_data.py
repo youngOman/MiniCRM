@@ -5,7 +5,7 @@ import re
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-import pymysql
+import psycopg2
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -22,14 +22,13 @@ def generate_slug(text):
     return text.lower().strip("-")
 
 
-# MySQL connection configuration from environment variables
+# PostgreSQL connection configuration from environment variables
 config = {
     "host": os.getenv("DB_HOST", "localhost"),
-    "port": int(os.getenv("DB_PORT", 3306)),
+    "port": int(os.getenv("DB_PORT", 15432)),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
     "database": os.getenv("DB_NAME"),
-    "charset": "utf8mb4",
 }
 
 
@@ -44,12 +43,12 @@ def create_enhanced_dummy_data():
         return
 
     try:
-        print(f"🔌 Connecting to MySQL database at {config['host']}...")
-        # Connect to MySQL
-        connection = pymysql.connect(**config)
+        print(f"🔌 Connecting to PostgreSQL database at {config['host']}...")
+        # Connect to PostgreSQL
+        connection = psycopg2.connect(**config)
         cursor = connection.cursor()
 
-        print("✅ Connected to MySQL database successfully!")
+        print("✅ Connected to PostgreSQL database successfully!")
 
         # Clear existing data (optional)
         print("Clearing existing data...")
@@ -442,6 +441,7 @@ def create_enhanced_dummy_data():
         INSERT INTO customers_customer 
         (first_name, last_name, email, phone, company, address, city, state, zip_code, country, source, tags, notes, age, gender, product_categories_interest, seasonal_purchase_pattern, is_active, created_at, updated_at, created_by_id, updated_by_id) 
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         now = datetime.now()
@@ -530,14 +530,15 @@ def create_enhanced_dummy_data():
                     gender,
                     product_interests_json,
                     seasonal_pattern,
-                    1,
+                    True,
                     created_at,
                     created_at,
                     user_id,
                     user_id,
                 ),
             )
-            customer_ids.append(cursor.lastrowid)
+            customer_id = cursor.fetchone()[0]
+            customer_ids.append(customer_id)
             if (i + 1) % 20 == 0:
                 print(f"Created {i + 1} customers...")
 
@@ -595,6 +596,7 @@ def create_enhanced_dummy_data():
         category_insert_query = """
         INSERT INTO products_category (name, description, slug, is_active, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         category_ids = []
@@ -615,9 +617,10 @@ def create_enhanced_dummy_data():
 
             cursor.execute(
                 category_insert_query,
-                (name, description, slug, 1, created_at, created_at),
+                (name, description, slug, True, created_at, created_at),
             )
-            category_ids.append(cursor.lastrowid)
+            category_id = cursor.fetchone()[0]
+            category_ids.append(category_id)
 
         print(f"Created {len(category_ids)} product categories")
 
@@ -675,8 +678,9 @@ def create_enhanced_dummy_data():
         ]
 
         brand_insert_query = """
-        INSERT INTO products_brand (name, description, is_active, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO products_brand (name, description, logo_url, website, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         brand_ids = []
@@ -685,9 +689,10 @@ def create_enhanced_dummy_data():
             created_at = now - timedelta(days=random.randint(365, 1825))
 
             cursor.execute(
-                brand_insert_query, (name, description, 1, created_at, created_at)
+                brand_insert_query, (name, description, "", "", True, created_at, created_at)
             )
-            brand_ids.append(cursor.lastrowid)
+            brand_id = cursor.fetchone()[0]
+            brand_ids.append(brand_id)
 
         print(f"Created {len(brand_ids)} brands")
 
@@ -732,8 +737,9 @@ def create_enhanced_dummy_data():
         ]
 
         supplier_insert_query = """
-        INSERT INTO products_supplier (name, contact_person, email, phone, address, is_active, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO products_supplier (name, contact_person, email, phone, address, payment_terms, credit_limit, is_active, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         supplier_ids = []
@@ -753,12 +759,15 @@ def create_enhanced_dummy_data():
                     email,
                     phone,
                     address,
-                    1,
+                    "30天",
+                    10000.00,
+                    True,
                     created_at,
                     created_at,
                 ),
             )
-            supplier_ids.append(cursor.lastrowid)
+            supplier_id = cursor.fetchone()[0]
+            supplier_ids.append(supplier_id)
 
         print(f"Created {len(supplier_ids)} suppliers")
 
@@ -859,6 +868,7 @@ def create_enhanced_dummy_data():
                                     base_price, cost_price, is_active, is_digital, weight, dimensions, 
                                     image_url, tax_rate, min_order_quantity, tags, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         product_ids = []
@@ -938,7 +948,7 @@ def create_enhanced_dummy_data():
                     supplier_id,
                     float(base_price),
                     float(cost_price),
-                    1,
+                    True,
                     is_digital,
                     weight,
                     dimensions,
@@ -950,7 +960,8 @@ def create_enhanced_dummy_data():
                     created_at,
                 ),
             )
-            product_ids.append(cursor.lastrowid)
+            product_id = cursor.fetchone()[0]
+            product_ids.append(product_id)
 
         print(f"Created {len(product_ids)} products")
 
@@ -1015,7 +1026,7 @@ def create_enhanced_dummy_data():
                     quantity = random.randint(-50, 50)
 
                 reference_type = random.choice(reference_types)
-                reference_id = f"REF-{random.randint(1000, 9999)}"
+                reference_id = random.randint(1000, 9999)
                 notes = f"{movement_type} - {reference_type} #{reference_id}"
 
                 movement_date = now - timedelta(days=random.randint(1, 365))
@@ -1040,6 +1051,7 @@ def create_enhanced_dummy_data():
         INSERT INTO orders_order 
         (order_number, customer_id, status, order_date, subtotal, tax_amount, shipping_amount, discount_amount, total, shipping_address, billing_address, notes, created_at, updated_at, created_by_id, updated_by_id) 
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
         """
 
         order_statuses = ["pending", "processing", "shipped", "delivered", "cancelled"]
@@ -1129,7 +1141,8 @@ def create_enhanced_dummy_data():
                             user_id,
                         ),
                     )
-                    order_ids.append(cursor.lastrowid)
+                    order_id = cursor.fetchone()[0]
+                    order_ids.append(order_id)
 
         print(f"Created {len(order_ids)} orders")
 

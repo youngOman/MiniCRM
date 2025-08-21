@@ -9,13 +9,13 @@ services:
       - "8000:8000"
     environment:
       - DEBUG=True
-      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - SECRET_KEY=django-insecure-change-this-in-production
       - DB_ENGINE=django.db.backends.postgresql
-      - DB_NAME=${DB_NAME:-minicrm}
-      - DB_USER=${DB_USER:-minicrm_user}
-      - DB_PASSWORD=${DB_PASSWORD:-minicrm_pass}
-      - DB_HOST=${DB_HOST:-postgres}
-      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=minicrm
+      - DB_USER=minicrm_user
+      - DB_PASSWORD=minicrm_pass
+      - DB_HOST=postgres
+      - DB_PORT=5432
       # - CHROMA_HOST=chromadb
       # - CHROMA_PORT=8000
       - OLLAMA_HOST=host.docker.internal
@@ -67,17 +67,17 @@ services:
     image: postgres:15-alpine
     container_name: minicrm_postgres
     ports:
-      - "5432:5432"
+      - "15432:5432"
     environment:
-      - POSTGRES_DB=${DB_NAME:-minicrm}
-      - POSTGRES_USER=${DB_USER:-minicrm_user}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-minicrm_pass}
+      - POSTGRES_DB=minicrm
+      - POSTGRES_USER=minicrm_user
+      - POSTGRES_PASSWORD=minicrm_pass
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - minicrm_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-minicrm_user} -d ${DB_NAME:-minicrm}"]
+      test: ["CMD-SHELL", "pg_isready -U minicrm_user -d minicrm"]
       interval: 30s
       timeout: 10s
       retries: 3

@@ -98,26 +98,6 @@ WSGI_APPLICATION = "crm_backend.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# PostgreSQL 設定
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'minicrm',
-#         'USER': 'postgres',
-#         'PASSWORD': '你的密碼',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
-
-
 # MySQL 設定 (舊版，已改用 PostgreSQL)
 # DATABASES = {
 #     "default": {
@@ -142,7 +122,7 @@ DATABASES = {
         "USER": os.getenv("DB_USER", "minicrm_user"),
         "PASSWORD": os.getenv("DB_PASSWORD", "minicrm_pass"),
         "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "PORT": os.getenv("DB_PORT", "15432"),
     }
 }
 
