@@ -27,6 +27,21 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
+## [v3.1] - 2025-08-21
+
+### 🔧 修復 PostgreSQL 兼容性問題
+
+- **修復客戶人口統計分析 API 500 錯誤**
+  - 問題：`customer_demographics_analytics` 視圖使用 MySQL 特定的 `JSON_SEARCH` 函式，在 PostgreSQL 環境下造成 500 Internal Server Error
+  - 錯誤訊息：`django.db.utils.ProgrammingError: function json_search(jsonb, unknown, unknown) does not exist`
+  - 修復：將 MySQL `JSON_SEARCH` 語法替換為 PostgreSQL 兼容的 `product_categories_interest__contains=[category]` 查詢
+
+### Docker & PostgreSQL 遷移完成
+
+- 完整從 MySQL 遷移至 PostgreSQL 15
+- Docker Compose 服務架構穩定運行
+- 所有 API 端點 PostgreSQL 兼容性驗證完成
+
 ## [v3] - 2025-08-20
 
 1. 改用 `pyproject.toml` 來管理套件

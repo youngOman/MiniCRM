@@ -485,10 +485,9 @@ def customer_demographics_analytics(request):
     )
 
     for category in product_categories:
-        # 使用 JSON 查詢來找到包含此類別的客戶
-        interested_customers = customers_qs.extra(
-            where=["JSON_SEARCH(product_categories_interest, 'one', %s) IS NOT NULL"],
-            params=[category],
+        # 使用 PostgreSQL JSON 查詢來找到包含此類別的客戶
+        interested_customers = customers_qs.filter(
+            product_categories_interest__contains=[category]
         )
 
         total_spent = 0
