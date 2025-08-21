@@ -3,7 +3,11 @@
     "allow": [
       "Bash(curl:*)",
       "Bash(docker compose logs:*)",
-      "Bash(docker compose exec:*)"
+      "Bash(docker compose exec:*)",
+      "Bash(docker compose run:*)",
+      "Bash(docker compose:*)",
+      "Bash(docker compose build:*)",
+      "Bash(uv lock:*)"
     ],
     "deny": []
   }
