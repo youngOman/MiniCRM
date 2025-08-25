@@ -1,7 +1,7 @@
 # MiniCRM Pro - 輕量型、一站式 B2C CRM 系統
 
 <div align="center">
-  <img src="./images/MiniCRM.png" style="margin-bottom: 12px;" />
+  <img src="./images/minicrm.png" style="margin-bottom: 12px;" />
   <br/>
   <img src="https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django"/>
   <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react"/>
