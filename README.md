@@ -1,8 +1,6 @@
 # MiniCRM Pro - 輕量型、一站式 B2C CRM 系統
 
 <div align="center">
-  <img src="./images/minicrm.png" style="margin-bottom: 12px;" />
-  <br/>
   <img src="https://img.shields.io/badge/Django-4.2.7-green?style=for-the-badge&logo=django"/>
   <img src="https://img.shields.io/badge/React-19-blue?style=for-the-badge&logo=react"/>
   <img src="https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript"/>
@@ -79,18 +77,18 @@ RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
 
 ### 階段二：用戶查詢處理
 
-| 順序 | 函數                        | 檔案:行號             | 說明                                  | Ollama LLM     |
-| ---- | --------------------------- | --------------------- | ------------------------------------- | -------------- |
-| 1    | `process_query()`           | query_engine.py:28    | 主查詢處理入口                        |                |
-| 2    | `classify_intent()`         | llm_service.py:25     | 開始意圖分類                          |                |
-| 2.1  | `search_similar_examples()` | knowledge_base.py:75  | **第 1 次搜尋**：為意圖分類提供上下文 |                |
+| 順序 | 函數                        | 檔案:行號             | 說明                                  | Ollama LLM    |
+| ---- | --------------------------- | --------------------- | ------------------------------------- | ------------- |
+| 1    | `process_query()`           | query_engine.py:28    | 主查詢處理入口                        |               |
+| 2    | `classify_intent()`         | llm_service.py:25     | 開始意圖分類                          |               |
+| 2.1  | `search_similar_examples()` | knowledge_base.py:75  | **第 1 次搜尋**：為意圖分類提供上下文 |               |
 | 2.2  | Ollama LLM 調用             | llm_service.py:63     | 意圖分類                              | ✅ **第 1 次** |
-| 3    | `_handle_sql_query()`       | query_engine.py:82    | SQL 查詢處理流程                      |                |
-| 4    | `generate_sql()`            | llm_service.py:84     | 開始 SQL 生成                         |                |
-| 4.1  | `search_relevant_schemas()` | knowledge_base.py:121 | 搜尋相關資料表結構                    |                |
-| 4.2  | `search_similar_examples()` | knowledge_base.py:75  | **第 2 次搜尋**：為 SQL 生成提供範例  |                |
+| 3    | `_handle_sql_query()`       | query_engine.py:82    | SQL 查詢處理流程                      |               |
+| 4    | `generate_sql()`            | llm_service.py:84     | 開始 SQL 生成                         |               |
+| 4.1  | `search_relevant_schemas()` | knowledge_base.py:121 | 搜尋相關資料表結構                    |               |
+| 4.2  | `search_similar_examples()` | knowledge_base.py:75  | **第 2 次搜尋**：為 SQL 生成提供範例  |               |
 | 4.3  | Ollama LLM 調用             | llm_service.py:127    | 結合 RAG 檢索結果生成 SQL             | ✅ **第 2 次** |
-| 5    | `_execute_sql()`            | query_engine.py:167   | 安全執行 SQL                          |                |
+| 5    | `_execute_sql()`            | query_engine.py:167   | 安全執行 SQL                          |               |
 | 6    | `generate_response()`       | llm_service.py:147    | 轉為自然語言回應                      | ✅ **第 3 次** |
 
 ### 1. 營銷分析儀表板
