@@ -11,25 +11,27 @@
 
 ## 專案概述
 
-MiniCRM Pro 是一套輕量型、免費開源的高效率 CRM 系統，專為中小企業、創業者與小型電商打造，不需設定、免授權費、免繁瑣導入流程，只保留最實用的 CRM 核心功能，RAG-based AI 客服，結合 LLaMA 3 及 LINE MESSAGING API，檢索系統內部資訊（如知識庫、客服紀錄、SOP、FAQ），透過 LINE 隨時隨地即時與系統互動。
+1. MiniCRM Pro 是個 開源、輕量型高效率 CRM 系統，專為中小企業、創業者與小型電商 打造，無需設定、免授權費，只保留最實用的核心功能
+2. RAG-based AI 客服，結合 RAG + LLaMA3 + LINE Messaging API，檢索系統內部資訊（如知識庫、客服紀錄、SOP、FAQ），以自然語言隨時隨地即時與系統互動
+3. AI 助理將能根據系統資料回答精準且具上下文的業務與客戶問題
+   1. 查詢客戶資料、訂單狀態、交易記錄、客服工單、FAQs、知識庫
+      1. 整合聯絡資訊、互動紀錄、購買歷史、服務請求、資產紀錄與報價／促銷紀錄，建立完整可追溯的客戶輪廓，掌握每位客戶的偏好、行為、問題、需求、價值
+      2. 同時管理多個品牌與供應商，不同品牌或供應商可進行獨立的客戶資料管理(訂單、交易記錄..等)
+   2. 訂單、交易、產品資料、追蹤交易紀錄
+      1. 管理客戶關係、追蹤銷售業績及分析業務表現，並進行後續的精準再行銷及提升顧客忠誠度及回流率。
+      2. 瞭解公司是否朝正確方向邁進，或是否有不足之處。
+      3. 獲得更多潛在客戶、提升生產力，以及提升客戶滿意度
+   3. 透過互動式儀表板瀏覽銷售業績、當季客戶偏好、客戶族群、營收表現..等資訊
+      1. 營收趨勢、今日、本月(新增客戶量、新增訂單、完成交易數)、客戶指標(平均客戶價值、待處理訂單、轉換率)...等
+      2. 客戶增長趨勢、客戶來源分佈、客戶價值分析、客戶行為分析...
+      3. 客戶生命週期價值 (CLV) 計算及分析： 客戶價值分布、各客戶來源價值、頂級客戶排行、月度 CLV 趨勢...
 
-AI 助理將能根據系統資料回答精準且具上下文的業務與客戶問題、查詢客戶資料、訂單狀態、交易記錄、客服工單、FAQs、知識庫、訂單、交易、產品資料、追蹤交易紀錄、透過互動式儀表板分析 銷售業績、當季客戶偏好、客戶族群、營收表現..等資訊
-
-- Ex:
+- Example Usage:
   - AI 助理根據系統資料回答精準且具上下文的業務與客戶問題
   - 例：「告訴我 VIP 客戶常見的售後問題，以及該如何處理」
   - 例：「幫我找出上個月購買最多的 25-35 歲女性客戶」
 
-1. 整合聯絡資訊、互動紀錄、購買歷史、服務請求、資產紀錄與報價／促銷紀錄，建立完整可追溯的客戶輪廓，掌握每位客戶的偏好、行為、問題、需求、價值
-   1. 同時管理多個品牌與供應商，不同品牌或供應商可進行獨立的客戶資料管理(訂單、交易記錄..等)
-2. 管理客戶關係、追蹤銷售業績及分析業務表現，並進行後續的精準再行銷及提升顧客忠誠度及回流率。
-   1. 瞭解公司是否朝正確方向邁進，或是否有不足之處。
-   2. 獲得更多潛在客戶、提升生產力，以及提升客戶滿意度
-3. 視覺化儀表板與報表如
-   1. 營收趨勢、今日、本月(新增客戶量、新增訂單、完成交易數)、客戶指標(平均客戶價值、待處理訂單、轉換率)...等
-   2. 客戶增長趨勢、客戶來源分佈、客戶價值分析、客戶行為分析...
-   3. 客戶生命週期價值 (CLV) 計算及分析： 客戶價值分布、各客戶來源價值、頂級客戶排行、月度 CLV 趨勢...
-4. (開發中)：成交率、追加銷售率、新淨收入、銷售週期長短、客戶獲取成本 (CAC)、 AI 智慧摘要
+- (開發中)：成交率、追加銷售率、新淨收入、銷售週期長短、客戶獲取成本 (CAC)、 AI 智慧摘要
 
 ## RAG 工作流程 講解
 
@@ -52,13 +54,11 @@ RAG = Retrieval（檢索）+ Augmented（增強）+ Generation（生成）
 ---
 
 1. 知識庫儲存階段（預先建立）
-
-- 資料表 Schema → 格式化文本 → 向量化 → 存入 ChromaDB
-- 查詢範例 → 格式化文本 → SentenceTransformer 向量化 → ChromaDB (examples_collection)
+   - 資料表 Schema → 格式化文本 → 向量化 → 存入 ChromaDB
+   - 查詢範例 → 格式化文本 → SentenceTransformer 向量化 → ChromaDB (examples_collection)
 
 2. 查詢處理並回覆階段（用戶互動）
-
-用戶輸入 → 意圖分類（同時向量搜尋相似範例作為上下文）→ SQL 生成（同時向量搜尋相關 Schema + 相似範例作為上下文）→ 執行 SQL → SQL 結果 → 格式化限制(限制結果筆數、避免傳給 LLM 的資料過長，影響回應品質)→ LLM 生成自然語言 → 返回用戶
+   - 用戶輸入 → 意圖分類（同時向量搜尋相似範例作為上下文）→ SQL 生成（同時向量搜尋相關 Schema + 相似範例作為上下文）→ 執行 SQL → SQL 結果 → 格式化限制(限制結果筆數、避免傳給 LLM 的資料過長，影響回應品質)→ LLM 生成自然語言 → 返回用戶
 
 ![RAG 工作流程](./images/rag/rag-flowchart.png)
 
@@ -408,9 +408,9 @@ npm run dev
 
 ### 4. 存取應用程式
 
-- **前端介面**: http://localhost:5173
-- **後端 API**: http://localhost:8000
-- **Django 後台**: http://localhost:8000/admin
+- **前端介面**: <http://localhost:5173>
+- **後端 API**: <http://localhost:8000>
+- **Django 後台**: <http://localhost:8000/admin>
 - **示範登入**: `test_young` / `young0921`
 
 ---
@@ -531,49 +531,49 @@ GET    /api/reports/customer-clv/
 
 ```json
 {
-	"clv_overview": {
-		"total_customers": 150,
-		"customers_with_orders": 120,
-		"avg_clv": 25000.5,
-		"total_clv": 3000060.0,
-		"avg_purchase_frequency": 2.5
-	},
-	"clv_segments": [
-		{
-			"segment": "頂級客戶",
-			"count": 15,
-			"total_value": 750000.0,
-			"avg_clv": 50000.0,
-			"percentage": 12.5
-		}
-	],
-	"clv_by_source": [
-		{
-			"source": "website",
-			"count": 80,
-			"avg_clv": 28000.0,
-			"total_clv": 2240000.0,
-			"avg_orders": 3.2
-		}
-	],
-	"top_customers": [
-		{
-			"id": 1,
-			"full_name": "王小明",
-			"email": "wang@example.com",
-			"total_spent": 85000.0,
-			"total_orders": 12,
-			"avg_order_value": 7083.33
-		}
-	],
-	"monthly_clv_trend": [
-		{
-			"month": "2024-12",
-			"new_customers": 25,
-			"avg_clv": 22000.0,
-			"total_clv": 550000.0
-		}
-	]
+ "clv_overview": {
+  "total_customers": 150,
+  "customers_with_orders": 120,
+  "avg_clv": 25000.5,
+  "total_clv": 3000060.0,
+  "avg_purchase_frequency": 2.5
+ },
+ "clv_segments": [
+  {
+   "segment": "頂級客戶",
+   "count": 15,
+   "total_value": 750000.0,
+   "avg_clv": 50000.0,
+   "percentage": 12.5
+  }
+ ],
+ "clv_by_source": [
+  {
+   "source": "website",
+   "count": 80,
+   "avg_clv": 28000.0,
+   "total_clv": 2240000.0,
+   "avg_orders": 3.2
+  }
+ ],
+ "top_customers": [
+  {
+   "id": 1,
+   "full_name": "王小明",
+   "email": "wang@example.com",
+   "total_spent": 85000.0,
+   "total_orders": 12,
+   "avg_order_value": 7083.33
+  }
+ ],
+ "monthly_clv_trend": [
+  {
+   "month": "2024-12",
+   "new_customers": 25,
+   "avg_clv": 22000.0,
+   "total_clv": 550000.0
+  }
+ ]
 }
 ```
 
