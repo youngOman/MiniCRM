@@ -33,6 +33,9 @@ ENV DJANGO_SETTINGS_MODULE=crm_backend.settings
 # 複製 backend 目錄內容至 app 目錄
 COPY ./backend .
 
+# 複製客服資料生成腳本
+# COPY ./create_customer_service_data.py /app/
+
 # 建立靜態檔案目錄並設定權限
 RUN mkdir -p /app/staticfiles && \
     chown -R appuser:appuser /app && \

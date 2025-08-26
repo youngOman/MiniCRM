@@ -171,9 +171,6 @@ const CustomerOverview: React.FC = () => {
               <div className="text-3xl font-bold">{data.overview.total_customers}</div>
               <div className="text-gray-300 text-sm mt-1">總客戶數</div>
             </div>
-            <div className="text-4xl opacity-80">
-              👥
-            </div>
           </div>
         </div>
         
@@ -182,9 +179,6 @@ const CustomerOverview: React.FC = () => {
             <div>
               <div className="text-3xl font-bold">{data.overview.customers_with_age}</div>
               <div className="text-gray-300 text-sm mt-1">有年齡資料</div>
-            </div>
-            <div className="text-4xl opacity-80">
-              🎂
             </div>
           </div>
         </div>
@@ -195,9 +189,6 @@ const CustomerOverview: React.FC = () => {
               <div className="text-3xl font-bold">{data.overview.customers_with_gender}</div>
               <div className="text-gray-300 text-sm mt-1">有性別資料</div>
             </div>
-            <div className="text-4xl opacity-80">
-              ⚥
-            </div>
           </div>
         </div>
         
@@ -206,9 +197,6 @@ const CustomerOverview: React.FC = () => {
             <div>
               <div className="text-3xl font-bold">{data.overview.customers_with_preferences}</div>
               <div className="text-gray-300 text-sm mt-1">有產品偏好</div>
-            </div>
-            <div className="text-4xl opacity-80">
-              💝
             </div>
           </div>
         </div>
@@ -219,9 +207,6 @@ const CustomerOverview: React.FC = () => {
               <div className="text-3xl font-bold">{data.overview.avg_age.toFixed(1)}</div>
               <div className="text-gray-300 text-sm mt-1">平均年齡</div>
             </div>
-            <div className="text-4xl opacity-80">
-              📊
-            </div>
           </div>
         </div>
         
@@ -230,9 +215,6 @@ const CustomerOverview: React.FC = () => {
             <div>
               <div className="text-3xl font-bold">{data.overview.data_completeness.toFixed(1)}%</div>
               <div className="text-gray-300 text-sm mt-1">資料完整度</div>
-            </div>
-            <div className="text-4xl opacity-80">
-              ✅
             </div>
           </div>
         </div>

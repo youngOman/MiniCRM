@@ -2,7 +2,7 @@
 """
 客服系統測試資料生成腳本
 生成客服工單、知識庫文章和常見問題的測試資料
-使用直接 MySQL 連接，參考 create_enhanced_dummy_data 的做法
+使用直接 PostgreSQL 連接，參考 create_enhanced_dummy_data 的做法
 """
 
 import json
@@ -11,7 +11,8 @@ import pathlib
 import random
 from datetime import datetime, timedelta
 
-import pymysql
+import psycopg2
+import psycopg2.extras
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -29,14 +30,13 @@ db_host_raw = os.getenv("DB_HOST", "localhost")
 # db_host = db_host_raw.split('#')[0].strip()  # 移除註解部分並去空格
 print(f"🔍 清理後的 DB_HOST: '{db_host_raw}'")
 
-# MySQL connection configuration from environment variables
+# PostgreSQL connection configuration from environment variables
 config = {
     "host": db_host_raw,
-    "port": int(os.getenv("DB_PORT", 3306)),
+    "port": int(os.getenv("DB_PORT", 5432)),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASSWORD"),
     "database": os.getenv("DB_NAME"),
-    "charset": "utf8mb4",
 }
 
 
@@ -52,8 +52,8 @@ class CustomerServiceDataGenerator:
         """連接到資料庫"""
         try:
             print(f"🔗 連接資料庫: {config['host']}:{config['port']}")
-            self.connection = pymysql.connect(**config)
-            self.cursor = self.connection.cursor()
+            self.connection = psycopg2.connect(**config)
+            self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
             print("✅ 資料庫連接成功")
             return True
         except Exception as e:
@@ -73,7 +73,7 @@ class CustomerServiceDataGenerator:
         try:
             # 檢查是否有超級用戶
             self.cursor.execute(
-                "SELECT id FROM auth_user WHERE is_superuser = 1 LIMIT 1"
+                "SELECT id FROM auth_user WHERE is_superuser = true LIMIT 1"
             )
             result = self.cursor.fetchone()
 
@@ -88,7 +88,7 @@ class CustomerServiceDataGenerator:
 
                 insert_sql = """
                 INSERT INTO auth_user (username, first_name, last_name, email, is_staff, is_active, is_superuser, date_joined, password)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
                 """
 
                 self.cursor.execute(
@@ -98,14 +98,14 @@ class CustomerServiceDataGenerator:
                         "",
                         "",
                         "admin@test.com",
-                        1,
-                        1,
-                        1,
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        True,
+                        True,
+                        True,
+                        datetime.now(),
                         password_hash,
                     ),
                 )
-                self.admin_user_id = self.cursor.lastrowid
+                self.admin_user_id = self.cursor.fetchone()[0]
                 print(f"✅ 創建管理員用戶 ID: {self.admin_user_id}")
 
         except Exception as e:
@@ -196,18 +196,25 @@ class CustomerServiceDataGenerator:
         ]
 
         insert_sql = """
-        INSERT IGNORE INTO customers_customer 
-        (first_name, last_name, email, phone, city, country, source, age, gender, created_by_id, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO customers_customer 
+        (first_name, last_name, email, phone, city, country, source, age, gender, is_active, product_categories_interest, created_by_id, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ON CONFLICT (email) DO NOTHING RETURNING id
         """
 
         created_count = 0
         for data in customers_data:
             first_name = data["name"][0]
             last_name = data["name"][1:] if len(data["name"]) > 1 else ""
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.now()
 
             try:
+                # 隨機生成產品興趣
+                product_interests = random.sample(
+                    ["電子產品", "服飾配件", "居家用品", "美妝保養", "運動健身", "書籍文具", "食品飲料"],
+                    k=random.randint(1, 3)
+                )
+                
                 self.cursor.execute(
                     insert_sql,
                     (
@@ -222,13 +229,16 @@ class CustomerServiceDataGenerator:
                         ),
                         random.randint(20, 65),
                         random.choice(["male", "female"]),
+                        True,  # is_active
+                        json.dumps(product_interests, ensure_ascii=False),  # product_categories_interest
                         self.admin_user_id,
                         now,
                         now,
                     ),
                 )
-                if self.cursor.rowcount > 0:
-                    customer_id = self.cursor.lastrowid
+                result = self.cursor.fetchone()
+                if result:
+                    customer_id = result[0]
                     self.customers.append(
                         {
                             "id": customer_id,
@@ -269,26 +279,36 @@ class CustomerServiceDataGenerator:
             {"name": "系統操作", "description": "系統功能和操作指南"},
         ]
 
-        insert_sql = """
-        INSERT IGNORE INTO customer_service_knowledgebasecategory 
-        (name, description, sort_order, is_active, created_at)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-
         for i, cat_data in enumerate(categories_data):
             try:
+                # 先檢查是否已存在
                 self.cursor.execute(
-                    insert_sql,
-                    (
-                        cat_data["name"],
-                        cat_data["description"],
-                        i * 10,
-                        1,
-                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    ),
+                    "SELECT id FROM customer_service_knowledgebasecategory WHERE name = %s",
+                    (cat_data["name"],)
                 )
-                if self.cursor.rowcount > 0:
-                    category_id = self.cursor.lastrowid
+                existing = self.cursor.fetchone()
+                
+                if existing:
+                    category_id = existing[0]
+                    self.categories.append(
+                        {"id": category_id, "name": cat_data["name"]}
+                    )
+                    print(f"知識庫分類已存在: {cat_data['name']}")
+                else:
+                    # 插入新分類
+                    self.cursor.execute(
+                        """INSERT INTO customer_service_knowledgebasecategory 
+                        (name, description, sort_order, is_active, created_at)
+                        VALUES (%s, %s, %s, %s, %s) RETURNING id""",
+                        (
+                            cat_data["name"],
+                            cat_data["description"],
+                            i * 10,
+                            True,
+                            datetime.now(),
+                        ),
+                    )
+                    category_id = self.cursor.fetchone()[0]
                     self.categories.append(
                         {"id": category_id, "name": cat_data["name"]}
                     )
@@ -403,19 +423,13 @@ class CustomerServiceDataGenerator:
             closed_at = None
 
             if status in ["in_progress", "pending", "resolved", "closed"]:
-                first_response_at = (
-                    created_time + timedelta(hours=random.randint(1, 24))
-                ).strftime("%Y-%m-%d %H:%M:%S")
+                first_response_at = created_time + timedelta(hours=random.randint(1, 24))
 
             if status in ["resolved", "closed"]:
-                resolved_at = (
-                    created_time + timedelta(hours=random.randint(25, 72))
-                ).strftime("%Y-%m-%d %H:%M:%S")
+                resolved_at = created_time + timedelta(hours=random.randint(25, 72))
 
             if status == "closed":
-                closed_at = (
-                    created_time + timedelta(hours=random.randint(73, 96))
-                ).strftime("%Y-%m-%d %H:%M:%S")
+                closed_at = created_time + timedelta(hours=random.randint(73, 96))
 
             tags = json.dumps(
                 random.sample(
@@ -427,7 +441,7 @@ class CustomerServiceDataGenerator:
 
             try:
                 self.cursor.execute(
-                    insert_sql,
+                    insert_sql + " RETURNING id",
                     (
                         ticket_number,
                         customer["id"],
@@ -449,13 +463,13 @@ class CustomerServiceDataGenerator:
                         "客戶滿意服務品質"
                         if status in ["resolved", "closed"]
                         and random.choice([True, False])
-                        else None,
-                        created_time.strftime("%Y-%m-%d %H:%M:%S"),
-                        created_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        else "",
+                        created_time,
+                        created_time,
                     ),
                 )
 
-                ticket_id = self.cursor.lastrowid
+                ticket_id = self.cursor.fetchone()[0]
                 created_count += 1
 
                 # 為非開啟狀態的工單創建服務記錄
@@ -490,17 +504,15 @@ class CustomerServiceDataGenerator:
 
         insert_sql = """
         INSERT INTO customer_service_servicenote 
-        (ticket_id, content, note_type, is_visible_to_customer, created_by_id, created_at)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        (ticket_id, content, note_type, is_visible_to_customer, attachments, created_by_id, created_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         note_types = ["internal", "customer", "system", "resolution"]
 
         for i in range(num_notes):
             hours_after = random.randint(1, 72)
-            note_time = (created_time + timedelta(hours=hours_after)).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )
+            note_time = created_time + timedelta(hours=hours_after)
 
             try:
                 self.cursor.execute(
@@ -510,6 +522,7 @@ class CustomerServiceDataGenerator:
                         random.choice(note_contents),
                         random.choice(note_types),
                         random.choice([True, False]),
+                        json.dumps([]),  # attachments - 空的附件列表
                         self.admin_user_id,
                         note_time,
                     ),
@@ -625,7 +638,7 @@ class CustomerServiceDataGenerator:
             category_id = (
                 random.choice(self.categories)["id"] if self.categories else None
             )
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.now()
 
             try:
                 self.cursor.execute(
@@ -637,9 +650,9 @@ class CustomerServiceDataGenerator:
                         category_id,
                         content_type,
                         tags,
-                        1,
+                        True,
                         random.choice([True, False, False, False]),  # 25% 精選
-                        1,
+                        True,
                         random.randint(0, 1000),
                         random.randint(0, 100),
                         random.randint(0, 20),
@@ -728,7 +741,7 @@ class CustomerServiceDataGenerator:
             category_id = (
                 random.choice(self.categories)["id"] if self.categories else None
             )
-            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            now = datetime.now()
 
             try:
                 self.cursor.execute(
@@ -737,7 +750,7 @@ class CustomerServiceDataGenerator:
                         question,
                         answer,
                         category_id,
-                        1,
+                        True,
                         random.choice([True, False, False, False]),  # 25% 置頂
                         i * 10,
                         random.randint(0, 500),
