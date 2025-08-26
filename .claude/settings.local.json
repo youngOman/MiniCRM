@@ -7,7 +7,9 @@
       "Bash(docker compose run:*)",
       "Bash(docker compose:*)",
       "Bash(docker compose build:*)",
-      "Bash(uv lock:*)"
+      "Bash(uv lock:*)",
+      "Bash(python test:*)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }

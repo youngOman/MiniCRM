@@ -15,6 +15,7 @@ const FAQList: React.FC = () => {
 
 	// 篩選器狀態
 	const [searchTerm, setSearchTerm] = useState("");
+	const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 	const [categoryFilter, setCategoryFilter] = useState("");
 	const [featuredFilter, setFeaturedFilter] = useState("");
 	const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
@@ -29,7 +30,7 @@ const FAQList: React.FC = () => {
 					page_size: "20",
 				});
 
-				if (searchTerm) params.append("search", searchTerm);
+				if (debouncedSearchTerm) params.append("search", debouncedSearchTerm);
 				if (categoryFilter) params.append("category", categoryFilter);
 				if (featuredFilter) params.append("is_featured", featuredFilter);
 
@@ -47,12 +48,21 @@ const FAQList: React.FC = () => {
 				setLoading(false);
 			}
 		},
-		[searchTerm, categoryFilter, featuredFilter]
+		[debouncedSearchTerm, categoryFilter, featuredFilter]
 	);
+
+	// Debounce 搜尋詞
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSearchTerm(searchTerm);
+		}, 500);
+
+		return () => clearTimeout(timer);
+	}, [searchTerm]);
 
 	useEffect(() => {
 		fetchFAQs(1);
-	}, [searchTerm, categoryFilter, featuredFilter, fetchFAQs]);
+	}, [debouncedSearchTerm, categoryFilter, featuredFilter, fetchFAQs]);
 
 	const handleDeleteFAQ = async (faqId: number) => {
 		if (!window.confirm("確定要刪除這個常見問題嗎？")) {

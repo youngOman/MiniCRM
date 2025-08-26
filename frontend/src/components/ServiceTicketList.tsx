@@ -21,6 +21,7 @@ const ServiceTicketList: React.FC = () => {
   
   // 篩選器狀態
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -34,7 +35,7 @@ const ServiceTicketList: React.FC = () => {
         page_size: '20',
       });
       
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       if (statusFilter) params.append('status', statusFilter);
       if (priorityFilter) params.append('priority', priorityFilter);
       if (categoryFilter) params.append('category', categoryFilter);
@@ -54,9 +55,18 @@ const ServiceTicketList: React.FC = () => {
     }
   };
 
+  // Debounce 搜尋詞
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchTickets(1);
-  }, [searchTerm, statusFilter, priorityFilter, categoryFilter]);
+  }, [debouncedSearchTerm, statusFilter, priorityFilter, categoryFilter]);
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {

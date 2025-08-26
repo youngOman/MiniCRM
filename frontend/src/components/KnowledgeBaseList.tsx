@@ -22,6 +22,7 @@ const KnowledgeBaseList: React.FC = () => {
   
   // 篩選器狀態
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [contentTypeFilter, setContentTypeFilter] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('');
@@ -30,9 +31,18 @@ const KnowledgeBaseList: React.FC = () => {
     fetchCategories();
   }, []);
 
+  // Debounce 搜尋詞
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     fetchArticles(1);
-  }, [searchTerm, categoryFilter, contentTypeFilter, featuredFilter]);
+  }, [debouncedSearchTerm, categoryFilter, contentTypeFilter, featuredFilter]);
 
   const fetchCategories = async () => {
     try {
@@ -52,7 +62,7 @@ const KnowledgeBaseList: React.FC = () => {
         page_size: '20',
       });
       
-      if (searchTerm) params.append('search', searchTerm);
+      if (debouncedSearchTerm) params.append('search', debouncedSearchTerm);
       if (categoryFilter) params.append('category', categoryFilter);
       if (contentTypeFilter) params.append('content_type', contentTypeFilter);
       if (featuredFilter) params.append('is_featured', featuredFilter);
