@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 客服系統測試資料生成腳本
 生成客服工單、知識庫文章和常見問題的測試資料
@@ -53,7 +52,9 @@ class CustomerServiceDataGenerator:
         try:
             print(f"🔗 連接資料庫: {config['host']}:{config['port']}")
             self.connection = psycopg2.connect(**config)
-            self.cursor = self.connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.cursor = self.connection.cursor(
+                cursor_factory=psycopg2.extras.DictCursor
+            )
             print("✅ 資料庫連接成功")
             return True
         except Exception as e:
@@ -211,10 +212,18 @@ class CustomerServiceDataGenerator:
             try:
                 # 隨機生成產品興趣
                 product_interests = random.sample(
-                    ["電子產品", "服飾配件", "居家用品", "美妝保養", "運動健身", "書籍文具", "食品飲料"],
-                    k=random.randint(1, 3)
+                    [
+                        "電子產品",
+                        "服飾配件",
+                        "居家用品",
+                        "美妝保養",
+                        "運動健身",
+                        "書籍文具",
+                        "食品飲料",
+                    ],
+                    k=random.randint(1, 3),
                 )
-                
+
                 self.cursor.execute(
                     insert_sql,
                     (
@@ -230,7 +239,9 @@ class CustomerServiceDataGenerator:
                         random.randint(20, 65),
                         random.choice(["male", "female"]),
                         True,  # is_active
-                        json.dumps(product_interests, ensure_ascii=False),  # product_categories_interest
+                        json.dumps(
+                            product_interests, ensure_ascii=False
+                        ),  # product_categories_interest
                         self.admin_user_id,
                         now,
                         now,
@@ -284,10 +295,10 @@ class CustomerServiceDataGenerator:
                 # 先檢查是否已存在
                 self.cursor.execute(
                     "SELECT id FROM customer_service_knowledgebasecategory WHERE name = %s",
-                    (cat_data["name"],)
+                    (cat_data["name"],),
                 )
                 existing = self.cursor.fetchone()
-                
+
                 if existing:
                     category_id = existing[0]
                     self.categories.append(
@@ -423,7 +434,9 @@ class CustomerServiceDataGenerator:
             closed_at = None
 
             if status in ["in_progress", "pending", "resolved", "closed"]:
-                first_response_at = created_time + timedelta(hours=random.randint(1, 24))
+                first_response_at = created_time + timedelta(
+                    hours=random.randint(1, 24)
+                )
 
             if status in ["resolved", "closed"]:
                 resolved_at = created_time + timedelta(hours=random.randint(25, 72))

@@ -4,7 +4,7 @@ RAG 系統測試腳本
 
 使用方法：
 1. 確保 Ollama 服務正在運行: ollama serve
-2. 確保 llama3 模型已下載: ollama pull llama3
+2. 確保 gpt-oss:20b 模型已下載: ollama pull gpt-oss:20b
 3. 在 backend 目錄執行: python test_rag.py
 """
 

@@ -44,6 +44,9 @@ RUN mkdir -p /app/staticfiles && \
 # 切換到非 root 使用者
 USER appuser
 
+# 收集靜態文件
+RUN python manage.py collectstatic --noinput
+
 # 暴露端口
 EXPOSE 8000
 

@@ -27,29 +27,27 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
-## [v3.1] - 2025-08-21
+## [v3.2] - 2025-09-02
+  
+1. 用 Docker 啟用記得 LINE Webhook URL 要設置成 `https://xxxxxx.ngrok-free.app/api/line-bot/webhook/`
+2. 更新本地 Ollama 模型，~~llama3~~ 升級成 gpt-oss:20b
 
-### 🔧 修復 PostgreSQL 兼容性問題
+## [v3] - 2025-08-21
 
-- **修復客戶人口統計分析 API 500 錯誤**
-  - 問題：`customer_demographics_analytics` 視圖使用 MySQL 特定的 `JSON_SEARCH` 函式，在 PostgreSQL 環境下造成 500 Internal Server Error
-  - 錯誤訊息：`django.db.utils.ProgrammingError: function json_search(jsonb, unknown, unknown) does not exist`
-  - 修復：將 MySQL `JSON_SEARCH` 語法替換為 PostgreSQL 兼容的 `product_categories_interest__contains=[category]` 查詢
+### 改用 uv 管理套件
 
 ### Docker & PostgreSQL 遷移完成
 
-- 完整從 MySQL 遷移至 PostgreSQL 15
-- Docker Compose 服務架構穩定運行
-- 所有 API 端點 PostgreSQL 兼容性驗證完成
+- 從 MySQL 遷移至 PostgreSQL 15
+- 用 Docker Compose 啟用整個服務
+- 所有 API 端點 PostgreSQL 兼容性驗證完畢
 
-## [v3] - 2025-08-20
+### 修復 PostgreSQL 兼容性問題
 
-1. 改用 `pyproject.toml` 來管理套件
-2. DB 改用 docker 的 PostgreSQL
-
-## [v2.1.2] - 2025-08-12
-
-更新本地 Ollama 模型，~~llama3~~ 升級成 gpt-oss:20b
+- 修復客戶人口統計分析 API 500 錯誤
+  - 問題：`customer_demographics_analytics` 視圖使用 MySQL 特定的 `JSON_SEARCH` 函式，在 PostgreSQL 環境下造成 500 Internal Server Error
+  - 錯誤訊息：`django.db.utils.ProgrammingError: function json_search(jsonb, unknown, unknown) does not exist`
+  - 修復：將 MySQL `JSON_SEARCH` 語法替換為 PostgreSQL 兼容的 `product_categories_interest__contains=[category]` 查詢
 
 ## [v2.1.1] - 2025-08-10
 
