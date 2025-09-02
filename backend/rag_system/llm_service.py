@@ -61,29 +61,28 @@ class OllamaLLMService:
                     context += f"{i}. {ex['intent']}: {ex['natural_query']}\n"
 
         prompt = f"""你是 CRM 系統助手。分析用戶查詢的意圖。
+            意圖類別:
+            - customer_query: 客戶資料查詢
+            - order_query: 訂單資料查詢  
+            - product_query: 產品資料查詢
+            - transaction_query: 交易資料查詢
+            - service_query: 客服工單查詢
+            - analytics_query: 統計分析查詢
+            - faq_query: FAQ 常見問題查詢
+            - knowledge_base_query: 知識庫文章查詢
+            - ticket_management_query: 客服工單管理查詢
 
-意圖類別:
-- customer_query: 客戶資料查詢
-- order_query: 訂單資料查詢  
-- product_query: 產品資料查詢
-- transaction_query: 交易資料查詢
-- service_query: 客服工單查詢
-- analytics_query: 統計分析查詢
-- faq_query: FAQ 常見問題查詢
-- knowledge_base_query: 知識庫文章查詢
-- ticket_management_query: 客服工單管理查詢
+            {context}
 
-{context}
+            用戶查詢: "{user_query}"
 
-用戶查詢: "{user_query}"
-
-請回覆 JSON 格式:
-{{
-    "intent": "意圖類別",
-    "confidence": 0.9,
-    "entities": ["提取的關鍵字"],
-    "reasoning": "分析原因"
-}}"""
+            請回覆 JSON 格式:
+            {{
+                "intent": "意圖類別",
+                "confidence": 0.9,
+                "entities": ["提取的關鍵字"],
+                "reasoning": "分析原因"
+            }}"""
 
         try:
             response = self.client.chat(
