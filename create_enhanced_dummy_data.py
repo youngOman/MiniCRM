@@ -689,7 +689,8 @@ def create_enhanced_dummy_data():
             created_at = now - timedelta(days=random.randint(365, 1825))
 
             cursor.execute(
-                brand_insert_query, (name, description, "", "", True, created_at, created_at)
+                brand_insert_query,
+                (name, description, "", "", True, created_at, created_at),
             )
             brand_id = cursor.fetchone()[0]
             brand_ids.append(brand_id)

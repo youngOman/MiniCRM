@@ -1,21 +1,14 @@
+import asyncio
 import logging
 import os
+import threading
+import time
 from pathlib import Path
 
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from dotenv import load_dotenv
-
-# 載入專案根目錄的 .env 檔案
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # 回到專案根目錄
-ENV_FILE = PROJECT_ROOT / ".env"
-load_dotenv(ENV_FILE)
-
-import asyncio
-import threading
-import time
-
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError, LineBotApiError
 from linebot.models import (
@@ -39,6 +32,12 @@ from linebot.v3.messaging import (
 
 # 引入 RAG 系統
 from rag_system.query_engine import CRMQueryEngine
+
+# 載入專案根目錄的 .env 檔案
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # 回到專案根目錄
+ENV_FILE = PROJECT_ROOT / ".env"
+load_dotenv(ENV_FILE)
+
 
 # 設置日誌
 logger = logging.getLogger(__name__)
