@@ -16,7 +16,7 @@ class OllamaLLMService:
         self,
         model_name: str = "gpt-oss:20b",
         knowledge_base: CRMKnowledgeBase | None = None,
-    ):
+    ) -> None:
         self.model_name = model_name
         self.knowledge_base = knowledge_base
 
@@ -30,7 +30,7 @@ class OllamaLLMService:
             # Docker 環境中使用容器名稱
             base_url = f"http://{ollama_host}:{ollama_port}"
             self.client = ollama.Client(host=base_url)
-            logger.info(f"使用 Docker Ollama 服務: {base_url}")
+            logger.info("使用 Docker Ollama 服務: %s", base_url)
         else:
             # 本地環境使用預設設定
             self.client = ollama.Client()
@@ -43,7 +43,7 @@ class OllamaLLMService:
                 f"成功連接 Ollama，可用模型: {[m['name'] for m in models['models']]}"
             )
         except Exception as e:
-            logger.error(f"連接 Ollama 失敗: {e}")
+            logger.error("連接 Ollama 失敗: %s", e)
             raise
 
     def classify_intent(self, user_query: str) -> dict[str, Any]:
@@ -63,7 +63,7 @@ class OllamaLLMService:
         prompt = f"""你是 CRM 系統助手。分析用戶查詢的意圖。
             意圖類別:
             - customer_query: 客戶資料查詢
-            - order_query: 訂單資料查詢  
+            - order_query: 訂單資料查詢
             - product_query: 產品資料查詢
             - transaction_query: 交易資料查詢
             - service_query: 客服工單查詢
@@ -101,7 +101,7 @@ class OllamaLLMService:
             return self._fallback_intent(user_query)
 
         except Exception as e:
-            logger.error(f"意圖分類失敗: {e}")
+            logger.error("意圖分類失敗: %s", e)
             return self._fallback_intent(user_query)
 
     def generate_sql(self, user_query: str, intent_info: dict[str, Any]) -> str:
@@ -155,9 +155,9 @@ class OllamaLLMService:
 
                 **範例格式：**
                 ```sql
-                SELECT question, answer 
-                FROM customer_service_faq 
-                WHERE question LIKE '%密碼%' AND is_active = true 
+                SELECT question, answer
+                FROM customer_service_faq
+                WHERE question LIKE '%密碼%' AND is_active = true
                 LIMIT 5;
                 ```
                 只回覆一個完整的 SQL 語句，不要其他解釋："""
@@ -172,11 +172,11 @@ class OllamaLLMService:
             # 提取 SQL 語句
             sql = self._extract_sql(content)
 
-            logger.info(f"生成 SQL: {sql}")
+            logger.info("生成 SQL: %s", sql)
             return sql
 
         except Exception as e:
-            logger.error(f"SQL 生成失敗: {e}")
+            logger.error("SQL 生成失敗: %s", e)
             return ""
 
     def _extract_sql(self, content: str) -> str:
@@ -228,7 +228,7 @@ class OllamaLLMService:
         if content.upper().strip().startswith("SELECT"):
             return content.strip()
 
-        logger.warning(f"無法從回應中提取 SQL: {content}")
+        logger.warning("無法從回應中提取 SQL: %s", content)
         return ""
 
     def generate_response(
@@ -261,7 +261,7 @@ class OllamaLLMService:
             return response["message"]["content"].strip()
 
         except Exception as e:
-            logger.error(f"回應生成失敗: {e}")
+            logger.error("回應生成失敗: %s", e)
             return self._fallback_response(sql_result)
 
     def _fallback_intent(self, query: str) -> dict[str, Any]:

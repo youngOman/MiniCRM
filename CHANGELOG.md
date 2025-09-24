@@ -26,6 +26,10 @@
   - AI 自動分析圖表與指標，生成營運跟銷售建議
   - AI 銷售建議引擎：整合客戶資料與互動紀錄，主動提示業務下一步最佳行動，提升成交率與 ROAS
 
+## [v3.2.1] - 2025-09-02
+
+- 嚴謹模式...啟動！！！ Type Hint 開到最嚴格，修復大量型別錯誤
+
 ## [v3.2] - 2025-09-02
 
 1. 用 Docker 部署記得 LINE Webhook URL 要多一個`.app`，`https://xxxxxx.ngrok-free.app/api/line-bot/webhook/`

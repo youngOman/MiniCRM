@@ -1,3 +1,5 @@
+import contextlib
+import operator
 from datetime import datetime, timedelta
 
 from customers.models import Customer
@@ -386,16 +388,12 @@ def customer_demographics_analytics(request):
         customers_qs = customers_qs.filter(source=source)
 
     if age_min:
-        try:
+        with contextlib.suppress(ValueError, TypeError):
             customers_qs = customers_qs.filter(age__gte=int(age_min))
-        except (ValueError, TypeError):
-            pass
 
     if age_max:
-        try:
+        with contextlib.suppress(ValueError, TypeError):
             customers_qs = customers_qs.filter(age__lte=int(age_max))
-        except (ValueError, TypeError):
-            pass
 
     if gender:
         customers_qs = customers_qs.filter(gender=gender)
@@ -555,7 +553,7 @@ def customer_demographics_analytics(request):
     customer_segments = []
 
     # 計算客戶等級
-    def get_customer_tier(total_spent, total_orders):
+    def get_customer_tier(total_spent, total_orders) -> str:
         if total_spent >= 60000:
             return "白金客戶"
         if total_spent >= 20000 and total_orders >= 1:
@@ -837,7 +835,7 @@ def customer_clv_analytics(request):
         customers_qs = customers_qs.filter(source=source)
 
     # 計算 CLV 相關指標
-    customers_with_data = customers_qs.annotate(
+    customers_qs.annotate(
         total_spent=Coalesce(
             Sum("orders__total"), Value(0), output_field=DecimalField()
         ),
@@ -965,12 +963,12 @@ def customer_clv_analytics(request):
         )
 
     # 按平均 CLV 排序
-    clv_by_source.sort(key=lambda x: x["avg_clv"], reverse=True)
+    clv_by_source.sort(key=operator.itemgetter("avg_clv"), reverse=True)
 
     # 4. 頂級客戶列表 (總消費額前20名)
     # 排序客戶消費額字典並取前20名
     sorted_customers = sorted(
-        customer_clv_dict.items(), key=lambda x: x[1], reverse=True
+        customer_clv_dict.items(), key=operator.itemgetter(1), reverse=True
     )[:20]
 
     top_customers_list = []

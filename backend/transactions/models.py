@@ -97,7 +97,7 @@ class Transaction(models.Model):
             models.Index(fields=["gateway_transaction_id"]),
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.transaction_id:
             self.transaction_id = f"TXN-{uuid.uuid4().hex[:8].upper()}"
 
@@ -106,5 +106,5 @@ class Transaction(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Transaction {self.transaction_id} - {self.customer.full_name} - ${self.amount}"

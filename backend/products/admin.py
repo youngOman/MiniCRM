@@ -102,7 +102,7 @@ class ProductAdmin(admin.ModelAdmin):
         ("訂購設定", {"fields": ("min_order_quantity", "tags")}),
     )
 
-    def profit_margin(self, obj):
+    def profit_margin(self, obj) -> str:
         return f"{obj.profit_margin}%"
 
     profit_margin.short_description = "利潤率"
@@ -233,7 +233,7 @@ class PriceHistoryAdmin(admin.ModelAdmin):
 
     get_item_name.short_description = "項目"
 
-    def price_change_percentage(self, obj):
+    def price_change_percentage(self, obj) -> str:
         return f"{obj.price_change_percentage}%"
 
     price_change_percentage.short_description = "變動百分比"

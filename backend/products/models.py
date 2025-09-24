@@ -19,7 +19,7 @@ class Category(models.Model):
         verbose_name_plural = "產品分類"
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -39,7 +39,7 @@ class Brand(models.Model):
         verbose_name_plural = "品牌"
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -70,7 +70,7 @@ class Supplier(models.Model):
         verbose_name_plural = "供應商"
         ordering = ["name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -152,7 +152,7 @@ class Product(models.Model):
         verbose_name_plural = "產品"
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.sku})"
 
     @property
@@ -211,7 +211,7 @@ class ProductVariant(models.Model):
         verbose_name_plural = "產品款式變體"
         ordering = ["product", "name"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.product.name} - {self.name}"
 
 
@@ -242,7 +242,7 @@ class Inventory(models.Model):
         verbose_name = "庫存"
         verbose_name_plural = "庫存"
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.variant:
             return f"{self.variant} - 庫存: {self.quantity_available}"
         return f"{self.product} - 庫存: {self.quantity_available}"
@@ -313,7 +313,7 @@ class StockMovement(models.Model):
         verbose_name_plural = "庫存異動記錄"
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         item_name = self.variant or self.product
         return f"{item_name} - {self.get_movement_type_display()}: {self.quantity}"
 
@@ -357,7 +357,7 @@ class PriceHistory(models.Model):
         verbose_name_plural = "價格歷史"
         ordering = ["-created_at"]
 
-    def __str__(self):
+    def __str__(self) -> str:
         item_name = self.variant or self.product
         return f"{item_name} - {self.old_price} → {self.new_price}"
 

@@ -1,5 +1,5 @@
-"""
-客服系統測試資料生成腳本
+"""客服系統測試資料生成腳本
+
 生成客服工單、知識庫文章和常見問題的測試資料
 使用直接 PostgreSQL 連接，參考 create_enhanced_dummy_data 的做法
 """
@@ -26,7 +26,6 @@ print(f"🔍 DB_HOST repr: {os.getenv('DB_HOST')!r}")
 
 # 清理 DB_HOST (移除可能的空格和註解)
 db_host_raw = os.getenv("DB_HOST", "localhost")
-# db_host = db_host_raw.split('#')[0].strip()  # 移除註解部分並去空格
 print(f"🔍 清理後的 DB_HOST: '{db_host_raw}'")
 
 # PostgreSQL connection configuration from environment variables
@@ -40,14 +39,14 @@ config = {
 
 
 class CustomerServiceDataGenerator:
-    def __init__(self):
+    def __init__(self) -> None:
         self.connection = None
         self.cursor = None
         self.admin_user_id = 1  # 假設管理員用戶ID為1
         self.customers = []
         self.categories = []
 
-    def connect_database(self):
+    def connect_database(self) -> bool | None:
         """連接到資料庫"""
         try:
             print(f"🔗 連接資料庫: {config['host']}:{config['port']}")
@@ -61,7 +60,7 @@ class CustomerServiceDataGenerator:
             print(f"❌ 資料庫連接失敗: {e}")
             return False
 
-    def close_database(self):
+    def close_database(self) -> None:
         """關閉資料庫連接"""
         if self.cursor:
             self.cursor.close()
@@ -69,7 +68,7 @@ class CustomerServiceDataGenerator:
             self.connection.close()
         print("📪 資料庫連接已關閉")
 
-    def get_or_create_admin_user(self):
+    def get_or_create_admin_user(self) -> None:
         """確保有管理員用戶"""
         try:
             # 檢查是否有超級用戶
@@ -113,7 +112,7 @@ class CustomerServiceDataGenerator:
             print(f"⚠️ 管理員用戶處理失敗，使用預設ID=1: {e}")
             self.admin_user_id = 1
 
-    def create_test_customers(self):
+    def create_test_customers(self) -> None:
         """創建測試客戶資料"""
         print("👥 創建測試客戶資料...")
 
@@ -197,7 +196,7 @@ class CustomerServiceDataGenerator:
         ]
 
         insert_sql = """
-        INSERT INTO customers_customer 
+        INSERT INTO customers_customer
         (first_name, last_name, email, phone, city, country, source, age, gender, is_active, product_categories_interest, created_by_id, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         ON CONFLICT (email) DO NOTHING RETURNING id
@@ -275,7 +274,7 @@ class CustomerServiceDataGenerator:
 
         print(f"✅ 客戶資料準備完成，共 {len(self.customers)} 個客戶")
 
-    def create_knowledge_categories(self):
+    def create_knowledge_categories(self) -> None:
         """創建知識庫分類"""
         print("📚 創建知識庫分類...")
 
@@ -308,7 +307,7 @@ class CustomerServiceDataGenerator:
                 else:
                     # 插入新分類
                     self.cursor.execute(
-                        """INSERT INTO customer_service_knowledgebasecategory 
+                        """INSERT INTO customer_service_knowledgebasecategory
                         (name, description, sort_order, is_active, created_at)
                         VALUES (%s, %s, %s, %s, %s) RETURNING id""",
                         (
@@ -337,7 +336,7 @@ class CustomerServiceDataGenerator:
 
         print(f"✅ 知識庫分類準備完成，共 {len(self.categories)} 個分類")
 
-    def create_service_tickets(self, count=50):
+    def create_service_tickets(self, count=50) -> None:
         """創建客服工單"""
         print(f"🎫 創建 {count} 筆客服工單...")
 
@@ -377,7 +376,7 @@ class CustomerServiceDataGenerator:
         ]
 
         # 生成工單號碼的輔助函數
-        def generate_ticket_number():
+        def generate_ticket_number() -> str:
             today = datetime.now().strftime("%Y%m%d")
             prefix = f"CS{today}"
 
@@ -397,8 +396,8 @@ class CustomerServiceDataGenerator:
             return f"{prefix}{new_number:04d}"
 
         insert_sql = """
-        INSERT INTO customer_service_serviceticket 
-        (ticket_number, customer_id, title, description, category, priority, status, 
+        INSERT INTO customer_service_serviceticket
+        (ticket_number, customer_id, title, description, category, priority, status,
          tags, assigned_to_id, created_by_id, first_response_at, resolved_at, closed_at,
          satisfaction_rating, satisfaction_comment, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -418,7 +417,7 @@ class CustomerServiceDataGenerator:
         priorities = ["low", "medium", "high", "urgent"]
         statuses = ["open", "in_progress", "pending", "resolved", "closed"]
 
-        for i in range(count):
+        for _i in range(count):
             customer = random.choice(self.customers)
             title = random.choice(title_templates)
             description = random.choice(description_templates)
@@ -433,12 +432,12 @@ class CustomerServiceDataGenerator:
             resolved_at = None
             closed_at = None
 
-            if status in ["in_progress", "pending", "resolved", "closed"]:
+            if status in {"in_progress", "pending", "resolved", "closed"}:
                 first_response_at = created_time + timedelta(
                     hours=random.randint(1, 24)
                 )
 
-            if status in ["resolved", "closed"]:
+            if status in {"resolved", "closed"}:
                 resolved_at = created_time + timedelta(hours=random.randint(25, 72))
 
             if status == "closed":
@@ -470,11 +469,11 @@ class CustomerServiceDataGenerator:
                         resolved_at,
                         closed_at,
                         random.randint(1, 5)
-                        if status in ["resolved", "closed"]
+                        if status in {"resolved", "closed"}
                         and random.choice([True, False])
                         else None,
                         "客戶滿意服務品質"
-                        if status in ["resolved", "closed"]
+                        if status in {"resolved", "closed"}
                         and random.choice([True, False])
                         else "",
                         created_time,
@@ -499,7 +498,7 @@ class CustomerServiceDataGenerator:
 
         print(f"✅ 成功創建 {created_count} 筆客服工單")
 
-    def create_service_notes_for_ticket(self, ticket_id, status, created_time):
+    def create_service_notes_for_ticket(self, ticket_id, status, created_time) -> None:
         """為工單創建服務記錄"""
         note_contents = [
             "已收到客戶反映，正在調查問題原因。",
@@ -510,20 +509,20 @@ class CustomerServiceDataGenerator:
         ]
 
         # 根據狀態決定記錄數量
-        if status in ["in_progress", "pending"]:
+        if status in {"in_progress", "pending"}:
             num_notes = random.randint(1, 3)
         else:  # resolved, closed
             num_notes = random.randint(2, 5)
 
         insert_sql = """
-        INSERT INTO customer_service_servicenote 
+        INSERT INTO customer_service_servicenote
         (ticket_id, content, note_type, is_visible_to_customer, attachments, created_by_id, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
         note_types = ["internal", "customer", "system", "resolution"]
 
-        for i in range(num_notes):
+        for _i in range(num_notes):
             hours_after = random.randint(1, 72)
             note_time = created_time + timedelta(hours=hours_after)
 
@@ -543,7 +542,7 @@ class CustomerServiceDataGenerator:
             except Exception as e:
                 print(f"創建服務記錄失敗: {e}")
 
-    def create_knowledge_base_articles(self, count=50):
+    def create_knowledge_base_articles(self, count=50) -> None:
         """創建知識庫文章"""
         print(f"📖 創建 {count} 篇知識庫文章...")
 
@@ -591,8 +590,8 @@ class CustomerServiceDataGenerator:
         ]
 
         insert_sql = """
-        INSERT INTO customer_service_knowledgebase 
-        (title, content, summary, category_id, content_type, tags, is_public, is_featured, 
+        INSERT INTO customer_service_knowledgebase
+        (title, content, summary, category_id, content_type, tags, is_public, is_featured,
          is_active, view_count, helpful_count, not_helpful_count, created_by_id, updated_by_id,
          created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -609,7 +608,7 @@ class CustomerServiceDataGenerator:
                 content_type = data["content_type"]
             else:
                 title = random.choice(
-                    additional_titles + [f"技術文檔 #{i - len(articles_data) + 1}"]
+                    [*additional_titles, f"技術文檔 #{i - len(articles_data) + 1}"]
                 )
                 summary = f"關於 {title} 的詳細說明和操作指南"
                 content_type = random.choice(content_types)
@@ -683,7 +682,7 @@ class CustomerServiceDataGenerator:
 
         print(f"✅ 成功創建 {created_count} 篇知識庫文章")
 
-    def create_faq_entries(self, count=50):
+    def create_faq_entries(self, count=50) -> None:
         """創建常見問題"""
         print(f"❓ 創建 {count} 個常見問題...")
 
@@ -734,7 +733,7 @@ class CustomerServiceDataGenerator:
         ]
 
         insert_sql = """
-        INSERT INTO customer_service_faq 
+        INSERT INTO customer_service_faq
         (question, answer, category_id, is_active, is_featured, sort_order, view_count,
          created_by_id, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -780,7 +779,7 @@ class CustomerServiceDataGenerator:
 
         print(f"✅ 成功創建 {created_count} 個常見問題")
 
-    def run(self):
+    def run(self) -> None:
         """執行資料生成"""
         print("🚀 開始生成客服系統測試資料...")
         print("🎯 用於測試 Ollama 和 LINE Messaging API")

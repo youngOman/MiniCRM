@@ -20,7 +20,7 @@ class CRMQueryEngine:
     4. 為 LINE Bot 提供統一的查詢接口
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """初始化查詢引擎，建立知識庫和 LLM 服務連接"""
         self.knowledge_base = CRMKnowledgeBase()
         self.llm_service = OllamaLLMService(knowledge_base=self.knowledge_base)
@@ -51,18 +51,18 @@ class CRMQueryEngine:
             }
         """
         try:
-            logger.info(f"處理查詢: {user_query}")
+            logger.info("處理查詢: %s", user_query)
 
             # 步驟 1: 意圖分類 (調用 LLM 服務，內部會使用向量搜尋)
             intent_info = self.llm_service.classify_intent(user_query)
             logger.info(f"意圖分類結果: {intent_info['intent']}")
 
             # 步驟 2: 根據意圖選擇處理方式
-            if intent_info["intent"] in [
+            if intent_info["intent"] in {
                 "faq_query",
                 "knowledge_base_query",
                 "ticket_management_query",
-            ]:
+            }:
                 # SQL 查詢：查詢真實的 FAQ、知識庫、工單資料
                 return self._handle_sql_query(user_query, intent_info)
             # 不支援的查詢類型，引導用戶
@@ -74,7 +74,7 @@ class CRMQueryEngine:
             }
 
         except Exception as e:
-            logger.error(f"查詢處理失敗: {e}")
+            logger.error("查詢處理失敗: %s", e)
             # 錯誤處理：確保即使發生錯誤也能給用戶友善的回應
             return {
                 "success": False,
@@ -122,7 +122,7 @@ class CRMQueryEngine:
                 "intent": intent_info["intent"],
             }
 
-        logger.info(f"生成的 SQL: {sql_query}")
+        logger.info("生成的 SQL: %s", sql_query)
 
         # 步驟 3: 安全執行 SQL 查詢
         sql_result = self._execute_sql(sql_query)
@@ -203,7 +203,7 @@ class CRMQueryEngine:
             # 安全檢查 1：只允許 SELECT 語句
             sql_clean = sql_query.strip().upper()
             if not sql_clean.startswith("SELECT"):
-                logger.warning(f"拒絕執行非 SELECT 語句: {sql_query}")
+                logger.warning("拒絕執行非 SELECT 語句: %s", sql_query)
                 return None
 
             # 安全檢查 2：禁止危險關鍵字（使用完整單詞邊界匹配）
@@ -223,7 +223,7 @@ class CRMQueryEngine:
                 pattern = r"\b" + keyword + r"\b"
                 if re.search(pattern, sql_clean, re.IGNORECASE):
                     logger.warning(
-                        f"拒絕執行包含危險關鍵字 '{keyword}' 的 SQL: {sql_query}"
+                        "拒絕執行包含危險關鍵字 '%s' 的 SQL: %s", keyword, sql_query
                     )
                     return None
 
@@ -236,16 +236,14 @@ class CRMQueryEngine:
                 rows = cursor.fetchall()
 
                 # 轉換為字典列表格式 (更容易處理)
-                result = []
-                for row in rows:
-                    result.append(dict(zip(columns, row, strict=False)))
+                result = [dict(zip(columns, row, strict=False)) for row in rows]
 
                 logger.info(f"SQL 執行成功，返回 {len(result)} 筆結果")
                 return result
 
         except Exception as e:
-            logger.error(f"SQL 執行失敗: {e}")
-            logger.error(f"問題 SQL: {sql_query}")
+            logger.error("SQL 執行失敗: %s", e)
+            logger.error("問題 SQL: %s", sql_query)
             return None
 
     def _search_faq(self, query: str) -> str:
@@ -283,7 +281,7 @@ class CRMQueryEngine:
             return response.strip()
 
         except Exception as e:
-            logger.error(f"FAQ 搜尋失敗: {e}")
+            logger.error("FAQ 搜尋失敗: %s", e)
             return "抱歉，FAQ 搜尋時發生錯誤。"
 
     def _search_knowledge_base(self, query: str) -> str:
@@ -315,7 +313,7 @@ class CRMQueryEngine:
             return response.strip()
 
         except Exception as e:
-            logger.error(f"知識庫搜尋失敗: {e}")
+            logger.error("知識庫搜尋失敗: %s", e)
             return "抱歉，知識庫搜尋時發生錯誤。"
 
     def _handle_ticket_management(self, query: str) -> str:
@@ -346,10 +344,10 @@ class CRMQueryEngine:
             return "關於客服工單，我可以幫您：\n1. 了解如何建立工單\n2. 查詢工單狀態\n3. 提供客服聯絡方式\n\n請告訴我您需要哪種協助？"
 
         except Exception as e:
-            logger.error(f"工單管理處理失敗: {e}")
+            logger.error("工單管理處理失敗: %s", e)
             return "抱歉，工單查詢時發生錯誤。"
 
-    def add_sample_data(self):
+    def add_sample_data(self) -> None:
         """
         添加範例資料到知識庫
 
@@ -443,7 +441,7 @@ class CRMQueryEngine:
 
         logger.info("範例資料添加完成")
 
-    def _add_customer_service_schemas(self):
+    def _add_customer_service_schemas(self) -> None:
         """添加真實的FAQ、知識庫、客服工單資料表 schema 資訊"""
 
         # FAQ 表

@@ -5,7 +5,7 @@ import os
 import sys
 
 
-def main():
+def main() -> None:
     """Run administrative tasks."""
     # 禁用 ChromaDB 遙測避免錯誤
     os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")

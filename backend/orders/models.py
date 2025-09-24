@@ -62,7 +62,7 @@ class Order(models.Model):
             models.Index(fields=["order_date"]),
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         if not self.order_number:
             self.order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
 
@@ -76,7 +76,7 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Order {self.order_number} - {self.customer.full_name}"
 
 
@@ -97,9 +97,9 @@ class OrderItem(models.Model):
             models.Index(fields=["product_sku"]),
         ]
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         self.total_price = self.quantity * self.unit_price
         super().save(*args, **kwargs)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.product_name} x {self.quantity} - {self.order.order_number}"

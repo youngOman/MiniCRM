@@ -32,7 +32,7 @@ config = {
 }
 
 
-def create_enhanced_dummy_data():
+def create_enhanced_dummy_data() -> None:
     # Validate required environment variables
     required_vars = ["DB_HOST", "DB_USER", "DB_PASSWORD", "DB_NAME"]
     missing_vars = [var for var in required_vars if not os.getenv(var)]
@@ -67,7 +67,7 @@ def create_enhanced_dummy_data():
         cursor.execute("DELETE FROM products_category")
 
         # Get the user ID for 'young'
-        cursor.execute("SELECT id FROM auth_user WHERE username = 'young'")
+        cursor.execute("SELECT id FROM auth_user WHERE username = 'test_young'")
         user_result = cursor.fetchone()
         if not user_result:
             print("User 'young' not found. Please ensure the user exists.")
@@ -438,8 +438,8 @@ def create_enhanced_dummy_data():
         ]
 
         customer_insert_query = """
-        INSERT INTO customers_customer 
-        (first_name, last_name, email, phone, company, address, city, state, zip_code, country, source, tags, notes, age, gender, product_categories_interest, seasonal_purchase_pattern, is_active, created_at, updated_at, created_by_id, updated_by_id) 
+        INSERT INTO customers_customer
+        (first_name, last_name, email, phone, company, address, city, state, zip_code, country, source, tags, notes, age, gender, product_categories_interest, seasonal_purchase_pattern, is_active, created_at, updated_at, created_by_id, updated_by_id)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
         """
@@ -865,8 +865,8 @@ def create_enhanced_dummy_data():
         ]
 
         product_insert_query = """
-        INSERT INTO products_product (name, sku, description, category_id, brand_id, supplier_id, 
-                                    base_price, cost_price, is_active, is_digital, weight, dimensions, 
+        INSERT INTO products_product (name, sku, description, category_id, brand_id, supplier_id,
+                                    base_price, cost_price, is_active, is_digital, weight, dimensions,
                                     image_url, tax_rate, min_order_quantity, tags, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
@@ -1007,7 +1007,7 @@ def create_enhanced_dummy_data():
 
         # Create some stock movements
         stock_movement_insert_query = """
-        INSERT INTO products_stockmovement (product_id, movement_type, quantity, reference_type, 
+        INSERT INTO products_stockmovement (product_id, movement_type, quantity, reference_type,
                                           reference_id, notes, created_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
@@ -1049,8 +1049,8 @@ def create_enhanced_dummy_data():
 
         # Insert sample orders with better date distribution
         order_insert_query = """
-        INSERT INTO orders_order 
-        (order_number, customer_id, status, order_date, subtotal, tax_amount, shipping_amount, discount_amount, total, shipping_address, billing_address, notes, created_at, updated_at, created_by_id, updated_by_id) 
+        INSERT INTO orders_order
+        (order_number, customer_id, status, order_date, subtotal, tax_amount, shipping_amount, discount_amount, total, shipping_address, billing_address, notes, created_at, updated_at, created_by_id, updated_by_id)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         RETURNING id
         """
@@ -1111,11 +1111,11 @@ def create_enhanced_dummy_data():
                 # Add seasonal variation (more orders in Nov-Dec, Mar-Apr, Jul-Aug)
                 month_factor = 1.0
                 target_month = (now - timedelta(days=days_back)).month
-                if target_month in [11, 12]:  # Holiday season
+                if target_month in {11, 12}:  # Holiday season
                     month_factor = 1.5
-                elif target_month in [3, 4]:  # Spring
+                elif target_month in {3, 4}:  # Spring
                     month_factor = 1.3
-                elif target_month in [7, 8]:  # Summer
+                elif target_month in {7, 8}:  # Summer
                     month_factor = 1.2
 
                 if random.random() < month_factor / 2:
@@ -1187,15 +1187,15 @@ def create_enhanced_dummy_data():
         ]
 
         orderitem_insert_query = """
-        INSERT INTO orders_orderitem 
-        (order_id, product_name, product_sku, quantity, unit_price, total_price, created_at, updated_at) 
+        INSERT INTO orders_orderitem
+        (order_id, product_name, product_sku, quantity, unit_price, total_price, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         for order_id in order_ids:
             # Create 1-5 items per order
             num_items = random.randint(1, 5)
-            for k in range(num_items):
+            for _k in range(num_items):
                 quantity = random.randint(1, 4)
                 unit_price = Decimal(random.uniform(50, 1200)).quantize(Decimal("0.01"))
                 total_price = quantity * unit_price
@@ -1219,7 +1219,7 @@ def create_enhanced_dummy_data():
         # Insert sample transactions
         transaction_insert_query = """
         INSERT INTO transactions_transaction
-        (transaction_id, customer_id, order_id, transaction_type, payment_method, status, amount, fee_amount, net_amount, currency, gateway_transaction_id, description, notes, processed_at, created_at, updated_at, created_by_id, updated_by_id) 
+        (transaction_id, customer_id, order_id, transaction_type, payment_method, status, amount, fee_amount, net_amount, currency, gateway_transaction_id, description, notes, processed_at, created_at, updated_at, created_by_id, updated_by_id)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 

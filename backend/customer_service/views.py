@@ -56,7 +56,7 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ServiceTicketListSerializer
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return ServiceTicketCreateUpdateSerializer
         return ServiceTicketDetailSerializer
 
@@ -72,10 +72,10 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
             note = serializer.save(ticket=ticket, created_by=request.user)
 
             # 更新工單的 first_response_at
-            if not ticket.first_response_at and note.note_type in [
+            if not ticket.first_response_at and note.note_type in {
                 "customer",
                 "resolution",
-            ]:
+            }:
                 ticket.first_response_at = timezone.now()
                 ticket.save()
 
@@ -89,7 +89,7 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
         """關閉工單"""
         ticket = self.get_object()
 
-        if ticket.status not in ["resolved", "closed"]:
+        if ticket.status not in {"resolved", "closed"}:
             return Response(
                 {"error": "只有已解決的工單才能關閉"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -147,9 +147,9 @@ class ServiceTicketViewSet(viewsets.ModelViewSet):
         ).count()
 
         # 平均回應時間（小時）
-        avg_response_time = ServiceTicket.objects.filter(
-            first_response_at__isnull=False
-        ).aggregate(avg_time=timezone.now())
+        ServiceTicket.objects.filter(first_response_at__isnull=False).aggregate(
+            avg_time=timezone.now()
+        )
 
         # 按優先級統計
         priority_stats = (
@@ -191,7 +191,7 @@ class ServiceNoteViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at"]
     ordering = ["created_at"]
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(created_by=self.request.user)
 
 
@@ -238,7 +238,7 @@ class KnowledgeBaseViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return KnowledgeBaseListSerializer
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return KnowledgeBaseCreateUpdateSerializer
         return KnowledgeBaseDetailSerializer
 
@@ -317,7 +317,7 @@ class FAQViewSet(viewsets.ModelViewSet):
         )
 
     def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return FAQCreateUpdateSerializer
         return FAQSerializer
 

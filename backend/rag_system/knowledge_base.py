@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class CRMKnowledgeBase:
     """CRM 系統知識庫管理器"""
 
-    def __init__(self, persist_directory: str = "chroma_db"):
+    def __init__(self, persist_directory: str = "chroma_db") -> None:
         self.persist_directory = persist_directory
         self.client = chromadb.PersistentClient(
             path=persist_directory
@@ -40,7 +40,7 @@ class CRMKnowledgeBase:
         except:
             return self.client.create_collection(name)  # 如果不存在則創建新的集合
 
-    def add_schema_info(self, table_name: str, schema_info: dict[str, Any]):
+    def add_schema_info(self, table_name: str, schema_info: dict[str, Any]) -> None:
         """
         添加資料表 schema 資訊
         將資料表結構轉換為可搜尋的向量
@@ -62,11 +62,11 @@ class CRMKnowledgeBase:
             ],
             ids=[f"schema_{table_name}"],
         )  # 存入 ChromaDB
-        logger.info(f"已添加 {table_name} 的 schema 資訊")
+        logger.info("已添加 %s 的 schema 資訊", table_name)
 
     def add_query_example(
         self, intent: str, natural_query: str, sql_query: str, description: str = ""
-    ):
+    ) -> None:
         """
         添加查詢範例
         儲存自然語言查詢與對應的 SQL 範例(包含意圖、描述等元資料)
@@ -91,7 +91,7 @@ class CRMKnowledgeBase:
             ],
             ids=[example_id],
         )  # 存入 ChromaDB
-        logger.info(f"已添加查詢範例: {intent}")
+        logger.info("已添加查詢範例: %s", intent)
 
     def search_similar_examples(
         self, query: str, n_results: int = 3
@@ -117,10 +117,7 @@ class CRMKnowledgeBase:
             query_embeddings=[query_embedding], n_results=n_results
         )
 
-        examples = []
-        for i in range(len(results["ids"][0])):
-            examples.append(
-                {
+        examples = [{
                     "intent": results["metadatas"][0][i]["intent"],
                     "natural_query": results["metadatas"][0][i]["natural_query"],
                     "sql_query": results["metadatas"][0][i]["sql_query"],
@@ -128,8 +125,7 @@ class CRMKnowledgeBase:
                     "similarity_score": results["distances"][0][i]
                     if "distances" in results
                     else 0,
-                }
-            )
+                } for i in range(len(results["ids"][0]))]
         """
         格式化後：
         examples = [
@@ -163,20 +159,14 @@ class CRMKnowledgeBase:
             query_embeddings=[query_embedding], n_results=n_results
         )
 
-        schemas = []
-        for i in range(len(results["ids"][0])):
-            schemas.append(
-                {
+        return [{
                     "table_name": results["metadatas"][0][i]["table_name"],
                     "schema_text": results["documents"][0][i],
                     "fields": json.loads(results["metadatas"][0][i]["fields"]),
                     "similarity_score": results["distances"][0][i]
                     if "distances" in results
                     else 0,
-                }
-            )
-
-        return schemas
+                } for i in range(len(results["ids"][0]))]
 
     def _format_schema_text(self, table_name: str, schema_info: dict[str, Any]) -> str:
         """

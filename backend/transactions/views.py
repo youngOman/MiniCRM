@@ -30,12 +30,12 @@ class TransactionViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return TransactionCreateUpdateSerializer
         return TransactionSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(created_by=self.request.user)
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer) -> None:
         serializer.save(updated_by=self.request.user)

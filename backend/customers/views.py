@@ -60,7 +60,7 @@ class CustomerViewSet(viewsets.ModelViewSet):
 
         # 使用 Django ORM 的聚合功能計算每個客戶的總消費額和總訂單數
         # 這樣就可以在資料庫層面進行排序，而不需要在 Python 層面處理
-        queryset = queryset.annotate(
+        return queryset.annotate(
             # 計算總消費額：將該客戶所有訂單的 total 欄位相加
             # 使用 Coalesce 處理 NULL 值，如果 Sum 結果是 NULL（沒有訂單）就設為 0
             annotated_total_spent=Coalesce(
@@ -73,35 +73,33 @@ class CustomerViewSet(viewsets.ModelViewSet):
             annotated_total_orders=Count("orders"),
         )
 
-        return queryset
-
     def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return CustomerCreateUpdateSerializer
         return CustomerSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(created_by=self.request.user)
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer) -> None:
         serializer.save(updated_by=self.request.user)
 
     @action(detail=True, methods=["get"])
-    def orders(self, request, pk=None):
+    def orders(self) -> Response:
         customer = self.get_object()
         orders = customer.orders.all()
         # Import here to avoid circular import
-        from orders.serializers import OrderSerializer
+        from orders.serializers import OrderSerializer  # noqa: PLC0415
 
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     @action(detail=True, methods=["get"])
-    def transactions(self, request, pk=None):
+    def transactions(self) -> Response:
         customer = self.get_object()
         transactions = customer.transactions.all()
         # Import here to avoid circular import
-        from transactions.serializers import TransactionSerializer
+        from transactions.serializers import TransactionSerializer  # noqa: PLC0415
 
         serializer = TransactionSerializer(transactions, many=True)
         return Response(serializer.data)

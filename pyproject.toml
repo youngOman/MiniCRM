@@ -213,6 +213,18 @@ max-statements = 50 # default is 50
 docstring-code-format = true
 skip-magic-trailing-comma = false # 預設就是 false，當你想要消除尾隨逗號時候可以暫時開啟
 
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "decouple.*",
+]
+ignore_missing_imports = true
+
 [dependency-groups]
 dev = [
     "mypy>=1.17.1",

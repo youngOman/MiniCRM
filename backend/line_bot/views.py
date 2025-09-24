@@ -70,18 +70,18 @@ except Exception as e:
 user_processing_status = {}
 
 
-def show_loading_animation_sync(user_id, loading_seconds=10):
+def show_loading_animation_sync(user_id, loading_seconds=10) -> None:
     """
     顯示 LINE 官方載入動畫 (同步版本)
     """
 
-    def run_async_loading():
+    def run_async_loading() -> None:
         try:
             # 在新的事件循環中運行異步函數
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
 
-            async def show_animation():
+            async def show_animation() -> None:
                 async_api_client = None
                 try:
                     # 在此處初始化 async API
@@ -100,9 +100,9 @@ def show_loading_animation_sync(user_id, loading_seconds=10):
 
             loop.run_until_complete(show_animation())
             loop.close()
-            logger.info(f"已顯示載入動畫給用戶 {user_id}，持續 {loading_seconds} 秒")
+            logger.info("已顯示載入動畫給用戶 %s，持續 %s 秒", user_id, loading_seconds)
         except Exception as e:
-            logger.error(f"顯示載入動畫失敗: {e}")
+            logger.error("顯示載入動畫失敗: %s", e)
 
     # 在背景執行緒中運行
     threading.Thread(
@@ -131,9 +131,9 @@ def send_processing_message(reply_token, user_id) -> None:
         # 然後顯示載入動畫 (必須是5的倍數)
         show_loading_animation_sync(user_id, 10)
 
-        logger.info(f"已發送處理訊息並啟動載入動畫給用戶 {user_id}: {message}")
+        logger.info("已發送處理訊息並啟動載入動畫給用戶 %s: %s", user_id, message)
     except Exception as e:
-        logger.error(f"發送處理訊息失敗: {e}")
+        logger.error("發送處理訊息失敗: %s", e)
 
 
 def is_user_processing(user_id):
@@ -143,7 +143,7 @@ def is_user_processing(user_id):
     return user_processing_status.get(user_id, {}).get("processing", False)
 
 
-def set_user_processing(user_id, status):
+def set_user_processing(user_id, status) -> None:
     """
     設定用戶處理狀態
     """
@@ -185,8 +185,8 @@ def webhook(request):
     signature = request.META.get("HTTP_X_LINE_SIGNATURE", "")
 
     # 記錄接收到的請求
-    logger.info(f"收到 LINE Webhook 請求: {body}")
-    logger.info(f"Signature: {signature}")
+    logger.info("收到 LINE Webhook 請求: %s", body)
+    logger.info("Signature: %s", signature)
 
     try:
         # 驗證簽名並處理事件
@@ -201,7 +201,7 @@ def webhook(request):
     return HttpResponse("OK")
 
 
-def process_user_query_async(user_id, user_message, reply_token):
+def process_user_query_async(user_id, user_message, reply_token) -> None:
     """
     非同步處理用戶查詢
     """
@@ -284,7 +284,7 @@ def format_response_message(rag_response, user_query):
     return formatted_response
 
 
-def handle_error_response(rag_response):
+def handle_error_response(rag_response) -> str:
     """
     處理錯誤回應
     """
@@ -293,13 +293,13 @@ def handle_error_response(rag_response):
 
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_text_message(event):
+def handle_text_message(event) -> None:
     """處理文字訊息"""
     user_id = event.source.user_id
     user_message = event.message.text.strip()
 
     # 記錄收到的訊息
-    logger.info(f"收到使用者 {user_id} 的訊息: {user_message}")
+    logger.info("收到使用者 %s 的訊息: %s", user_id, user_message)
 
     # 防呆機制：檢查用戶是否正在處理中
     if is_user_processing(user_id):
@@ -311,7 +311,7 @@ def handle_text_message(event):
                     quick_reply=create_quick_reply_menu(),
                 ),
             )
-            logger.info(f"用戶 {user_id} 處理中，已發送等待訊息")
+            logger.info("用戶 %s 處理中，已發送等待訊息", user_id)
             return
         except LineBotApiError as e:
             logger.error(f"發送等待訊息失敗: {e.message}")
@@ -327,19 +327,19 @@ def handle_text_message(event):
                     quick_reply=create_quick_reply_menu(),
                 ),
             )
-            logger.info(f"用戶 {user_id} 訊息太短，已提示")
+            logger.info("用戶 %s 訊息太短，已提示", user_id)
             return
         except LineBotApiError as e:
             logger.error(f"回覆訊息失敗: {e.message}")
             return
 
     # 特殊指令處理
-    if user_message.lower() in ["help", "menu", "選單", "幫助"]:
+    if user_message.lower() in {"help", "menu", "選單", "幫助"}:
         try:
             help_message = """🤖 **智慧客服小幫手**
             我可以幫您：
             ❓ 解答常見問題
-            📚 查詢知識庫資訊  
+            📚 查詢知識庫資訊
             🎫 查看工單狀態
             🆘 聯繫人工客服
 
@@ -351,7 +351,7 @@ def handle_text_message(event):
                     text=help_message, quick_reply=create_quick_reply_menu()
                 ),
             )
-            logger.info(f"已發送幫助訊息給用戶 {user_id}")
+            logger.info("已發送幫助訊息給用戶 %s", user_id)
             return
         except LineBotApiError as e:
             logger.error(f"發送幫助訊息失敗: {e.message}")
@@ -376,15 +376,15 @@ def handle_text_message(event):
     )
     processing_thread.start()
 
-    logger.info(f"已開始處理用戶 {user_id} 的查詢: {user_message}")
+    logger.info("已開始處理用戶 %s 的查詢: %s", user_id, user_message)
 
 
 # 處理貼圖訊息
 @handler.add(MessageEvent, message=StickerMessage)
-def handle_sticker_message(event):
+def handle_sticker_message(event) -> None:
     """處理貼圖訊息"""
     user_id = event.source.user_id
-    logger.info(f"收到使用者 {user_id} 的貼圖")
+    logger.info("收到使用者 %s 的貼圖", user_id)
 
     try:
         # 回應一個友善的貼圖
@@ -401,7 +401,7 @@ def handle_sticker_message(event):
                 ),
             ],
         )
-        logger.info(f"已回應貼圖給用戶 {user_id}")
+        logger.info("已回應貼圖給用戶 %s", user_id)
     except LineBotApiError as e:
         logger.error(f"回應貼圖失敗: {e.message}")
 

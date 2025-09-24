@@ -112,7 +112,7 @@ class ServiceTicketDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["ticket_number", "created_at", "updated_at", "created_by"]
 
-    def get_response_time_display(self, obj):
+    def get_response_time_display(self, obj) -> str | None:
         """格式化首次回應時間"""
         if obj.response_time:
             total_seconds = int(obj.response_time.total_seconds())
@@ -121,7 +121,7 @@ class ServiceTicketDetailSerializer(serializers.ModelSerializer):
             return f"{hours}小時{minutes}分鐘"
         return None
 
-    def get_resolution_time_display(self, obj):
+    def get_resolution_time_display(self, obj) -> str | None:
         """格式化解決時間"""
         if obj.resolution_time:
             total_seconds = int(obj.resolution_time.total_seconds())

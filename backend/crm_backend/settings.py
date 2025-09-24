@@ -32,10 +32,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-your-secret-key-here")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = config("DEBUG", default=True, cast=bool)
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-# ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1']
+# ALLOWED_HOSTS = ['minicrm.akebee.com', 'localhost', '127.0.0.1']  # noqa: ERA001
 ALLOWED_HOSTS = ["*"]
 
 
@@ -97,25 +96,8 @@ WSGI_APPLICATION = "crm_backend.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# MySQL 設定 (舊版，已改用 PostgreSQL)
-# DATABASES = {
-#     "default": {
-#         "ENGINE": os.getenv("DB_ENGINE"),
-#         "NAME": os.getenv("DB_NAME"),
-#         "USER": os.getenv("DB_USER"),
-#         "PASSWORD": os.getenv("DB_PASSWORD"),
-#         "HOST": os.getenv("DB_HOST"),
-#         "PORT": os.getenv("DB_PORT"),
-#         "OPTIONS": {
-#             "charset": "utf8mb4",
-#             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-#         },
-#     }
-# }
-
-# PostgreSQL 設定 (新版)
+# PostgreSQL 設定
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
@@ -227,8 +209,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# 允許所有來源 (開發環境用)
-# CORS_ALLOW_ALL_ORIGINS = True
+# 允許所有來源 開發階段用
+CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOW_CREDENTIALS = True
 

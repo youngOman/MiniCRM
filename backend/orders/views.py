@@ -27,14 +27,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering = ["-order_date"]
 
     def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
+        if self.action in {"create", "update", "partial_update"}:
             return OrderCreateUpdateSerializer
         return OrderSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         serializer.save(created_by=self.request.user)
 
-    def perform_update(self, serializer):
+    def perform_update(self, serializer) -> None:
         serializer.save(updated_by=self.request.user)
 
 

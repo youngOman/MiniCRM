@@ -85,11 +85,11 @@ class Customer(models.Model):
             models.Index(fields=["is_active"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.first_name} {self.last_name} ({self.email})"
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
         return f"{self.first_name} {self.last_name}"
 
     @property
